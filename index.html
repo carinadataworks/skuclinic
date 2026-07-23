@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<!--
+  Margin Pilot — Ad Spend Profit Optimizer
+  Version 1.0 — July 2026
+  Created by Kyle Guy
+
+  © 2026 Kyle Guy. All rights reserved.
+  Shared for internal use and evaluation. Redistribution, resale, or use outside
+  of this purpose requires written permission from the author.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Margin Pilot — Ad Spend Profit Optimizer</title>
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAMf0lEQVR4nO2dfWwT5x3Hf2f7fHFwEkISAwuQBkgJ0PAiaAKMriVCiIHoVlE2KExTh7ZRrdqmlb22WtVt7dR1UysmtftjGqBqghU2hDTWFUpR0QqIJStaCQFKgMDCi/NuJyT2nc/74ybjxT7n7vzc3fM8/n3+S+TE57uPv7/n7Z4TkskkIEg2PG4fAEIvKAeiC8qB6IJyILqgHIguKAeiC8qB6IJyILr43D4AdwhtOWz2T8L7vmDHkdCMwP0IqQUPjMO3MXzKMa4QYvUys/9T7jqT+wX8icKPHHpCWPDAOHrG8CEK83JkdcJWIfTIKgrTlrAqR6YTrgihR6YoLFrCnhxjtKDKiUzGWMKWIszIwZYTmbBoCQNysK5FOmwpQrUcPGmRDiuK0CtHuhncaJFOuiJ0+kGjHNxrkQ7NitAlR0FpkQ6dilAkR8qMgtIinZQilPhBhRwFGxiZUBUh7suBgZEJJRHi8mIfNCMrqbNh63qDcXEtOVALI7gbIe4kB5phEHcjxAU50AxTuOiH02VF+4SohQW0EuNkfXE0OdCMfNDOm5P54VByYCkhhZNNVCeSA80giJNNENvlQDOI45gf9sqBZtiEM344UVbQDDtw4KzaKAf2TezG7v6LXXKgGc5gqx+2yIFmOIl9fpCXA81wHpv8ICyHu1PMCNnzb0tZwdhwHjvOOUk5sKC4C/HiQkwONIMGyPpBZuKN6ZHQFbP9B3aUZ/5+8Uvd4ajq/PHkCcGZOZJlhUUzAEBw+wDIQvAqEJCD9YIicGYHueKSrxwc9F25c+M+eV4dMmWF3dgAHpMDCF2RvORgvaBoeHiUA0gUF9zBmM/kIIJ1OfiIDQAQ+G115BkeFuXgoB16H27duI+165VXWeEgNoB3N/K5RlZGSNkdDxW9woOTvfOrxdoKb3W5d2qZp6zYEyrxVJVk+ZLEleTASHLwnjo4khwcUbujajiqhiNqOKreGUz8pz8Rjqpub1FgCMtjptafmsCQGZ+Z6N2wUHpsjtRYKxaJRpPC7xNCJUIomzcaciLZ1a/e7E9c605cCSsd3cqVcKJrIEGbMWL1snE3bs+K6eRgKDYEAZrrpW8+Wrxilt+xLsn2PQN/Px9z6M0MYy08LCYH/WYsqRF/9sWSRdNFtw+ECqyFB4cP4/F54UefD+54dAIOYOSJud4K/WMbJUXCvq+XP/MYmjEWC2MeXCVHQBT2f6N80QwsJWQwkRz0x8aup8rQjByYDQ9+5lY2NwbWNUhuHwVXcCJHsV/48bqg20fBG0bbHJTXlK1NgcqgOdFbO+VjbbFzN+WpE72vf7k08wXLX+kBgMoST1XQU1XqqQv55k711U/xVZh8I6rQ+rShLYeNDHhw0iDd3BQw/uKObmXnO5Gz12Ttx+Wz/FlfNionw1H1Rl9izO9DJZ6GaeIjdf5H6vxzpvg47hbxIMe0cm/9FKMfpP22svHN/sER68vKw1H1eHvseHsMACqDns/O9q9fULR6nl/y8aaJoXNKeU1ZNtNED+U7+wbzMWMMPUPq4XOjh8+NBiVhbYP0xOKAPDZoqMN4ZeEhOeomG/0UF24pbbcUO45hKJY82DJ6sGXUjn/uFgy3rVJMK/cafGVnRgMCyQEPcgQlo8Xe+CsRMCIH5Q0OABANtwQXTRd9RlOGZwwOlfKQHKOy0SUpJUXC1qZiWw+GJ3iQo2/YRO/jxceDq+qzD2wgY+BBjsxxqhxIPuHt7eW/+VLpHMNDIwXLOCeI/gYHAJzvMtc7FQTY3BjY3Bjo7E3887qsqpSt+XQEI6MdPHx7Wq7HlQRYaGnWVHhrKnT/bM186ew1uaNbSbC3SQcZeJAjMpI8eTnWPJfwfP2rT5YCQExJXr6rnO9SWq/LLZ3yp3dtGUOjEx7kAIDdp0aIy6Eh+YSGarGhWtzSGACAcET98HLs2IX48faY8V4So3AixwftsdZOeUmN7cvAQqWeTUsDm5YGhmPJdz+J7T5179wN2e43dQseeisaPzgQcfKrPEESnlxadOTbkw59a5LepD/r8CPHxTvKzncizt9t1lgrHnym/HdfKTO72oh+ct3xxkQ/dgyblgZ+vanUlTHycETdvnfgX50sVZncDxXkTfYDLSMb3+q76cbsa6jUc2BHOU8lhjc5AKDlurzqtd5dx4fvxZ2uMUWisPvpiQ9UcjK5x6EcADAiJ199d2jZKz1vHBt2eKPZkiLhrW1lfOwzxqccGr1D6mvvDT38i+6ndw8c+ng0OupQkCyYJm5uNLHgmVo4GefIgZKAo22xo20xnweWPuBfWedvqhUXzRCL/TZ+u59tnrD/7Ajrkzb8y5FCUeHM1fiZq3EA8Hpgdsj3ULVv3lTx4VqR+OhZTYV3ZZ3/5OU42X/rMDyXlRwkVLh0R/lz6+jP/xr95d+G7HiLtQ8xf29mASWHWdbv6isvFhqmiZ+r8zfN9JttY65gv0+Lcuhyqz9x7oZ64mJ81/vDNRXe768NPrG4yPifzwr5JkjCcIzhdkeBlhWzdPYmnv3j4MtHTBQgjwAzJrE94IFymODNE8OnO0y0MadORDkKib2nRoy/uITx22RQDnO0mplXkwzveUonKIc5eoZMDMbLCsOtUeBDjp+sD25bHvA58lGKzIyWOT/zRxYe5Jha5n11Y+nJH1ZubQrYvUnGzEoTnf87EbbXreeSQ1sDYm3bbOepqfD+alPp2Rcqv7dmwpQyu6Rft8DEuOf1Hqpv6s+90gf4SI50KoOe59YEzz5f9fb2iRsWFpGdXaub7Nu+0uitttd6EgR3iXEFPkdIvR5onis1z5ViSvLDS/EPLsZOXZE7uvO65WRlnf+3T5UZf+jCR1fYnnUDXuVIIfmENfOlNfMlAAhH1X/flNtuKe23lRt9iRu9if57ub7ZoleoCHpmTPIumi5uWCQ11ZqbKzl8jvldfjiXI51QiWf1PGn1vPuNBjmRHLiXVHSWXZx9odLye3V0K2fMjKXSSQHJkYnoFapKbOndvH50mPWVPsBfg5QG/vFp/NDHzNcUGFcOtnqzNBCOqN/dH3H7KMZn3H4sYHKQJTKS/OofBm4PUj28YZyCbnOQ5c6guu33/e23+dmjgQc5Xjwc/aRL3tIYeNDwbrXEea8t9tyfIrn7xsxh6OmQrNw0u6RG3NIUeHxh0QQHF1Jcvqu8fGTo/QvUPREyB0YaHMBHcqRo7ZRbO+Xn/xJdMVtcVS8110u1tt2ZqKhw8lJs7+mR4+0x2h4kSwqu5NCIKckTF+MnLsZ/CtGaCu+qemnxdHF+ta8u5Mv/7vtwRD19NX7ycvxoW8zUFpcswqEc6XT2JvZ8dG8PAKQ/q7zSO7n0f4/YqQp6K4OerNLc6Ev0RNXeYbWrP9HZl+gIJ853yXcZn4U3hdEnUrPS7LDA6nnS3q9NzPz94pe6Hb4J2xkMNjgAxzkAgNcWQ/6gHIBu6GFUDp7H0QvJDuM1BTA5ACBZUHaYAeXANocuJuTgubIUBqZqCmByACaHPubk4DI8CsQNs7EBmByAyaGPRTl4Co9CcMPa9TIth6lcYoLCSQ6z1856WeEmPLh3w/KVsiIHZ+FRIMlh4arlNWUvd53hYJ72dEe8euddt4/CLvIJeItlhbPw4B5r18t6m4PLMQ/OsDC2kQ6OcyC65CUHhgfN5BkbQCo50A/aIHJF8pUDW6Y0k+fVIZAcWFxoI/+CokGyQYp+0ADBq0BGDiwutEHkihBLDiwuNECqoGiQLCvoh7uQNQNsGgRDP5zHjnNOWA5sfLgL2fNPPjmwuDgP8YKiYUtZQT+cxCYzwL6JN/TDGewzA2ydlUU/7MZWM8CZKXv0ww4cOKv2ypGSGv0gS+p82to9tD050A/iOGMGOFNW0A+COGYGGN8TjAgcbyzmDHa3QMfg6BpS7L/kg8NmgMPJoaHlB2CEGMbJUpKOC6vPsQliCrfMALduTUA/DOKiGeBKWUkHS4we7mqh4fJNTRghWaHBDHA9OTRS+QEFHyHpXxLXF8dQIYcGlhhKAiMFRXJAAUcIVYGRgi45NApKETq10KBRDg3uFaFZCw165YD/9wM4UmRM14xOM4ByOTR4UoQVLTQYkEODdUXY0kKDGTlSsGUJi06kYE8OjTGKAGWWZA74sqWFBqtypMi0BFwSJesMAItOpGBejhRZLQGbRdGbEmLaiRT8yJGOnigpLBgz7tQgH0Kkw6cc6YwrSj7wJ0Q6/MuRFQvG8O1BVgpUDsQIuIMxogvKgeiCciC6oByILigHogvKgeiCciC6/BcWYGmLhTVweAAAAABJRU5ErkJggg==">
+<link rel="apple-touch-icon" sizes="167x167" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKcAAACnCAIAAAD7dNu7AAALjElEQVR4nO2deWwU1xnAv5mdvVl7jWFt2FDA2DGHzdGk1HFKiWjUlCOiTa0KpIQiFSqRROqhVknVKlKrVhWpKiWpUjUJUhuJEFWQBJASSkOhCSpHUMGAAQM+QoyxsWN8rI89Zmf6x6irza539+3sezPvzbzff9iLd/b93ve97x0zK6iqChybIZp9ARwT4NbtCLduR7h1O8Kt2xFu3Y5w63ZEMvsCiBPaeqjY/zLw9mYSV0IPgsVWaXQ4RsFi/YB56wU1O8NNxf7NRO+Z/C9gvROwaj2XbB2OUcjVDxjVz5j1bNmENOcnuxOwpZ8N65TIzoZR/bRbz/BNiexsMvRT7p5e66z4TocV9zRaT/fNhOxs0vVT6J4u6xbwnQ617mmxbjHf6VDongrrKeUW851Oyj0N4k22buEQz4aeoDfTuh1CPBsagt4c6/b0nY657k3YX+fKIe2zE9okzI/R1rnyFCaKNy7Dc9+5MD7bGxTrXHkejA96I6xz5QUxWDxx61w5IkaKJzuuax+A+y4KbZgnOsYTjHWuXB9aixGNeFLWufJSIC2eiHWuvHSIisdvnSvHBTnxmK2bsr5oebC3Kk7rfJKGHULTOfwZnivHC4n2xGadD+fkwD7A47HOlZMGr3gM1nkFZyRYWhtbhueBThqMLVzqOjxzuX1bs/f3T5Rl/PDn+8f2nZ0y5XqKBcsqfUmxzpxyABBAMPsSSgLLAG+759IIbEvHg37rLAY6AOORDgA4wl2ndXbrdivFum4LJWV45gIdAERLWC+x5fVYZzS3a1hCOkBped521Zx1tJdA0daZDnSw1riuO9xtF+sWkq6f4tbmmAv0UEBsuM95f5VjXoVjTtBR7hUWzpKqyjL7upyEu5Fk/6jSP5q8M6p0DcqdA8mOAfnumGLKZReFjtU6Cz5HVhSguda1sdGztt41v9KB8l8kB4SDjnDQAeBM//l4TL1yJ3Hptnz5duJij9w5KFPwjAcMFBHr9Ae63y082eTdscY3N4gku1hGJpXTXYnTHfFTnfH2fop6QLHhbp1Yb3nA88tNgVCAYKUS9InrG9zrG9wA8Pif7p2/lSD3XkRBbSOaF+MCHuH1bcGXt5YTVU4/6I6KayYK0/vsgPjO0zM3LnebfSFmUqwXtoPD5xL27qhYNtc645QxIFmnto7b3VLWEObKAYpcsWE41tctdj/xZY/ZV8EkDFt/bv0Msy+BVQqnRzrT+1cWOIvK7a09iQ8uxS70JL5W6/rRo/6M3z7/ztixq/GqMjFUJlaXi0uqnQ1haclcyetkaQHXGW5K9J4JbT1UcOLO6qC4eRVqbh+MKD/bP3bsakz7Z33VNB85qUDfaLJvNPn/H0wBgCjAopDUvMi1brGrudblc7HUA/LDqvWHa10oL4tE1e/+ebhzUNbxFooKN+/KN+/Kb56adElCU41z43LP5pWegId5/QXGdTrTu1sS6kJI/fWlY+P6lGcQl9WPb8SfOzC28teDz741evJmXKFyXwaxkmcy1udXOhC3yY9cjuF962hCfe9C9L0LUbx/1mCYrOGDPtQcOzROZUiaDZPWPcil9Wx7r8zngslGSSQLv0bjG0tsvT6fi3zW6SzlACASRc3bz6zz220jDqWgY7JFeodRrYcC4v5dFUv59swXYbI5hieVgYiCGMS1IenoTyo/vBp7/1L0XHfCSmdkdcOkdQA41x3fuBx1eU4U4LFl7seWuQGAnmNPJsKq9SOXY+jW05k21n/7ncD3m33X+hLX+uQrd+SLPYlI1Mq9g1nrbbF7E8pMP566xC0JDWEptZ2jqHCjXz7ZEf/oeuw/HYm4bLUekPOMLLUFfIpdj/h/tYn4Zmskqh5ti+07O3W2O076vTCS/9QskzW8xhsnJ67cwbDGnp+AR2h50PPuMxUf/rRyfYPbGsUgw9blJOx8c8SwNdelc6U924MHdlXUzCZy2N5IGLYOALeGkt/7y3D/qHGL7U01rn/8uHJDI9tLfmxbB4D2fvlbLw2daDdu0PW7hde2Bb+NfKyDQpi3DgCDEeXJPcO79o5++jnyAn1piAK8tKVsxTxn4ZdSiRWsaxxuja598fOn946e+9SIG5GcDuHlLWUSm+3H6nx9WmQFDrVGD7VG51c6Nq/yfHOpe8U8J7kH0dRVSVtWe/eeYePxhOlYynqKW0PJV45NvHJsosInNtU4Vy90rfySc+lcaYYbcxfYscbHrVPH8KRypC12pC0GAIIAC2c5fvh1/1MPeXH9/boqafEcqb2P+LIBXtgcl3ShqtA1mLzeP42h053x49did0b0FIOP1COd1qUKi8c6Iu+ej2pPD55f6Wh5wPuDNd5yL2o8rGKwkrdRrKNwayj5x3+Or31x6GIP6kRg4Wz2Iodbn4bBiLL9ryOTcaSttuqsZxvRD3tXbAwDY8rhVqRD7zMYvBWGW8/Jhc+QkrzTwa1biJEppAw/hTYQUEVO69qGvLY5TxsNYem1p8obw2SL5wq0O2xGpqi7vabgg8jYqz8BwCEKm1Z4Nq3wnOqI/+3U1NG2qEyg5ZtqkCbinw0ZtOWDESatp2iudTXXugYigUOt0YPno63I062C1FdLm9BOY7aRP8+DHbata4QC4s41vp1rfL0jyX9djR9vj33SnRgtIfGunOfcs71cQjsyc6qDpfN0GlawniIcdGxr9m5r9qoq3LgrX7qdaO+Xb/Qne4aTvcPJPPNvUYByrzgnKDaGnRsa3Y8udSPu1I1Nqf++zq3TgSBAfbVUX/2FTzcRUyNR1TFd/bq7pWx3i543+vu5KRbPTeebudFcxuvA7xaqy0WM9zaPx9RXT0zg+mu4QHmSMJ+v6+c3hyODEeqmbShw6zp5+5Optxj5ks9suHU9HPhv9PkDY2ZfhX6sWc2RQ07CH46Ov3pigul7Ywt/FwSFN7wJAqxe4Hp8pXtjoydk4Ebnma74CwcjBtxmpRvEL4VgMtZVFc52x892x184GPlqjWtDo/vhWtf9VRKhm9CSCnx0Pfb6x5Mnb7I3NZ8WJq2nUFQ43Rk/3RkHgJl+8aFFzqYa14MLnHVVGB4BG4mqZ7riJ9rjH1yOMlqr5wLp234oTPL5EQS4r8JRF5LqqhwLZ0mzAuJMv1DpF2f6xaBPzF53G5lU+keVoQmlb0S5dU/uGky29cpdg7LC1OCN/p0/bMd6LlQVeu4le+4lj7dn/urZdf5fbMi86/1374/vY3YapgPbzdyYrr1xgWTdSkuzVpVe1Fe68Vi3I8VZt0C4q1aM9mK9oFov6stfacbCsY7uyH4Z3uwLoIEirFujprNerOv4Jm7bxToPdijWugXC3WLSdQQ62DDWrZfhdVC0ddbD3UrS9QU68Fi3J0h7btkwtwtnPXQHOpQY6+zmedYpseV1WrfMUh3T6LagP9ZZL+vYpZTcrmG7ao4DJVrn4W48pQc6lB7rXLyRYFEOGDM8F08ajC2MwTqv540ES2vjiXWe50mDK7drYMvwXDw58CoHEjM3Lh4vJNoTp/VUZ+TicZFqSbzFE+ZY55UdCbC3Kv4Mzwd4XGAfzlMQWZHl4kuHnHIgtw7PxZcCUeVAdPeFi9cHaeWg+ywNOtqpG+AHbxAgVLFnQ3ynlU/nEDFMORizv87FF8RI5WDYqQouPg8GKwcDxvUM+DCfjvG+NYw+QcWDPoVZysGUc3NcPJiqHIzP8OnYM9ub61vDTOuQJh5s4D49t5m7TWWydQ07BD0NIZ6CCutg6aCnJ8RT0GJdw2LuKfStQZd1DQu4p9a3Bo3WNdLdAyP6M+aiFPrWoNe6BivuWfGtQbt1jQz3QI3+7IUmyn1rsGE9BSX6GZWdgjHrKbL1axDqBLkWj9mSnYJV6yly6U+hox8U3CBgVHYK5q1nULAT6IN1zRlYzXo2OvqBxRxnY33rnGz4c2nsCLduR7h1O8Kt2xFu3Y5w63aEW7cj/wMqlQzfJPoIFwAAAABJRU5ErkJggg==">
+<link rel="apple-touch-icon" sizes="152x152" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" sizes="120x120" href="data:image/png;base64,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">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Margin Pilot">
+<meta name="theme-color" content="#1A73E8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%231A73E8'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold'%3E%24%3C/text%3E%3C/svg%3E">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F8F9FA; --surface-3:#F1F3F4;
+    --border:#DADCE0; --border-light:#E8EAED;
+    --text:#202124; --text-dim:#5F6368; --text-faint:#80868B;
+    --blue:#1A73E8; --blue-dark:#1558B0; --blue-bg:#E8F0FE;
+    --green:#188038; --green-bg:#E6F4EA;
+    --amber:#B06000; --amber-bg:#FEF7E0;
+    --red:#C5221F; --red-bg:#FCE8E6;
+    --shadow-1:0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+    --shadow-2:0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:transparent;color:var(--text);font-family:'Roboto',Arial,sans-serif;font-size:14px;}
+  .app{max-width:1320px;margin:0 auto;padding:24px 20px 60px;}
+
+  .hero{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:20px;margin-bottom:18px;flex-wrap:wrap;gap:14px;}
+  .hero h1{font-family:'Google Sans',Arial,sans-serif;font-weight:500;font-size:26px;margin:0 0 6px;letter-spacing:0;color:var(--text);display:flex;align-items:center;gap:10px;}
+  .hero h1 .dot{width:11px;height:11px;border-radius:50%;background:conic-gradient(from 180deg, #4285F4, #EA4335, #FBBC04, #34A853, #4285F4);display:inline-block;}
+  .hero p{margin:0;color:var(--text-dim);font-size:13.5px;max-width:540px;line-height:1.5;}
+  .hero-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .save-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px;font-size:12.5px;color:var(--text-dim);}
+  .save-bar .stamp{padding:6px 12px;background:var(--surface-2);border-radius:16px;color:var(--text-dim);}
+
+  button{font-family:'Google Sans',Arial,sans-serif;font-size:13px;font-weight:500;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--blue);padding:9px 16px;cursor:pointer;transition:.15s;}
+  button:hover{background:var(--blue-bg);border-color:var(--blue-bg);box-shadow:var(--shadow-1);}
+  button.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+  button.primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);box-shadow:var(--shadow-1);}
+  button.small{padding:6px 12px;font-size:12px;border-radius:14px;color:var(--text-dim);}
+  button.small:hover{color:var(--blue);}
+  input[type=file]{display:none;}
+
+  .panel{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:20px 20px 16px;margin-bottom:16px;box-shadow:var(--shadow-1);}
+  .panel h3{font-family:'Google Sans',Arial,sans-serif;font-weight:500;font-size:16px;margin:2px 0 6px;color:var(--text);}
+
+  .field-row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;}
+  .field{display:flex;flex-direction:column;}
+  .field label{font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:500;letter-spacing:.02em;}
+  .field input{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;width:112px;}
+  .field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 1px var(--blue);}
+
+  .assumptions{display:flex;gap:22px;flex-wrap:wrap;align-items:center;padding:14px 20px;background:var(--blue-bg);border:1px solid #C5DAFC;border-radius:12px;margin-bottom:16px;}
+  .assumptions .note{font-size:12px;color:var(--text-dim);max-width:440px;line-height:1.4;}
+  .assumptions .field input{background:#fff;}
+
+  .summary-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .stat{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow-1);}
+  .stat .label{font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--text-dim);margin-bottom:6px;}
+  .stat .value{font-family:'Google Sans',Arial,sans-serif;font-size:22px;font-weight:500;color:var(--text);}
+  .stat .value.pos{color:var(--green);} .stat .value.neg{color:var(--red);}
+  .stat .delta{font-size:11.5px;margin-top:4px;font-family:'Roboto Mono',monospace;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{text-align:left;font-size:11px;font-weight:500;color:var(--text-dim);padding:10px 8px;border-bottom:2px solid var(--border-light);white-space:nowrap;position:sticky;top:0;background:var(--surface);}
+  tbody td{padding:7px 8px;border-bottom:1px solid var(--border-light);vertical-align:middle;white-space:nowrap;}
+  tbody tr.main-row:hover{background:var(--surface-2);}
+  td input{background:transparent;border:1px solid transparent;color:var(--text);font-family:'Roboto Mono',monospace;font-size:12.5px;width:100%;min-width:58px;padding:5px 6px;border-radius:6px;}
+  td input:hover{background:var(--surface-3);}
+  td input:focus{outline:none;border-color:var(--blue);background:var(--surface);box-shadow:0 0 0 1px var(--blue);}
+  td.calc{font-family:'Roboto Mono',monospace;color:var(--text-dim);}
+  td.calc.hot{color:var(--text);font-weight:500;}
+
+  .gauge-wrap{display:flex;align-items:center;gap:7px;}
+  .gauge{width:52px;height:6px;background:var(--border-light);border-radius:4px;overflow:hidden;}
+  .gauge i{display:block;height:100%;border-radius:4px;}
+
+  .badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap;}
+  .badge.up{background:var(--green-bg);color:var(--green);}
+  .badge.hold{background:var(--amber-bg);color:var(--amber);}
+  .badge.down{background:var(--red-bg);color:var(--red);}
+  .badge.wait{background:var(--surface-3);color:var(--text-dim);}
+  .badge.stock{background:var(--blue-bg);color:var(--blue-dark);}
+  .conf{font-size:10.5px;font-weight:500;padding:3px 8px;border-radius:10px;}
+  .conf.low{background:var(--red-bg);color:var(--red);}
+  .conf.med{background:var(--amber-bg);color:var(--amber);}
+  .conf.high{background:var(--green-bg);color:var(--green);}
+
+  .row-del{background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;padding:0 6px;line-height:1;}
+  .row-del:hover{color:var(--red);}
+  .adv-toggle{background:none;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;font-size:11px;font-weight:500;padding:5px 10px;border-radius:14px;}
+  .adv-toggle:hover{color:var(--blue);border-color:var(--blue);background:var(--blue-bg);}
+
+  tr.advanced-row td{background:var(--surface-2);padding:18px 20px;border-bottom:1px solid var(--border-light);}
+  .adv-grid{display:flex;gap:32px;flex-wrap:wrap;}
+  .adv-col{min-width:220px;}
+  .adv-col h4{font-size:11px;font-weight:500;letter-spacing:.02em;color:var(--text-dim);margin:0 0 12px;text-transform:uppercase;}
+  .adv-col .field{margin-bottom:9px;}
+  .adv-col .field label{font-size:10.5px;}
+  .adv-col .field input{width:130px;font-size:12px;padding:6px 8px;background:var(--surface);}
+  .adv-out{font-family:'Roboto Mono',monospace;font-size:12.5px;line-height:2;color:var(--text);}
+  .adv-out b{color:var(--blue-dark);font-weight:500;}
+
+  .test-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px;}
+  .test-table th{font-size:10px;font-weight:500;color:var(--text-dim);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border);}
+  .test-table td{padding:5px 6px;border-bottom:1px solid var(--border-light);}
+  .test-table input{width:70px;font-size:12px;padding:5px 6px;background:var(--surface);}
+  .test-table tr.best td{background:var(--green-bg);}
+  .test-table tr.worst td{background:var(--red-bg);}
+
+  .add-row-bar{padding:12px 0 4px;}
+  .foot-note{color:var(--text-faint);font-size:11.5px;margin-top:8px;line-height:1.5;}
+  .table-scroll{overflow-x:auto;padding-bottom:10px;}
+  ::placeholder{color:var(--text-faint);}
+
+  .mode-btn{background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-size:12.5px;}
+  .mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .mode-btn:hover{box-shadow:none;}
+  .mode-btn.active:hover{background:var(--blue-dark);}
+
+  .impact-compare{display:flex;align-items:center;gap:18px;margin:18px 0 10px;flex-wrap:wrap;}
+  .impact-card{flex:1;min-width:200px;background:var(--surface-2);border:1px solid var(--border-light);border-radius:12px;padding:18px 20px;text-align:center;}
+  .impact-card.after{background:var(--blue-bg);border-color:#C5DAFC;}
+  .impact-card-label{font-size:12px;font-weight:500;color:var(--text-dim);margin-bottom:10px;}
+  .impact-card-sales{font-family:'Google Sans',Arial,sans-serif;font-size:26px;font-weight:500;color:var(--text);}
+  .impact-card-sub{font-size:11px;color:var(--text-faint);margin-bottom:8px;}
+  .impact-card-profit{font-family:'Roboto Mono',monospace;font-size:16px;font-weight:500;padding-top:8px;border-top:1px solid var(--border-light);}
+  .impact-arrow{font-size:24px;color:var(--text-faint);flex:0 0 auto;}
+  .impact-gain-banner{font-family:'Google Sans',Arial,sans-serif;font-size:16px;font-weight:500;text-align:center;padding:14px;border-radius:10px;}
+  .impact-gain-banner.pos{background:var(--green-bg);color:var(--green);}
+  .impact-gain-banner.neg{background:var(--red-bg);color:var(--red);}
+
+  .table-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+  .table-count{font-size:12.5px;color:var(--text-dim);font-weight:500;}
+  .pagination{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);}
+  .pagination button{padding:5px 10px;font-size:12px;border-radius:6px;}
+  .pagination button:disabled{opacity:.4;cursor:default;}
+  .pagination button:disabled:hover{background:var(--surface);box-shadow:none;}
+  .pagination select{border:1px solid var(--border);border-radius:6px;padding:5px 6px;font-family:'Roboto',sans-serif;font-size:12px;color:var(--text);background:var(--surface);}
+  .import-status{font-size:12.5px;color:var(--text-dim);padding:8px 0;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(32,33,36,0.55);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fadeIn .18s ease-out;}
+  .modal-overlay.hidden{display:none;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .modal-card{background:var(--surface);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 32px 24px;box-shadow:var(--shadow-2);animation:modalIn .22s cubic-bezier(.2,.9,.3,1);position:relative;}
+  .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text-faint);font-size:20px;line-height:1;padding:6px;border-radius:50%;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--surface-3);color:var(--text);box-shadow:none;}
+  @keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .modal-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .modal-card h2{font-family:'Google Sans',Arial,sans-serif;font-weight:500;font-size:21px;margin:0;color:var(--text);}
+  .modal-card p{color:var(--text-dim);font-size:13.5px;line-height:1.55;margin:0 0 18px;}
+  .modal-points{list-style:none;padding:0;margin:0 0 22px;display:flex;flex-direction:column;gap:10px;}
+  .modal-points li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text);line-height:1.4;}
+  .modal-points li .pt-icon{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--blue-bg);color:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px;}
+  .modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .modal-actions button{flex:1;min-width:140px;}
+  .modal-skip{display:flex;align-items:center;gap:6px;margin-top:16px;font-size:11.5px;color:var(--text-faint);}
+  .modal-skip input{margin:0;}
+
+  .modal-card.wide{max-width:720px;}
+  .help-nav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 22px;padding-bottom:18px;border-bottom:1px solid var(--border-light);}
+  .help-nav a{font-size:11.5px;color:var(--blue-dark);background:var(--blue-bg);padding:5px 10px;border-radius:12px;text-decoration:none;font-weight:500;}
+  .help-nav a:hover{background:#D2E3FC;}
+  #helpModal section{margin-bottom:26px;scroll-margin-top:10px;}
+  #helpModal h3{font-family:'Google Sans',Arial,sans-serif;font-weight:500;font-size:15px;margin:0 0 10px;color:var(--text);}
+  #helpModal p{font-size:13px;color:var(--text-dim);line-height:1.6;margin:0 0 10px;}
+  #helpModal p b{color:var(--text);font-weight:500;}
+  #helpModal p i{color:var(--text);font-style:italic;}
+  .help-formula{background:var(--surface-2);border:1px solid var(--border-light);border-radius:10px;padding:14px 16px;margin:12px 0;font-family:'Roboto Mono',monospace;font-size:12.5px;color:var(--text);line-height:2;}
+  .help-table{width:100%;border-collapse:collapse;margin-top:8px;}
+  .help-table td{padding:9px 10px;border-bottom:1px solid var(--border-light);font-size:12.5px;color:var(--text-dim);vertical-align:top;line-height:1.5;}
+  .help-table td:first-child{white-space:nowrap;color:var(--text);width:1%;padding-right:16px;}
+
+  .app-footer{text-align:center;color:var(--text-faint);font-size:11.5px;padding:24px 0 8px;}
+
+  .search-box{flex:1;min-width:180px;max-width:320px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12.5px;color:var(--text);}
+  .search-box:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 1px var(--blue);}
+
+  thead th.sortable{cursor:pointer;user-select:none;}
+  thead th.sortable:hover{color:var(--blue-dark);}
+  .sort-arrow{display:inline-block;width:10px;font-size:9px;margin-left:2px;color:var(--blue);}
+
+  tbody tr.main-row{border-left:3px solid transparent;}
+  tbody tr.main-row.stripe-up{border-left-color:var(--green);}
+  tbody tr.main-row.stripe-hold{border-left-color:var(--amber);}
+  tbody tr.main-row.stripe-down{border-left-color:var(--red);}
+  tbody tr.main-row.stripe-stock{border-left-color:var(--blue);}
+  tbody tr.main-row.stripe-wait{border-left-color:var(--border);}
+
+  .toast-stack{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:3000;}
+  .toast{background:#323232;color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;box-shadow:var(--shadow-2);animation:toastIn .2s ease-out;max-width:320px;}
+  @keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .toast.fading{animation:toastOut .25s ease-in forwards;}
+  @keyframes toastOut{to{opacity:0;transform:translateY(8px);}}
+</style>
+</head>
+<body>
+<div class="toast-stack" id="toastStack"></div>
+<div class="modal-overlay hidden" id="welcomeModal" onclick="if(event.target===this) closeWelcome()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeWelcome()" aria-label="Close" title="Close">&times;</button>
+    <div class="modal-logo"><span class="dot"></span></div>
+    <h2>Welcome to Margin Pilot</h2>
+    <p>Most bid tools chase revenue. This one bids on what's actually left after cost, ads, and everything else — per product, not just at the account level.</p>
+    <ul class="modal-points">
+      <li><span class="pt-icon">$</span> Tell it your price, cost, and Google Ads numbers — it works out the most you can afford to pay per click and still hit your margin.</li>
+      <li><span class="pt-icon">✓</span> Flags thin data, stock risk, and sales that would've happened without the ad, so the recommendation isn't just a confident-looking guess.</li>
+      <li><span class="pt-icon">↑</span> Import a spreadsheet with thousands of products — only what's on screen renders, so it stays fast either way.</li>
+    </ul>
+    <div class="modal-actions">
+      <button onclick="closeWelcome()">Start with a blank sheet</button>
+      <button class="primary" onclick="closeWelcome(); document.getElementById('fileInput').click();">Import a file</button>
+    </div>
+    <label class="modal-skip"><input type="checkbox" id="dontShowAgain"> Don't show this again</label>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="helpModal" onclick="if(event.target===this) closeHelp()">
+  <div class="modal-card wide">
+    <button class="modal-close" onclick="closeHelp()" aria-label="Close" title="Close">&times;</button>
+    <div class="modal-logo"><span class="dot"></span></div>
+    <h2>How Margin Pilot works</h2>
+    <p>Everything below is the actual math running behind every number in the table — nothing here is a black box.</p>
+
+    <div class="help-nav">
+      <a href="#help-core">The core idea</a>
+      <a href="#help-columns">Every column, explained</a>
+      <a href="#help-buffer">Buffer %</a>
+      <a href="#help-confidence">Confidence</a>
+      <a href="#help-advanced">Advanced panel</a>
+      <a href="#help-impact">Ad Spend Impact</a>
+      <a href="#help-snapshots">Snapshots &amp; profiles</a>
+      <a href="#help-import">Import / export format</a>
+      <a href="#help-limits">What this can't tell you</a>
+    </div>
+
+    <section id="help-core">
+      <h3>The core idea</h3>
+      <p>Most ad platforms default to bidding on <b>revenue</b> — a Target ROAS strategy just chases whichever products convert the cheapest, even if those are your worst-margin items. This tool flips that: every recommendation is built around <b>profit</b>, not sales.</p>
+      <div class="help-formula">
+        <div><b>Max Profitable CPC</b> = (Price − Cost) × (1 − Buffer%) × Conversion Rate</div>
+        <div><b>Target ROAS</b> = Price ÷ [(Price − Cost) × (1 − Buffer%)]</div>
+      </div>
+      <p>In plain terms: take what you actually profit on one sale, decide how much of that profit you insist on keeping (the Buffer), and that tells you the most you can afford to pay per click before you're spending into your own margin.</p>
+    </section>
+
+    <section id="help-columns">
+      <h3>Every column, explained</h3>
+      <table class="help-table">
+        <tr><td><b>CPC</b></td><td>Ad Spend ÷ Clicks. What you're actually paying per click right now.</td></tr>
+        <tr><td><b>Conv. Rate</b></td><td>Sales ÷ Clicks. How often a click turns into a sale — e.g. 1-in-20 clicks = 5%.</td></tr>
+        <tr><td><b>Conf.</b></td><td>How much to trust that conversion rate. Built from click volume using a Wilson score interval (the same math behind polling margins of error) — a 5% conversion rate from 10 clicks is noise; from 500 clicks it's real. Low/Med/High reflects that, not the percentage itself.</td></tr>
+        <tr><td><b>Margin %</b></td><td>(Price − Cost) ÷ Price. How much of each sale is profit before any ad spend.</td></tr>
+        <tr><td><b>Max CPC</b></td><td>The highest you could pay per click and still hit your Buffer %, given this product's current conversion rate. This is the number to actually compare your real CPC against.</td></tr>
+        <tr><td><b>Target ROAS</b></td><td>The same idea as Max CPC, expressed as a ratio — paste this directly into a Google Ads Target ROAS bid strategy.</td></tr>
+        <tr><td><b>Net Profit</b></td><td>(Sales × Profit per unit) − Ad Spend. What you actually made or lost for the period shown.</td></tr>
+        <tr><td><b>CPC vs Max</b></td><td>A bar comparing what you're paying (CPC) to what you could afford (Max CPC). Full bar = paying right at the limit.</td></tr>
+        <tr><td><b>Recommendation</b></td><td>Increase bid (CPC well under Max) · Maintain (CPC near Max) · Decrease — losing profit (CPC over Max) · Unprofitable (cost exceeds price) · Hold — low stock (overrides everything else if you're about to run out) · Need data (not enough info yet to calculate).</td></tr>
+      </table>
+    </section>
+
+    <section id="help-buffer">
+      <h3>Buffer %</h3>
+      <p>This is the one number you're really steering with. It means: <i>"of the profit on a sale, how much do I insist on keeping instead of spending on ads?"</i></p>
+      <p>A 20% buffer means you're willing to spend up to 80% of a sale's profit chasing that sale, keeping the other 20% as actual profit. Lower it to bid more aggressively and win more volume; raise it to protect margin more conservatively. Set a default at the top for every product, or override it per-row if one item needs its own number.</p>
+    </section>
+
+    <section id="help-confidence">
+      <h3>Confidence</h3>
+      <p>A conversion rate calculated from a handful of clicks can look identical to one built on thousands — but they don't deserve the same trust. Confidence uses a statistical lower-bound estimate (Wilson score interval) to flag when a row's numbers are still too thin to act on with certainty. Under 50 clicks shows Low; 50–200 shows Med; 200+ shows High. Treat Low-confidence recommendations as a starting hypothesis, not a firm call.</p>
+    </section>
+
+    <section id="help-advanced">
+      <h3>Advanced panel (click "Advanced" on any row)</h3>
+      <p><b>True cost</b> — Price minus COGS alone usually overstates real margin. Add shipping cost, returns/refund rate, payment processing fee %, and referral/marketplace fee % to get a <i>true</i> margin, and Max CPC / Target ROAS recalculate off that instead.</p>
+      <p><b>Stock</b> — if stock on hand is lower than this period's sales pace, the recommendation overrides to "Hold — low stock" regardless of what the profit math says, since profitable bidding is worthless if you can't fulfill it.</p>
+      <p><b>Baseline sales (no ads)</b> — your best estimate of what would've sold with zero ads running (from a holdout test or pre-campaign history). This powers the incremental-profit math shown in the Advanced panel: sales that would've happened anyway shouldn't get credited to the ad spend.</p>
+      <p><b>Spend-level tests</b> — if you've actually run this product at two or more different budgets/bids, log each result here. The tool shows profit at each tested point and the marginal profit-per-dollar <i>between</i> them — this is the only way to see where returns start diminishing, since that curve can't be predicted, only observed from real tests.</p>
+    </section>
+
+    <section id="help-impact">
+      <h3>Ad Spend Impact panel</h3>
+      <p>A single before/after comparison: what you'd make with zero ads, next to what you make once ads turn on. The gain banner (Ads added $X / Ads cost you $X) is literally "after profit minus before profit" — which mathematically already accounts for sales that would've happened anyway, without needing a separate calculation.</p>
+      <p><b>Planning a budget</b> — you haven't spent yet; give it a budget, expected CPC, and expected conversion rate, and it projects the outcome (assuming ad-driven sales are additional to your baseline — a simplifying assumption, since you can't know real overlap ahead of time).</p>
+      <p><b>Reviewing a campaign that already ran</b> — give it your actual spend and actual total sales for the period, and it tells you the truth about what happened, no assumptions needed.</p>
+    </section>
+
+    <section id="help-snapshots">
+      <h3>Snapshots</h3>
+      <p><b>Save snapshot</b> stores your current product list so it's still there next time you open this file. <b>Load last snapshot</b> restores it. <b>Compare to last snapshot</b> shows a ▲/▼ change on Net Profit per row and in the summary bar, so you can see whether things are improving.</p>
+      <p>This is saved in your browser only — it does not sync to any server, and does not follow you to a different device or a different copy of this file.</p>
+    </section>
+
+    <section id="help-import">
+      <h3>Import / export format</h3>
+      <p>Click <b>"Blank template"</b> to download a starter spreadsheet with the exact column headers this tool recognizes. The importer also accepts a few common alternate header names (e.g. "SKU" instead of "UPC / SKU", "Price" instead of "Sale Price ($)"). Only the visible page renders on screen during import — thousands of rows import fine, since the browser never has to hold more than about 100 live rows at once. <b>Export results</b> always includes every imported product, not just what's currently on screen.</p>
+    </section>
+
+    <section id="help-limits">
+      <h3>What this can't tell you</h3>
+      <p>This tool works from averages — actual CPC and conversion rate don't stay flat as you raise or lower bids, they shift, usually against you at higher spend. Max CPC tells you whether your <i>current</i> numbers are profitable; it can't predict exactly where returns will start diminishing as you spend more. The only real way to see that curve is to actually test different spend levels and log them in the Advanced panel's spend-level tests.</p>
+      <p>It also can't see anything about competitors — no tool can access another seller's real CPC or conversion data; that's private account information Google never exposes, to anyone.</p>
+    </section>
+  </div>
+</div>
+
+<div class="app">
+
+  <div class="hero">
+    <div>
+      <h1><span class="dot"></span>Margin Pilot</h1>
+      <p>Feed in Google Ads data per product. Get back a bid target that protects real profit — flagged for thin data, real costs, stock, and what the ad spend actually caused.</p>
+    </div>
+    <div class="hero-actions">
+      <input type="file" id="fileInput" accept=".xlsx,.csv">
+      <button onclick="openHelp()">? Help</button>
+      <button onclick="document.getElementById('fileInput').click()">Import Excel / CSV</button>
+      <button onclick="downloadTemplate()">Blank template</button>
+      <button class="primary" onclick="exportExcel()">Export results</button>
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <button class="small" onclick="saveSnapshot()">Save snapshot</button>
+    <button class="small" onclick="loadLatestSnapshot()">Load last snapshot</button>
+    <button class="small" onclick="compareToSnapshot()">Compare to last snapshot</button>
+    <span class="stamp" id="snapshotStamp">No snapshot saved yet</span>
+  </div>
+
+  <div class="assumptions">
+    <div class="field">
+      <label>Default profit buffer %</label>
+      <input type="number" id="defaultBuffer" value="20" min="0" max="95" step="1" onchange="renderAll()">
+    </div>
+    <div class="note">Share of gross profit you want to keep as real profit after ad spend. Applied to any row without its own buffer set. Rows with "Advanced" true-cost data use true margin instead of raw price/COGS margin.</div>
+  </div>
+
+  <div class="panel" id="impactPanel">
+    <h3>Ad Spend Impact — before vs. after</h3>
+    <p class="foot-note" style="margin:0 0 16px;">What you'd make with zero ads, next to what you make once ads turn on — same product, same period. The gap between the two is what the ad spend is actually worth.</p>
+
+    <div class="mode-toggle" style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="mode-btn active" id="modeBtnPlan" onclick="setImpactMode('plan')">Planning a budget</button>
+      <button class="mode-btn" id="modeBtnReview" onclick="setImpactMode('review')">Reviewing a campaign that already ran</button>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Sale price $</label><input type="number" id="imPrice" value="100" step="0.01" oninput="recalcImpact()"></div>
+      <div class="field"><label>Margin %</label><input type="number" id="imMargin" value="30" step="1" oninput="recalcImpact()"></div>
+      <div class="field"><label>Baseline sales, zero ads (units)</label><input type="number" id="imBaseline" value="1" step="0.1" oninput="recalcImpact()"></div>
+    </div>
+
+    <div class="field-row" id="imPlanFields">
+      <div class="field"><label>Ad budget $</label><input type="number" id="imBudget" value="100" step="1" oninput="recalcImpact()"></div>
+      <div class="field"><label>Expected CPC $</label><input type="number" id="imCpc" value="2.50" step="0.01" oninput="recalcImpact()"></div>
+      <div class="field"><label>Expected conv. rate %</label><input type="number" id="imConv" value="5" step="0.1" oninput="recalcImpact()"></div>
+    </div>
+    <div class="field-row" id="imReviewFields" style="display:none;">
+      <div class="field"><label>Ad spend $ (actual)</label><input type="number" id="imActualSpend" value="100" step="1" oninput="recalcImpact()"></div>
+      <div class="field"><label>Total sales while ads ran (units)</label><input type="number" id="imActualSales" value="2" step="0.1" oninput="recalcImpact()"></div>
+    </div>
+
+    <div class="impact-compare">
+      <div class="impact-card">
+        <div class="impact-card-label">Without ads</div>
+        <div class="impact-card-sales" id="imBeforeSales">–</div>
+        <div class="impact-card-sub">sales</div>
+        <div class="impact-card-profit" id="imBeforeProfit">–</div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-card after">
+        <div class="impact-card-label" id="imAfterLabel">With ads</div>
+        <div class="impact-card-sales" id="imAfterSales">–</div>
+        <div class="impact-card-sub">sales</div>
+        <div class="impact-card-profit" id="imAfterProfit">–</div>
+      </div>
+    </div>
+
+    <div class="impact-gain-banner" id="imGainBanner">–</div>
+    <p class="foot-note" id="imNote"></p>
+  </div>
+
+  <div class="summary-row" id="summaryRow"></div>
+  <div class="panel">
+    <div class="table-toolbar">
+      <div class="table-count" id="tableCount">0 products</div>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search by name or SKU…" oninput="setSearch(this.value)">
+      <div class="pagination" id="paginationTop"></div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th>UPC / SKU</th><th>Product</th><th>Price $</th><th>COGS $</th><th>Buffer %</th>
+            <th>Spend $</th><th>Clicks</th><th class="sortable" onclick="setSort('sales')">Sales<span class="sort-arrow" data-field="sales"></span></th>
+            <th class="sortable" onclick="setSort('cpc')">CPC<span class="sort-arrow" data-field="cpc"></span></th>
+            <th class="sortable" onclick="setSort('convrate')">Conv. Rate<span class="sort-arrow" data-field="convrate"></span></th>
+            <th>Conf.</th>
+            <th class="sortable" onclick="setSort('effMarginFrac')">Margin %<span class="sort-arrow" data-field="effMarginFrac"></span></th>
+            <th class="sortable" onclick="setSort('maxcpc')">Max CPC<span class="sort-arrow" data-field="maxcpc"></span></th>
+            <th class="sortable" onclick="setSort('troas')">Target ROAS<span class="sort-arrow" data-field="troas"></span></th>
+            <th class="sortable" onclick="setSort('netProfit')">Net Profit<span class="sort-arrow" data-field="netProfit"></span></th>
+            <th class="sortable" onclick="setSort('cpcGap')">CPC vs Max<span class="sort-arrow" data-field="cpcGap"></span></th>
+            <th>Recommendation</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="add-row-bar">
+      <button onclick="addBlankProduct()">+ Add product</button>
+      <div class="pagination" id="paginationBottom"></div>
+    </div>
+    <p class="import-status" id="importStatus"></p>
+    <p class="foot-note">Only the current page is rendered on screen — imports of thousands of products stay fast because the page never has to hold more than ~100 live rows at once. Export and the summary numbers above always cover every imported product, not just what's currently visible. Search filters what's shown on screen only — Export and the totals above always include everything, filtered or not. Click a column header to sort — this reorders the underlying list, so sorted order carries into Export too. Click "Advanced" on a row to add true costs, stock level, baseline sales, and multi-spend test data.</p>
+  </div>
+
+  <div class="app-footer">Margin Pilot · Version 1.0 · 7/2026 · Created by Kyle Guy</div>
+
+</div>
+
+<script>
+// ===================== Data model =====================
+// Every product lives in this plain array — NOT in the DOM. Only the current page
+// gets rendered as actual table rows. This is what lets imports of thousands of rows
+// stay fast: building 10,000 live <input> elements is what makes a browser tab choke,
+// building 10,000 plain JS objects does not.
+let products = [];
+let nextId = 1;
+let currentPage = 1;
+let pageSize = 100;
+let expandedId = null; // which product's Advanced panel is open, if any (page-scoped)
+
+function esc(s){ return String(s==null?'':s).replace(/"/g,'&quot;'); }
+function num(v){ return (v===undefined||v===null||v==='') ? '' : v; }
+function fmtMoney(v){ return isFinite(v) ? '$'+v.toFixed(2) : '–'; }
+function fmtPct(v){ return isFinite(v) ? (v*100).toFixed(1)+'%' : '–'; }
+function fmtX(v){ return isFinite(v) ? v.toFixed(2)+'x' : '–'; }
+
+function wilsonLower(successes, n){
+  if(!n || n<=0) return NaN;
+  const z=1.96, phat=Math.min(successes/n,1);
+  const denom = 1 + z*z/n;
+  const center = phat + z*z/(2*n);
+  const margin = z*Math.sqrt((phat*(1-phat) + z*z/(4*n))/n);
+  return Math.max((center-margin)/denom, 0);
+}
+
+// ===================== Pure computation (no DOM) =====================
+// Takes a product's raw data, returns every derived number. Same function is used
+// whether the row is currently on screen, being exported, or being summed for totals.
+function computeProduct(p){
+  const defaultBufferFrac = (parseFloat(document.getElementById('defaultBuffer').value)||20)/100;
+  const price = p.price!=null && p.price!=='' ? parseFloat(p.price) : null;
+  const cogs = p.cogs!=null && p.cogs!=='' ? parseFloat(p.cogs) : null;
+  const buffer = p.buffer!=null && p.buffer!=='' ? parseFloat(p.buffer) : null;
+  const spend = p.spend!=null && p.spend!=='' ? parseFloat(p.spend) : null;
+  const clicks = p.clicks!=null && p.clicks!=='' ? parseFloat(p.clicks) : null;
+  const sales = p.sales!=null && p.sales!=='' ? parseFloat(p.sales) : null;
+  const bufferFrac = (buffer===null ? defaultBufferFrac : buffer/100);
+
+  const cpc = (spend!=null && clicks) ? spend/clicks : NaN;
+  const convrate = (sales!=null && clicks) ? sales/clicks : NaN;
+  const marginFrac = (price!=null && cogs!=null && price>0) ? (price-cogs)/price : NaN;
+  const grossProfitPerUnit = (price!=null && cogs!=null) ? (price-cogs) : NaN;
+
+  const shipping = parseFloat(p.shipping)||0;
+  const returnsPct = (parseFloat(p.returns)||0)/100;
+  const payfeePct = (parseFloat(p.payfee)||0)/100;
+  const reffeePct = (parseFloat(p.reffee)||0)/100;
+  const stock = p.stock!=null && p.stock!=='' ? parseFloat(p.stock) : null;
+  const baseline = p.baseline!=null && p.baseline!=='' ? parseFloat(p.baseline) : null;
+  const hasAdvCost = (p.shipping!=null && p.shipping!=='') || (p.returns!=null && p.returns!=='') ||
+                      (p.payfee!=null && p.payfee!=='') || (p.reffee!=null && p.reffee!=='');
+
+  let trueCost = NaN, trueMarginFrac = NaN, trueGrossProfitPerUnit = NaN;
+  if(price!=null && cogs!=null){
+    trueCost = cogs + shipping + price*(returnsPct+payfeePct+reffeePct);
+    trueGrossProfitPerUnit = price - trueCost;
+    trueMarginFrac = price>0 ? trueGrossProfitPerUnit/price : NaN;
+  }
+
+  const effGrossProfitPerUnit = hasAdvCost ? trueGrossProfitPerUnit : grossProfitPerUnit;
+  const effMarginFrac = hasAdvCost ? trueMarginFrac : marginFrac;
+
+  const maxSpendPerConv = isFinite(effGrossProfitPerUnit) ? effGrossProfitPerUnit*(1-bufferFrac) : NaN;
+  const maxcpc = (isFinite(maxSpendPerConv) && isFinite(convrate)) ? maxSpendPerConv*convrate : NaN;
+  const troas = (isFinite(price) && isFinite(maxSpendPerConv) && maxSpendPerConv>0) ? price/maxSpendPerConv : NaN;
+  const grossProfit = (isFinite(effGrossProfitPerUnit) && sales!=null) ? effGrossProfitPerUnit*sales : NaN;
+  const netProfit = (isFinite(grossProfit) && spend!=null) ? grossProfit-spend : NaN;
+
+  // confidence
+  let confTier=null, confLabel='–', confLower=NaN;
+  if(clicks!=null && clicks>0){
+    confLower = wilsonLower(sales||0, clicks);
+    confTier='low'; confLabel='Low (n='+clicks+')';
+    if(clicks>=200){confTier='high';confLabel='High (n='+clicks+')';}
+    else if(clicks>=50){confTier='med';confLabel='Med (n='+clicks+')';}
+  }
+
+  // recommendation
+  let recHtml, gaugePct=null, gaugeColor=null, statusKey='wait';
+  if(isFinite(effGrossProfitPerUnit) && effGrossProfitPerUnit<0){
+    recHtml = '<span class="badge down">Unprofitable — cost exceeds price</span>';
+    statusKey = 'down';
+  } else if(!isFinite(cpc) || !isFinite(maxcpc) || maxcpc<=0){
+    recHtml = '<span class="badge wait">Need data</span>';
+    statusKey = 'wait';
+  } else {
+    const ratio = Math.min(cpc/maxcpc, 1.6);
+    gaugePct = Math.min(ratio/1.6*100, 100);
+    gaugeColor='var(--green)'; recHtml='<span class="badge up">Increase bid</span>'; statusKey='up';
+    if(cpc > maxcpc*1.05){ gaugeColor='var(--red)'; recHtml='<span class="badge down">Decrease — losing profit</span>'; statusKey='down'; }
+    else if(cpc >= maxcpc*0.85){ gaugeColor='var(--amber)'; recHtml='<span class="badge hold">Maintain</span>'; statusKey='hold'; }
+    if(clicks && clicks<50){ recHtml += ' <span class="badge wait" style="margin-left:4px;">Low confidence</span>'; }
+    if(stock!=null && sales!=null && sales>0 && stock < sales){
+      recHtml = '<span class="badge stock">Hold — low stock</span>';
+      gaugeColor = 'var(--blue)'; statusKey = 'stock';
+    }
+  }
+
+  // advanced output text
+  let advLines = [];
+  if(hasAdvCost && isFinite(trueCost)){
+    advLines.push(`True unit cost: <b>${fmtMoney(trueCost)}</b> (COGS + shipping + returns/fees)`);
+    advLines.push(`True margin: <b>${fmtPct(trueMarginFrac)}</b> vs raw margin ${fmtPct(marginFrac)}`);
+    advLines.push(`True Max CPC: <b>${fmtMoney(maxcpc)}</b> · True Target ROAS: <b>${fmtX(troas)}</b>`);
+  }
+  let incSales=null, incProfit=NaN;
+  if(baseline!=null && sales!=null){
+    incSales = Math.max(sales-baseline,0);
+    incProfit = isFinite(effGrossProfitPerUnit) ? incSales*effGrossProfitPerUnit - (spend||0) : NaN;
+    advLines.push(`Incremental sales (ad-caused): <b>${incSales.toFixed(2)}</b> of ${sales} total`);
+    advLines.push(`True ad-driven net profit: <b style="color:${incProfit>=0?'var(--green)':'var(--red)'}">${fmtMoney(incProfit)}</b> vs naive ${fmtMoney(netProfit)}`);
+  }
+  let coverage=null;
+  if(stock!=null && sales!=null){
+    coverage = sales>0 ? stock/sales : Infinity;
+    advLines.push(`Stock covers about <b>${isFinite(coverage)?coverage.toFixed(1):'∞'}×</b> this period's sales pace ${coverage<1?'— you will stock out before spend catches up':''}`);
+  }
+
+  // spend-level tests
+  const tests = (p.tests||[]).map(t=>{
+    const tSpend = t.spend!=null && t.spend!=='' ? parseFloat(t.spend) : null;
+    const tClicks = t.clicks!=null && t.clicks!=='' ? parseFloat(t.clicks) : null;
+    const tSales = t.sales!=null && t.sales!=='' ? parseFloat(t.sales) : null;
+    const tCpc = (tSpend!=null&&tClicks)?tSpend/tClicks:NaN;
+    const tConv = (tSales!=null&&tClicks)?tSales/tClicks:NaN;
+    const gp = isFinite(effMarginFrac)&&price!=null ? price*effMarginFrac : NaN;
+    const tProfit = (isFinite(gp)&&tSales!=null&&tSpend!=null) ? tSales*gp - tSpend : NaN;
+    return {...t, cpc:tCpc, conv:tConv, profit:tProfit};
+  });
+  let bestTestIdx=-1, worstTestIdx=-1, marginalNote='';
+  const validTests = tests.map((t,i)=>({...t,i})).filter(t=>t.spend!=null && isFinite(t.profit));
+  if(validTests.length>=2){
+    validTests.sort((a,b)=>a.spend-b.spend);
+    const best = validTests.reduce((a,b)=>b.profit>a.profit?b:a);
+    const worst = validTests.reduce((a,b)=>b.profit<a.profit?b:a);
+    bestTestIdx = best.i; worstTestIdx = worst.i;
+    let parts=[];
+    for(let k=1;k<validTests.length;k++){
+      const dP = validTests[k].profit-validTests[k-1].profit;
+      const dS = validTests[k].spend-validTests[k-1].spend;
+      const marg = dS!==0 ? dP/dS : NaN;
+      parts.push(`$${validTests[k-1].spend}→$${validTests[k].spend}: ${isFinite(marg)?(marg>=0?'+':'')+marg.toFixed(2)+'/$ marginal':'–'}`);
+    }
+    marginalNote = `Best tested spend: <b>$${best.spend}</b> (${fmtMoney(best.profit)} profit). Marginal profit between tested points — ${parts.join(' · ')}. Only interpolating between tested points, not guessing beyond them.`;
+  } else if(validTests.length===1){
+    marginalNote = 'Add a second tested spend level to see where marginal returns turn negative.';
+  }
+
+  return {
+    price, cogs, buffer, spend, clicks, sales, cpc, convrate, marginFrac, effMarginFrac, maxcpc, troas,
+    netProfit, confTier, confLabel, confLower, recHtml, gaugePct, gaugeColor, statusKey, hasAdvCost, advLines, tests,
+    bestTestIdx, worstTestIdx, marginalNote, stock, baseline, effGrossProfitPerUnit,
+  };
+}
+
+// ===================== Row lifecycle =====================
+function addBlankProduct(){
+  products.push({ id: nextId++, tests: [] });
+  currentPage = Math.ceil(products.length / pageSize);
+  renderAll();
+}
+
+function addImportedProduct(data){
+  products.push({ id: nextId++, tests: data.tests||[], ...data });
+}
+
+function delProduct(id){
+  products = products.filter(p=>p.id!==id);
+  if(expandedId===id) expandedId=null;
+  const maxPage = Math.max(1, Math.ceil(products.length/pageSize));
+  if(currentPage>maxPage) currentPage = maxPage;
+  renderAll();
+}
+
+function updateField(id, field, value){
+  const p = products.find(p=>p.id===id);
+  if(!p) return;
+  p[field] = value;
+  renderAll();
+}
+
+function toggleAdv(id){
+  expandedId = (expandedId===id) ? null : id;
+  renderAll();
+}
+
+function addTestRow(id){
+  const p = products.find(p=>p.id===id);
+  if(!p) return;
+  p.tests = p.tests || [];
+  p.tests.push({});
+  renderAll();
+}
+function updateTestField(id, idx, field, value){
+  const p = products.find(p=>p.id===id);
+  if(!p) return;
+  p.tests[idx][field] = value;
+  renderAll();
+}
+function delTestRow(id, idx){
+  const p = products.find(p=>p.id===id);
+  if(!p) return;
+  p.tests.splice(idx,1);
+  renderAll();
+}
+
+// ===================== Rendering (only the current page becomes DOM) =====================
+let searchQuery = '';
+let sortField = null;
+let sortDir = 1; // 1 = ascending, -1 = descending
+
+function setSearch(value){
+  searchQuery = value.trim().toLowerCase();
+  currentPage = 1;
+  renderAll();
+}
+
+function sortValueFor(p, c, field){
+  if(field==='cpcGap'){
+    // How far current CPC is from Max CPC, as a ratio — matches the visual gauge.
+    return (isFinite(c.cpc) && isFinite(c.maxcpc) && c.maxcpc>0) ? c.cpc/c.maxcpc : null;
+  }
+  const v = c[field];
+  return (v==null || (typeof v==='number' && !isFinite(v))) ? null : v;
+}
+
+function setSort(field){
+  if(sortField===field){ sortDir = -sortDir; }
+  else { sortField = field; sortDir = 1; }
+  // Sorting reorders the actual product list (not just the view), so sorted order
+  // carries into Export too — consistent with "what you see is what you get" for order,
+  // while search filtering (below) only ever changes what's shown, never what's exported.
+  products.sort((a,b)=>{
+    const ca = computeProduct(a), cb = computeProduct(b);
+    const va = sortValueFor(a, ca, field), vb = sortValueFor(b, cb, field);
+    if(va==null && vb==null) return 0;
+    if(va==null) return 1;
+    if(vb==null) return -1;
+    if(va<vb) return -1*sortDir;
+    if(va>vb) return 1*sortDir;
+    return 0;
+  });
+  currentPage = 1;
+  renderAll();
+}
+
+function getFilteredProducts(){
+  if(!searchQuery) return products;
+  return products.filter(p =>
+    (p.upc||'').toLowerCase().includes(searchQuery) ||
+    (p.name||'').toLowerCase().includes(searchQuery)
+  );
+}
+
+function renderAll(){
+  renderTable();
+  renderPagination();
+  renderSummary();
+  renderSortArrows();
+}
+
+function renderSortArrows(){
+  document.querySelectorAll('.sort-arrow').forEach(el=>{
+    el.textContent = el.dataset.field===sortField ? (sortDir===1?'▲':'▼') : '';
+  });
+}
+
+function renderTable(){
+  const rowsEl = document.getElementById('rows');
+  const filtered = getFilteredProducts();
+  const start = (currentPage-1)*pageSize;
+  const pageItems = filtered.slice(start, start+pageSize);
+
+  document.getElementById('tableCount').textContent = searchQuery
+    ? `${filtered.length.toLocaleString()} of ${products.length.toLocaleString()} products match "${searchQuery}"`
+    : (products.length===0 ? '0 products' : `${products.length.toLocaleString()} product${products.length===1?'':'s'} total`);
+
+  if(pageItems.length===0){
+    rowsEl.innerHTML = `<tr><td colspan="19" style="text-align:center;color:var(--text-faint);padding:24px;">${
+      searchQuery ? 'No products match your search.' : 'No products yet — add one, or import a spreadsheet.'
+    }</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  for(const p of pageItems){
+    const c = computeProduct(p);
+    html += `<tr class="main-row stripe-${c.statusKey}" data-id="${p.id}">
+      <td><button class="row-del" onclick="delProduct(${p.id})" title="Remove">&times;</button></td>
+      <td><input value="${esc(p.upc)}" placeholder="SKU" oninput="updateField(${p.id},'upc',this.value)"></td>
+      <td><input value="${esc(p.name)}" placeholder="Product name" oninput="updateField(${p.id},'name',this.value)"></td>
+      <td><input type="number" step="0.01" value="${num(p.price)}" oninput="updateField(${p.id},'price',this.value)"></td>
+      <td><input type="number" step="0.01" value="${num(p.cogs)}" oninput="updateField(${p.id},'cogs',this.value)"></td>
+      <td><input type="number" step="1" placeholder="def." value="${num(p.buffer)}" oninput="updateField(${p.id},'buffer',this.value)"></td>
+      <td><input type="number" step="0.01" value="${num(p.spend)}" oninput="updateField(${p.id},'spend',this.value)"></td>
+      <td><input type="number" step="1" value="${num(p.clicks)}" oninput="updateField(${p.id},'clicks',this.value)"></td>
+      <td><input type="number" step="1" value="${num(p.sales)}" oninput="updateField(${p.id},'sales',this.value)"></td>
+      <td class="calc">${fmtMoney(c.cpc)}</td>
+      <td class="calc">${fmtPct(c.convrate)}</td>
+      <td class="calc">${c.confTier ? `<span class="conf ${c.confTier}" title="True conversion rate is at least ${isFinite(c.confLower)?(c.confLower*100).toFixed(1):'?'}% with 95% confidence">${c.confLabel}</span>` : '–'}</td>
+      <td class="calc">${fmtPct(c.effMarginFrac)}${c.hasAdvCost?' *':''}</td>
+      <td class="calc hot">${fmtMoney(c.maxcpc)}</td>
+      <td class="calc hot">${fmtX(c.troas)}</td>
+      <td class="calc" style="color:${isFinite(c.netProfit)?(c.netProfit>=0?'var(--green)':'var(--red)'):''}">${isFinite(c.netProfit)?fmtMoney(c.netProfit):'–'}</td>
+      <td class="calc">${c.gaugePct!=null ? `<div class="gauge-wrap"><div class="gauge"><i style="width:${c.gaugePct}%;background:${c.gaugeColor}"></i></div></div>` : '–'}</td>
+      <td class="calc">${c.recHtml}</td>
+      <td><button class="adv-toggle" onclick="toggleAdv(${p.id})">Advanced ${expandedId===p.id?'▴':'▾'}</button></td>
+    </tr>`;
+
+    if(expandedId===p.id){
+      const testRowsHtml = (p.tests||[]).map((t,idx)=>{
+        const tc = c.tests[idx] || {};
+        const rowClass = idx===c.bestTestIdx?'best':(idx===c.worstTestIdx?'worst':'');
+        return `<tr class="${rowClass}">
+          <td><input type="number" step="0.01" value="${num(t.spend)}" oninput="updateTestField(${p.id},${idx},'spend',this.value)"></td>
+          <td><input type="number" step="1" value="${num(t.clicks)}" oninput="updateTestField(${p.id},${idx},'clicks',this.value)"></td>
+          <td><input type="number" step="0.1" value="${num(t.sales)}" oninput="updateTestField(${p.id},${idx},'sales',this.value)"></td>
+          <td class="calc">${fmtMoney(tc.cpc)}</td>
+          <td class="calc">${fmtPct(tc.conv)}</td>
+          <td class="calc" style="color:${isFinite(tc.profit)?(tc.profit>=0?'var(--green)':'var(--red)'):''}">${isFinite(tc.profit)?fmtMoney(tc.profit):'–'}</td>
+          <td><button class="row-del" onclick="delTestRow(${p.id},${idx})">&times;</button></td>
+        </tr>`;
+      }).join('');
+
+      html += `<tr class="advanced-row"><td colspan="19"><div class="adv-grid">
+        <div class="adv-col">
+          <h4>True cost per unit</h4>
+          <div class="field"><label>Shipping cost $</label><input type="number" step="0.01" value="${num(p.shipping)}" oninput="updateField(${p.id},'shipping',this.value)"></div>
+          <div class="field"><label>Returns / refund rate %</label><input type="number" step="0.1" value="${num(p.returns)}" oninput="updateField(${p.id},'returns',this.value)"></div>
+          <div class="field"><label>Payment processing fee %</label><input type="number" step="0.1" value="${num(p.payfee)}" oninput="updateField(${p.id},'payfee',this.value)"></div>
+          <div class="field"><label>Referral / marketplace fee %</label><input type="number" step="0.1" value="${num(p.reffee)}" oninput="updateField(${p.id},'reffee',this.value)"></div>
+        </div>
+        <div class="adv-col">
+          <h4>Stock &amp; incrementality</h4>
+          <div class="field"><label>Stock units remaining</label><input type="number" step="1" value="${num(p.stock)}" oninput="updateField(${p.id},'stock',this.value)"></div>
+          <div class="field"><label>Baseline sales, no ads (units)</label><input type="number" step="0.1" value="${num(p.baseline)}" oninput="updateField(${p.id},'baseline',this.value)"></div>
+        </div>
+        <div class="adv-col" style="min-width:340px;">
+          <h4>Computed (true) figures</h4>
+          <div class="adv-out">${c.advLines.length ? c.advLines.join('<br>') : 'Fill in true-cost, stock, or baseline fields to see adjusted numbers.'}</div>
+        </div>
+        <div class="adv-col" style="min-width:420px;">
+          <h4>Spend-level tests <span style="font-weight:400;color:var(--text-dim);font-size:10.5px;">— data from times you actually ran this product at a different budget/bid</span></h4>
+          <table class="test-table">
+            <thead><tr><th>Spend $</th><th>Clicks</th><th>Sales</th><th>CPC</th><th>Conv%</th><th>Net Profit</th><th></th></tr></thead>
+            <tbody>${testRowsHtml}</tbody>
+          </table>
+          <button class="adv-toggle" style="margin-top:8px;" onclick="addTestRow(${p.id})">+ Add tested spend level</button>
+          <p class="foot-note">${c.marginalNote}</p>
+        </div>
+      </div></td></tr>`;
+    }
+  }
+  rowsEl.innerHTML = html;
+}
+
+function renderPagination(){
+  const filtered = getFilteredProducts();
+  const totalPages = Math.max(1, Math.ceil(filtered.length/pageSize));
+  if(currentPage>totalPages) currentPage=totalPages;
+  const start = filtered.length===0 ? 0 : (currentPage-1)*pageSize+1;
+  const end = Math.min(currentPage*pageSize, filtered.length);
+
+  const html = `
+    <span>Showing ${start}–${end} of ${filtered.length.toLocaleString()}</span>
+    <button ${currentPage<=1?'disabled':''} onclick="goToPage(1)">« First</button>
+    <button ${currentPage<=1?'disabled':''} onclick="goToPage(currentPage-1)">‹ Prev</button>
+    <span>Page ${currentPage} of ${totalPages}</span>
+    <button ${currentPage>=totalPages?'disabled':''} onclick="goToPage(currentPage+1)">Next ›</button>
+    <button ${currentPage>=totalPages?'disabled':''} onclick="goToPage(totalPages)">Last »</button>
+    <select onchange="setPageSize(this.value)">
+      <option value="50" ${pageSize===50?'selected':''}>50 / page</option>
+      <option value="100" ${pageSize===100?'selected':''}>100 / page</option>
+      <option value="250" ${pageSize===250?'selected':''}>250 / page</option>
+    </select>`;
+  document.getElementById('paginationTop').innerHTML = html;
+  document.getElementById('paginationBottom').innerHTML = html;
+}
+
+function goToPage(n){
+  const totalPages = Math.max(1, Math.ceil(getFilteredProducts().length/pageSize));
+  currentPage = Math.min(Math.max(1,n), totalPages);
+  expandedId = null; // collapse advanced panel when changing pages, it belongs to a row that just left view
+  renderAll();
+}
+function setPageSize(v){
+  pageSize = parseInt(v,10);
+  currentPage = 1;
+  renderAll();
+}
+
+function renderSummary(){
+  let totalSpend=0, totalRevenue=0, totalNet=0, count=products.length;
+  for(const p of products){
+    const c = computeProduct(p);
+    if(p.spend!=null && p.spend!=='') totalSpend += parseFloat(p.spend);
+    if(p.price!=null && p.sales!=null) totalRevenue += parseFloat(p.price)*parseFloat(p.sales);
+    if(isFinite(c.netProfit)) totalNet += c.netProfit;
+  }
+  const roas = totalSpend>0 ? totalRevenue/totalSpend : NaN;
+  const lastSnap = window.__lastSnapshotForCompare;
+  let deltaHtml = '';
+  if(lastSnap && isFinite(lastSnap.totalNet)){
+    const d = totalNet-lastSnap.totalNet;
+    deltaHtml = `<div class="delta" style="color:${d>=0?'var(--green)':'var(--red)'}">${d>=0?'▲':'▼'} ${fmtMoney(Math.abs(d))} vs last snapshot</div>`;
+  }
+  document.getElementById('summaryRow').innerHTML = `
+    <div class="stat"><div class="label">Products tracked</div><div class="value">${count.toLocaleString()}</div></div>
+    <div class="stat"><div class="label">Total ad spend</div><div class="value">${fmtMoney(totalSpend)}</div></div>
+    <div class="stat"><div class="label">Blended ROAS</div><div class="value">${fmtX(roas)}</div></div>
+    <div class="stat"><div class="label">Net profit after ads</div><div class="value ${totalNet>=0?'pos':'neg'}">${fmtMoney(totalNet)}</div>${deltaHtml}</div>
+  `;
+}
+
+// defaultBuffer's onchange="renderAll()" (set on the input in the header) handles
+// recalculation when the global buffer changes — no separate listener needed here.
+
+function showToast(message){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = message;
+  stack.appendChild(el);
+  setTimeout(()=>{
+    el.classList.add('fading');
+    setTimeout(()=>el.remove(), 260);
+  }, 2600);
+}
+
+// ===================== Import (handles thousands of rows without touching the DOM per-row) =====================
+document.getElementById('fileInput').addEventListener('change', function(e){
+  const file=e.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('importStatus');
+  statusEl.textContent = 'Reading file…';
+  const reader=new FileReader();
+  reader.onload=function(evt){
+    const data=new Uint8Array(evt.target.result);
+    const wb=XLSX.read(data,{type:'array'});
+    const sheetName = wb.SheetNames.includes('Product Data') ? 'Product Data' : wb.SheetNames[0];
+    const json=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{defval:''});
+    if(json.length===0){ statusEl.textContent = 'No rows found in that file.'; return; }
+
+    products = []; // replace current set — import is a fresh load, not an append
+    const get=(row, keys)=>{ for(const k of keys){ if(row[k]!==undefined && row[k]!=='') return row[k]; } return undefined; };
+    for(const r of json){
+      addImportedProduct({
+        upc:get(r,['UPC / SKU','UPC','SKU']),
+        name:get(r,['Product Name','Product','Name']),
+        price:parseFloat(get(r,['Sale Price ($)','Sale Price','Price']))||undefined,
+        cogs:parseFloat(get(r,['COGS per Unit ($)','COGS','Cost']))||undefined,
+        buffer:(()=>{ const b=get(r,['Buffer %','Desired Profit Buffer %','Buffer']); if(b===undefined) return undefined; const f=parseFloat(b); return f<=1?f*100:f; })(),
+        spend:parseFloat(get(r,['Ad Spend ($)','Ad Spend','Spend']))||undefined,
+        clicks:parseFloat(get(r,['Clicks']))||undefined,
+        sales:parseFloat(get(r,['Conversions','Sales']))||undefined,
+        shipping:parseFloat(get(r,['Shipping $']))||undefined,
+        returns:parseFloat(get(r,['Returns %']))||undefined,
+        payfee:parseFloat(get(r,['Payment Fee %']))||undefined,
+        reffee:parseFloat(get(r,['Referral Fee %']))||undefined,
+        stock:parseFloat(get(r,['Stock Units']))||undefined,
+        baseline:parseFloat(get(r,['Baseline Sales (no ads)']))||undefined,
+      });
+    }
+    currentPage = 1;
+    expandedId = null;
+    renderAll();
+    statusEl.textContent = `Imported ${products.length.toLocaleString()} products.`;
+    showToast(`Imported ${products.length.toLocaleString()} products`);
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value='';
+});
+
+// ===================== Export — always the FULL set, not just the visible page =====================
+function exportExcel(){
+  const out = products.map(p=>{
+    const c = computeProduct(p);
+    return {
+      'UPC / SKU': p.upc||'', 'Product Name': p.name||'', 'Sale Price ($)': p.price||'', 'COGS per Unit ($)': p.cogs||'',
+      'Buffer %': p.buffer || document.getElementById('defaultBuffer').value, 'Ad Spend ($)': p.spend||'',
+      'Clicks': p.clicks||'', 'Conversions': p.sales||'', 'CPC': fmtMoney(c.cpc), 'Conversion Rate': fmtPct(c.convrate),
+      'Confidence': c.confLabel, 'Profit Margin %': fmtPct(c.effMarginFrac), 'Max Profitable CPC': fmtMoney(c.maxcpc),
+      'Recommended Target ROAS': fmtX(c.troas), 'Net Profit': isFinite(c.netProfit)?fmtMoney(c.netProfit):'',
+      'Recommendation': c.recHtml.replace(/<[^>]+>/g,' ').trim(),
+      'Shipping $': p.shipping||'', 'Returns %': p.returns||'', 'Payment Fee %': p.payfee||'', 'Referral Fee %': p.reffee||'',
+      'Stock Units': p.stock||'', 'Baseline Sales (no ads)': p.baseline||'',
+    };
+  });
+  const ws=XLSX.utils.json_to_sheet(out);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Margin Pilot Results');
+  XLSX.writeFile(wb,'margin-pilot-results.xlsx');
+  showToast(`Exported ${products.length.toLocaleString()} products`);
+}
+
+function downloadTemplate(){
+  const out=[{'UPC / SKU':'012345678905','Product Name':'Sample Product A','Sale Price ($)':29.99,'COGS per Unit ($)':12.50,'Buffer %':20,'Ad Spend ($)':84,'Clicks':240,'Conversions':12}];
+  const ws=XLSX.utils.json_to_sheet(out);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Product Data');
+  XLSX.writeFile(wb,'margin-pilot-blank-template.xlsx');
+}
+
+// ===================== Persistence =====================
+// window.storage is Claude's artifact-preview storage — it only exists while this file
+// is running inside a Claude.ai chat. Once downloaded and opened directly, or deployed
+// (Vercel, etc.), that API doesn't exist at all. This adapter uses it when available and
+// falls back to the browser's own localStorage otherwise, so Save/Load/Compare Snapshot
+// keeps working wherever the file actually ends up running.
+const storageAdapter = {
+  async get(key){
+    if(window.storage){
+      try{ return await window.storage.get(key, false); }catch(e){ /* fall through */ }
+    }
+    const v = localStorage.getItem(key);
+    return v!=null ? { value: v } : null;
+  },
+  async set(key, value){
+    if(window.storage){
+      try{ return await window.storage.set(key, value, false); }catch(e){ /* fall through */ }
+    }
+    localStorage.setItem(key, value);
+    return { value };
+  }
+};
+
+async function saveSnapshot(){
+  const state = {
+    savedAt: new Date().toISOString(),
+    defaultBuffer: document.getElementById('defaultBuffer').value,
+    products,
+  };
+  let totalNet=0;
+  for(const p of products){ const c=computeProduct(p); if(isFinite(c.netProfit)) totalNet+=c.netProfit; }
+  state.totalNet = totalNet;
+  try{
+    await storageAdapter.set('snapshot:latest', JSON.stringify(state));
+    document.getElementById('snapshotStamp').textContent = 'Saved ' + new Date(state.savedAt).toLocaleString() + ` (${products.length.toLocaleString()} products)`;
+    showToast('Snapshot saved');
+  }catch(err){
+    document.getElementById('snapshotStamp').textContent = 'Save failed — storage unavailable';
+    showToast('Save failed — storage unavailable');
+    console.error(err);
+  }
+}
+
+async function loadLatestSnapshot(){
+  try{
+    const res = await storageAdapter.get('snapshot:latest');
+    if(!res){ document.getElementById('snapshotStamp').textContent='No snapshot saved yet'; return; }
+    const state = JSON.parse(res.value);
+    products = state.products || [];
+    nextId = Math.max(0, ...products.map(p=>p.id||0)) + 1;
+    if(state.defaultBuffer) document.getElementById('defaultBuffer').value = state.defaultBuffer;
+    currentPage = 1; expandedId = null;
+    renderAll();
+    document.getElementById('snapshotStamp').textContent = 'Loaded snapshot from ' + new Date(state.savedAt).toLocaleString();
+  }catch(err){
+    document.getElementById('snapshotStamp').textContent = 'No snapshot found';
+  }
+}
+
+async function compareToSnapshot(){
+  try{
+    const res = await storageAdapter.get('snapshot:latest');
+    if(!res){ document.getElementById('snapshotStamp').textContent='No snapshot to compare to'; return; }
+    const state = JSON.parse(res.value);
+    window.__lastSnapshotForCompare = state;
+    document.getElementById('snapshotStamp').textContent = 'Comparing to snapshot from ' + new Date(state.savedAt).toLocaleString() + ` (${(state.products||[]).length.toLocaleString()} products)`;
+    renderSummary();
+  }catch(err){
+    document.getElementById('snapshotStamp').textContent = 'Compare failed';
+    console.error(err);
+  }
+}
+
+// ===================== Ad Spend Impact (unified before/after) — standalone, unaffected by table size =====================
+let impactMode = 'plan';
+function setImpactMode(mode){
+  impactMode = mode;
+  document.getElementById('modeBtnPlan').classList.toggle('active', mode==='plan');
+  document.getElementById('modeBtnReview').classList.toggle('active', mode==='review');
+  document.getElementById('imPlanFields').style.display = mode==='plan' ? 'flex' : 'none';
+  document.getElementById('imReviewFields').style.display = mode==='review' ? 'flex' : 'none';
+  recalcImpact();
+}
+
+function recalcImpact(){
+  const price = parseFloat(document.getElementById('imPrice').value);
+  const marginPct = parseFloat(document.getElementById('imMargin').value);
+  const baseline = parseFloat(document.getElementById('imBaseline').value);
+
+  const beforeSalesEl = document.getElementById('imBeforeSales');
+  const beforeProfitEl = document.getElementById('imBeforeProfit');
+  const afterSalesEl = document.getElementById('imAfterSales');
+  const afterProfitEl = document.getElementById('imAfterProfit');
+  const afterLabelEl = document.getElementById('imAfterLabel');
+  const banner = document.getElementById('imGainBanner');
+  const note = document.getElementById('imNote');
+
+  if(![price, marginPct, baseline].every(isFinite)){
+    banner.textContent = 'Fill in price, margin, and baseline sales to see the comparison.';
+    banner.className = 'impact-gain-banner';
+    return;
+  }
+
+  const cogs = price*(1-marginPct/100);
+  const gp = price-cogs;
+
+  let spend, afterSales, isProjection;
+  if(impactMode==='plan'){
+    const budget = parseFloat(document.getElementById('imBudget').value);
+    const cpc = parseFloat(document.getElementById('imCpc').value);
+    const convPct = parseFloat(document.getElementById('imConv').value);
+    if(![budget,cpc,convPct].every(isFinite) || cpc<=0){
+      banner.textContent = 'Fill in budget, CPC, and conversion rate to see the projection.';
+      banner.className = 'impact-gain-banner';
+      return;
+    }
+    const clicks = budget/cpc;
+    const adDrivenSales = clicks*(convPct/100);
+    spend = budget;
+    afterSales = baseline + adDrivenSales;
+    isProjection = true;
+    afterLabelEl.textContent = `With $${budget} in ads (projected)`;
+  } else {
+    spend = parseFloat(document.getElementById('imActualSpend').value);
+    afterSales = parseFloat(document.getElementById('imActualSales').value);
+    if(![spend, afterSales].every(isFinite)){
+      banner.textContent = 'Fill in actual spend and actual sales to see the comparison.';
+      banner.className = 'impact-gain-banner';
+      return;
+    }
+    isProjection = false;
+    afterLabelEl.textContent = `With $${spend} in ads (actual)`;
+  }
+
+  const beforeProfit = baseline*gp;
+  const afterProfit = afterSales*gp - spend;
+  const gain = afterProfit - beforeProfit;
+
+  beforeSalesEl.textContent = baseline.toFixed(2);
+  beforeProfitEl.textContent = fmtMoney(beforeProfit);
+  beforeProfitEl.style.color = beforeProfit>=0 ? 'var(--green)' : 'var(--red)';
+
+  afterSalesEl.textContent = afterSales.toFixed(2);
+  afterProfitEl.textContent = fmtMoney(afterProfit);
+  afterProfitEl.style.color = afterProfit>=0 ? 'var(--green)' : 'var(--red)';
+
+  banner.className = 'impact-gain-banner ' + (gain>=0 ? 'pos' : 'neg');
+  banner.textContent = gain>=0
+    ? `Ads added ${fmtMoney(gain)} in profit vs. not running them`
+    : `Ads cost you ${fmtMoney(Math.abs(gain))} vs. just not running them`;
+
+  if(afterSales<=baseline){
+    note.textContent = `Every sale in the "with ads" scenario looks like it would've happened anyway — the ad spend isn't creating incremental sales here.`;
+  } else if(isProjection){
+    note.textContent = `Projection assumes ad-driven sales are additional to your baseline. Once you've actually run this, switch to "Reviewing" mode with real numbers to check that assumption.`;
+  } else {
+    note.textContent = `Based on your actual results for this period.`;
+  }
+}
+
+function closeWelcome(){
+  document.getElementById('welcomeModal').classList.add('hidden');
+  if(document.getElementById('dontShowAgain').checked){
+    storageAdapter.set('hideWelcomeModal', 'true').catch(()=>{});
+  }
+}
+
+function openHelp(){
+  document.getElementById('helpModal').classList.remove('hidden');
+}
+function closeHelp(){
+  document.getElementById('helpModal').classList.add('hidden');
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.key!=='Escape') return;
+  if(!document.getElementById('welcomeModal').classList.contains('hidden')) closeWelcome();
+  if(!document.getElementById('helpModal').classList.contains('hidden')) closeHelp();
+});
+
+async function maybeShowWelcome(){
+  try{
+    const res = await storageAdapter.get('hideWelcomeModal');
+    if(!res || res.value!=='true'){
+      document.getElementById('welcomeModal').classList.remove('hidden');
+    }
+  }catch(e){
+    document.getElementById('welcomeModal').classList.remove('hidden');
+  }
+}
+
+setImpactMode('plan');
+renderAll();
+maybeShowWelcome();
+</script>
+</body>
+</html>
