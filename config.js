@@ -6,9 +6,8 @@ var STRIPE_PRO_YEARLY_LINK = '';
 var STRIPE_AGENCY_LINK = '';
 
 /* FormSubmit AJAX endpoint. No account required.
-   When filled it looks like 'https://formsubmit.co/ajax/<email-or-hash>'.
-   Leave it empty and the signup form does not send anything. */
-var SIGNUP_FORM_ENDPOINT = '';
+   Leave it empty and the signup form does not send anything, and feedback stays hidden. */
+var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
 
 /* Cloudflare Web Analytics token. Leave empty and no beacon is added. */
 var CF_ANALYTICS_TOKEN = '';

@@ -36,7 +36,7 @@ Edit `config.js`:
 var STRIPE_PRO_MONTHLY_LINK = ''; // $29/mo
 var STRIPE_PRO_YEARLY_LINK = '';  // $290/yr
 var STRIPE_AGENCY_LINK = '';      // $79/mo
-var SIGNUP_FORM_ENDPOINT = '';    // https://formsubmit.co/ajax/<email-or-hash>
+var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
 var CF_ANALYTICS_TOKEN = '';      // Cloudflare Web Analytics token
 ```
 

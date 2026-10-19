@@ -29,12 +29,15 @@
 
   function signupPayload(input) {
     input = input || {};
+    var email = text(input.email);
     var body = {
-      email: text(input.email),
+      email: email,
       _subject: 'SkuClinic signup',
       _honey: '',
-      _captcha: 'false'
+      _captcha: 'false',
+      _template: 'table'
     };
+    if (email) body._replyto = email;
     if (PAY[input.wouldPay]) body['Would you pay $29/mo for this?'] = input.wouldPay;
     if (SIZES[input.storeSize]) body['Store size'] = input.storeSize;
     var worth = text(input.worth);
@@ -48,13 +51,17 @@
     var body = {
       _subject: 'SkuClinic feedback',
       _honey: '',
-      _captcha: 'false'
+      _captcha: 'false',
+      _template: 'table'
     };
     var message = text(input.message);
     if (message) body["What's missing or confusing?"] = message;
     if (PAY[input.wouldPay]) body['Would you pay $29/mo?'] = input.wouldPay;
     var email = text(input.email);
-    if (email) body.email = email;
+    if (email) {
+      body.email = email;
+      body._replyto = email;
+    }
     return body;
   }
 
