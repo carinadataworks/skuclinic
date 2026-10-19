@@ -1,0 +1,130 @@
+/* TrueMargin shared parsers. No network. No DOM. */
+(function (root) {
+  var TM = root.TM || (root.TM = {});
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function hasValue(v) {
+    return v != null && String(v).trim() !== '';
+  }
+
+  function parseNumber(v) {
+    if (v == null) return undefined;
+    if (typeof v === 'number') return isFinite(v) ? v : undefined;
+    var s = String(v).trim();
+    if (!s || s === '--' || s === '—' || s === '-' || s.toLowerCase() === 'n/a') return undefined;
+    var neg = false;
+    if (/^\(.*\)$/.test(s)) {
+      neg = true;
+      s = s.slice(1, -1);
+    }
+    s = s.replace(/[$€£¥\s]/g, '').replace(/%/g, '');
+    if (!s) return undefined;
+    var lastComma = s.lastIndexOf(',');
+    var lastDot = s.lastIndexOf('.');
+    if (lastComma !== -1 && lastDot !== -1) {
+      if (lastComma > lastDot) s = s.replace(/\./g, '').replace(',', '.');
+      else s = s.replace(/,/g, '');
+    } else if (lastComma !== -1) {
+      var parts = s.split(',');
+      if (parts.length === 2 && parts[1].length <= 2) s = parts[0].replace(/\./g, '') + '.' + parts[1];
+      else s = s.replace(/,/g, '');
+    }
+    var n = parseFloat(s);
+    if (!isFinite(n)) return undefined;
+    return neg ? -n : n;
+  }
+
+  /* Percent columns: 20 and 20% are 20. 1 and 1% are 1, not 100.
+     A value strictly between 0 and 1 (such as 0.2) is a fraction, so 0.2 is 20.
+     0 stays 0. */
+  function parsePercent(v) {
+    if (v == null) return undefined;
+    if (typeof v === 'number') {
+      if (!isFinite(v)) return undefined;
+      if (v > 0 && v < 1) return v * 100;
+      return v;
+    }
+    var raw = String(v).trim();
+    if (!raw) return undefined;
+    var hasPct = raw.indexOf('%') !== -1;
+    var n = parseNumber(raw);
+    if (n === undefined) return undefined;
+    if (hasPct) return n;
+    if (n > 0 && n < 1) return n * 100;
+    return n;
+  }
+
+  function normHeader(h) {
+    return String(h == null ? '' : h)
+      .toLowerCase()
+      .replace(/[$€£¥]/g, '')
+      .replace(/[_/\\\-]+/g, ' ')
+      .replace(/[()%.,:#*]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  var HEADER_SUFFIX = { usd: 1, eur: 1, gbp: 1, cad: 1, aud: 1, 'per unit': 1, 'per order': 1 };
+
+  function headerEq(norm, alias) {
+    if (!norm || !alias) return false;
+    if (norm === alias) return true;
+    if (norm.indexOf(alias) === 0) {
+      var rest = norm.slice(alias.length).replace(/^\s+/, '');
+      if (HEADER_SUFFIX[rest]) return true;
+    }
+    return false;
+  }
+
+  function fmtMoney(v) {
+    if (!isFinite(v)) return '–';
+    var sign = v < 0 ? '−' : '';
+    return sign + '$' + Math.abs(v).toFixed(2);
+  }
+
+  function fmtPct(fraction) {
+    if (!isFinite(fraction)) return '–';
+    return (fraction * 100).toFixed(1) + '%';
+  }
+
+  function fmtX(v) {
+    if (!isFinite(v)) return '–';
+    return v.toFixed(2) + 'x';
+  }
+
+  function skuKey(s) {
+    return String(s == null ? '' : s).trim().toLowerCase();
+  }
+
+  function csvCell(v) {
+    var s = v == null ? '' : String(v);
+    if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function toCsv(rows) {
+    return rows.map(function (row) {
+      return row.map(csvCell).join(',');
+    }).join('\r\n');
+  }
+
+  TM.esc = esc;
+  TM.hasValue = hasValue;
+  TM.parseNumber = parseNumber;
+  TM.parsePercent = parsePercent;
+  TM.normHeader = normHeader;
+  TM.headerEq = headerEq;
+  TM.fmtMoney = fmtMoney;
+  TM.fmtPct = fmtPct;
+  TM.fmtX = fmtX;
+  TM.skuKey = skuKey;
+  TM.toCsv = toCsv;
+})(typeof window !== 'undefined' ? window : globalThis);

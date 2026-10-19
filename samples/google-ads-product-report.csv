@@ -1,0 +1,15 @@
+Product report
+January 1, 2026 - January 31, 2026
+
+Item ID,Campaign,Ad group,Title,Currency code,Cost,Clicks,Impr.,Conversions,Conv. value
+CAMP-MUG,PMax - Shopping,All products,Camp mug,USD,"$90.00",400,"1,200",22,"$616.00"
+DESK-LAMP,PMax - Shopping,All products,Desk lamp,USD,"$700.00",900,"8,400",18,"$756.00"
+USB-CABLE,PMax - Shopping,All products,USB-C cable,USD,"$180.00",1500,"22,000",0,"$0.00"
+STEEL-BOTTLE,PMax - Shopping,All products,Steel bottle,USD,"$80.00",320,"2,100",28,"$896.00"
+CLEAR-CASE,PMax - Shopping,All products,Clear phone case,USD,"$20.00",500,"4,400",20,"$300.00"
+THROW,PMax - Shopping,All products,Throw blanket,USD,"$400.00",600,"3,300",10,"$490.00"
+CEDAR-CANDLE,PMax - Shopping,All products,Cedar candle,USD,"$15.00",200,"1,800",16,"$256.00"
+MARBLE-TABLE,PMax - Shopping,All products,Marble side table,USD,"$40.00",70,"900",3,"$270.00"
+STICKER-PACK,PMax - Shopping,All products,Sticker pack,USD,"$25.00",800,"9,500",90,"$810.00"
+YOGA-MAT,PMax - Shopping,All products,Yoga mat,USD,"$60.00",250,"1,600",14,"$504.00"
+Total,--,--,--,USD,"$1,610.00",5540,"55,600",221,"$4,898.00"

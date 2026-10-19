@@ -1,0 +1,11 @@
+Name,Financial Status,Lineitem quantity,Lineitem name,Lineitem price,Lineitem sku
+#1001,paid,50,Camp mug,28.00,CAMP-MUG
+#1002,paid,30,Camp mug,28.00,CAMP-MUG
+#1003,paid,18,Desk lamp,42.00,DESK-LAMP
+#1004,paid,50,Steel bottle,32.00,STEEL-BOTTLE
+#1005,paid,40,Clear phone case,15.00,CLEAR-CASE
+#1006,paid,12,Throw blanket,49.00,THROW
+#1007,paid,30,Cedar candle,16.00,CEDAR-CANDLE
+#1008,paid,4,Marble side table,90.00,MARBLE-TABLE
+#1009,paid,200,Sticker pack,9.00,STICKER-PACK
+#1010,paid,25,Yoga mat,36.00,YOGA-MAT
