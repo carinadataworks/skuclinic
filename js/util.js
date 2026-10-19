@@ -1,4 +1,4 @@
-/* TrueMargin shared parsers. No network. No DOM. */
+/* SkuClinic shared parsers. No network. No DOM. */
 (function (root) {
   var TM = root.TM || (root.TM = {});
 
@@ -116,6 +116,19 @@
     }).join('\r\n');
   }
 
+  /* Copy truemargin* localStorage keys to skuclinic* when the new key is absent. */
+  function migrateStorageKeys(entries) {
+    var copy = {};
+    var oldPrefix = 'truemargin';
+    Object.keys(entries || {}).forEach(function (key) { copy[key] = entries[key]; });
+    Object.keys(entries || {}).forEach(function (oldKey) {
+      if (oldKey.indexOf(oldPrefix) !== 0) return;
+      var next = 'skuclinic' + oldKey.slice(oldPrefix.length);
+      if (!Object.prototype.hasOwnProperty.call(copy, next)) copy[next] = entries[oldKey];
+    });
+    return copy;
+  }
+
   TM.esc = esc;
   TM.hasValue = hasValue;
   TM.parseNumber = parseNumber;
@@ -127,4 +140,5 @@
   TM.fmtX = fmtX;
   TM.skuKey = skuKey;
   TM.toCsv = toCsv;
+  TM.migrateStorageKeys = migrateStorageKeys;
 })(typeof window !== 'undefined' ? window : globalThis);

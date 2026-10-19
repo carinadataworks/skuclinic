@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <!--
-  TrueMargin
+  SkuClinic
   © 2026 Kyle Guy. All rights reserved.
 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="TrueMargin app. Drop Shopify and Google Ads exports. Your files stay in this browser.">
+<meta name="description" content="SkuClinic app. Drop Shopify and Google Ads exports. Your files stay in this browser.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
-<title>TrueMargin</title>
+<title>SkuClinic</title>
 <link rel="icon" href="../favicon.svg">
 <link rel="stylesheet" href="../css/site.css">
 <link rel="stylesheet" href="../css/app.css">
@@ -18,7 +18,7 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
-  <a class="brand" href="../index.html"><img src="../favicon.svg" alt=""><span>TrueMargin</span></a>
+  <a class="brand" href="../index.html"><img src="../favicon.svg" alt=""><span>SkuClinic</span></a>
   <nav class="nav">
     <a href="../guide.html">How to export</a>
     <a href="../index.html#pricing">Pricing</a>
@@ -71,7 +71,7 @@
       <label class="field">Default profit buffer %
         <input id="defaultBuffer" type="number" min="0" max="100" step="1" value="20">
       </label>
-      <p class="note">Share of gross profit you want to keep after ads. 0% stays 0%. An empty cell uses this default. Rows with shipping, fees, or other costs use true margin.</p>
+      <p class="note">Share of gross profit you want to keep after ads. 0% stays 0%. An empty cell uses this default. Rows with shipping, fees, or other costs use margin after those costs.</p>
     </div>
 
     <div class="panel" id="impactPanel">
@@ -303,7 +303,7 @@
 <div id="welcomeModal" class="overlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <h2 id="welcomeTitle">Your files stay in this browser</h2>
-    <p>Drop a Shopify product export and a Google Ads product report. TrueMargin joins them by SKU and tells you the most you can pay per click, and which products to fix. Nothing is uploaded.</p>
+    <p>Drop a Shopify product export and a Google Ads product report. SkuClinic joins them by SKU and tells you the most you can pay per click, and which products to fix. Nothing is uploaded.</p>
     <div class="modal-actions">
       <button type="button" class="btn" id="welcomeBlank">Start blank</button>
       <button type="button" class="btn primary" id="welcomeSample">Load sample files</button>

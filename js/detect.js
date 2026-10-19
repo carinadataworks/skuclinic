@@ -271,7 +271,7 @@
     if (best < 0) {
       return {
         ok: false,
-        error: 'No header row found in the first 40 rows. TrueMargin looks for names like Variant SKU, Item ID, Unit cost, or estimated fee total. A title above the header is fine — this file does not seem to have a header at all.'
+        error: 'No header row found in the first 40 rows. SkuClinic looks for names like Variant SKU, Item ID, Unit cost, or estimated fee total. A title above the header is fine — this file does not seem to have a header at all.'
       };
     }
     var headers = (rows[best] || []).map(function (c) { return String(c == null ? '' : c).trim(); });

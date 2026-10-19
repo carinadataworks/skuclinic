@@ -1,4 +1,4 @@
-/* TrueMargin configuration.
+/* SkuClinic configuration.
    Paste Stripe Payment Links here when you create them.
    Leave a Stripe string empty and that pricing button joins the founding list. */
 var STRIPE_PRO_MONTHLY_LINK = '';
@@ -17,5 +17,5 @@ var CF_ANALYTICS_TOKEN = '';
    There is no server. The code is compared in the browser and the result is
    stored only in localStorage. Anyone who can read this file can unlock paid
    features. This is a temporary stand-in, not security. */
-var PRO_UNLOCK_CODE = 'TRUEMARGIN-PRO';
-var AGENCY_UNLOCK_CODE = 'TRUEMARGIN-AGENCY';
+var PRO_UNLOCK_CODE = 'SKUCLINIC-PRO';
+var AGENCY_UNLOCK_CODE = 'SKUCLINIC-AGENCY';
