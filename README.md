@@ -40,7 +40,7 @@ var STRIPE_AGENCY_LINK = '';      // $79/mo
 
 Leave a string empty and that button says **Coming soon**.
 
-There are no accounts yet. Pro and Agency can be unlocked in the browser with the placeholder codes in the same file (`PRO_UNLOCK_CODE`, `AGENCY_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. Replace it with real Stripe billing before you charge anyone. The upgrade dialog is marked TODO for that reason. The email form on the home page does not submit anywhere; it is marked TODO as well.
+There are no accounts yet. Pro and Agency can be unlocked in the browser with the codes in the same file (`PRO_UNLOCK_CODE`, `AGENCY_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. The note to replace it with real Stripe billing is a comment in `config.js` and in the app script, not copy on the site. The email form does not submit. The page says signup opens soon and that nothing is stored.
 
 ## Layout
 

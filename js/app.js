@@ -1191,6 +1191,7 @@
     $('proMonthBtn').addEventListener('click', openPaidLink);
     $('proYearBtn').addEventListener('click', openPaidLink);
     $('agencyBtn').addEventListener('click', openPaidLink);
+    /* TODO: replace this browser-only code check with Stripe billing. See config.js. */
     $('unlockBtn').addEventListener('click', function () {
       var code = $('unlockCode').value.trim();
       var agencyCode = String(window.AGENCY_UNLOCK_CODE || '').trim();
@@ -1199,7 +1200,7 @@
       if (agencyCode && code === agencyCode) next = 'agency';
       else if (proCode && code === proCode) next = 'pro';
       if (!next) {
-        $('unlockMsg').textContent = 'That code does not match. TODO: this check is a placeholder in the browser, not a subscription.';
+        $('unlockMsg').textContent = 'That code does not match. A matching code unlocks this browser only. It is not a subscription.';
         return;
       }
       plan = next;

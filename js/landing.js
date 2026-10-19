@@ -48,14 +48,15 @@
   paintLink(agency, window.STRIPE_AGENCY_LINK, 'Start Agency');
   paint();
 
+  /* TODO: wire this form to a real list. Do not store the address until then. */
   document.getElementById('signupForm').addEventListener('submit', function (event) {
     event.preventDefault();
     var email = document.getElementById('email');
     var msg = document.getElementById('signupMsg');
     if (!email.value || email.value.indexOf('@') < 1) {
-      msg.textContent = 'Enter an email address. This preview still will not send it.';
+      msg.textContent = 'Enter an email address. Nothing is stored.';
     } else {
-      msg.textContent = 'Thanks. TODO: this form does not submit anywhere yet. Your email was not sent or stored.';
+      msg.textContent = 'Thanks. Email signup opens soon. Nothing is stored yet.';
       email.value = '';
     }
     msg.hidden = false;
