@@ -1,6 +1,6 @@
-# TrueMargin
+# SkuClinic
 
-TrueMargin is a browser-only profit tool for Shopify brands that run Google Shopping or Performance Max, roughly $10K–$200K a month and 20–300 SKUs. You drop in the exports you already download. It joins them by SKU and tells you the most you can pay per click, and which products to fix: raise the price, cut the ad, stop selling, or review fees.
+SkuClinic is a browser-only profit tool for Shopify brands that run Google Shopping or Performance Max, roughly $10K–$200K a month and 20–300 SKUs. You drop in the exports you already download. It joins them by SKU and tells you the most you can pay per click, and which products to fix: raise the price, cut the ad, stop selling, or review fees.
 
 Nothing is uploaded. There is no server, no account connection, and no secret in this repo.
 

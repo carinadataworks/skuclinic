@@ -1,4 +1,4 @@
-/* TrueMargin app. All calculation stays in the browser. */
+/* SkuClinic app. All calculation stays in the browser. */
 (function () {
   var FREE_CAP = 25;
   var plan = 'free';
@@ -130,7 +130,7 @@
     if (plan === 'free') return;
     capture();
     var payload = { version: 1, active: active, stores: plan === 'agency' ? stores : [stores[active]] };
-    try { localStorage.setItem('truemargin:workspace', JSON.stringify(payload)); }
+    try { localStorage.setItem('skuclinic:workspace', JSON.stringify(payload)); }
     catch (err) { /* private mode or full storage */ }
   }
 
@@ -145,7 +145,7 @@
     active = 0;
     if (plan === 'free') { bindStore(); return; }
     try {
-      var raw = localStorage.getItem('truemargin:workspace');
+      var raw = localStorage.getItem('skuclinic:workspace');
       if (raw) {
         var data = JSON.parse(raw);
         if (data && data.stores && data.stores.length) {
@@ -277,7 +277,7 @@
   function exportFixes() {
     if (!paid()) { openUpgrade('export'); return; }
     if (!products.length) { showToast('Nothing to export yet'); return; }
-    download('truemargin-fixes.csv', exportRows());
+    download('skuclinic-fixes.csv', exportRows());
     showToast('Exported ' + products.length + ' SKUs');
   }
 
@@ -1098,7 +1098,7 @@
   function closeWelcome() {
     $('welcomeModal').hidden = true;
     if ($('dontShowAgain').checked) {
-      try { localStorage.setItem('truemargin:hideWelcome', '1'); } catch (err) {}
+      try { localStorage.setItem('skuclinic:hideWelcome', '1'); } catch (err) {}
     }
   }
 
@@ -1118,7 +1118,7 @@
     $('exportBtn').addEventListener('click', exportFixes);
     $('exportLeak').addEventListener('click', exportFixes);
     $('templateBtn').addEventListener('click', function () {
-      download('truemargin-cost-sheet.csv', 'SKU,Product,Unit cost,Shipping,Other costs,ASIN\nEXAMPLE-1,Example product,8.00,1.50,0.40,\n');
+      download('skuclinic-cost-sheet.csv', 'SKU,Product,Unit cost,Shipping,Other costs,ASIN\nEXAMPLE-1,Example product,8.00,1.50,0.40,\n');
     });
     $('sampleBtn').addEventListener('click', loadSamples);
     $('welcomeSample').addEventListener('click', function () { closeWelcome(); loadSamples(); });
@@ -1255,7 +1255,7 @@
         return;
       }
       plan = next;
-      try { localStorage.setItem('truemargin:plan', plan); } catch (err) {}
+      try { localStorage.setItem('skuclinic:plan', plan); } catch (err) {}
       $('unlockMsg').textContent = (next === 'agency' ? 'Agency' : 'Pro') + ' is unlocked in this browser only.';
       showToast(plan === 'agency' ? 'Agency unlocked' : 'Pro unlocked');
       persist();
@@ -1330,15 +1330,31 @@
     });
   }
 
+  function migrateStorage() {
+    try {
+      var entries = {};
+      var i, key;
+      for (i = 0; i < localStorage.length; i++) {
+        key = localStorage.key(i);
+        entries[key] = localStorage.getItem(key);
+      }
+      var next = TM.migrateStorageKeys(entries);
+      Object.keys(next).forEach(function (name) {
+        if (!Object.prototype.hasOwnProperty.call(entries, name)) localStorage.setItem(name, next[name]);
+      });
+    } catch (err) {}
+  }
+
   function init() {
-    try { plan = localStorage.getItem('truemargin:plan') || 'free'; } catch (err) { plan = 'free'; }
+    migrateStorage();
+    try { plan = localStorage.getItem('skuclinic:plan') || 'free'; } catch (err) { plan = 'free'; }
     if (plan !== 'pro' && plan !== 'agency') plan = 'free';
     wire();
     loadWorkspace();
     renderStores();
     renderAll();
     var hide = false;
-    try { hide = localStorage.getItem('truemargin:hideWelcome') === '1'; } catch (err) {}
+    try { hide = localStorage.getItem('skuclinic:hideWelcome') === '1'; } catch (err) {}
     if (!hide) $('welcomeModal').hidden = false;
   }
 

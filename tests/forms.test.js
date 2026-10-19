@@ -49,7 +49,7 @@ check('signup payload is only typed answers', function () {
   var body = TM.signupPayload(catalog);
   same(body, {
     email: 'buyer@shop.example',
-    _subject: 'TrueMargin signup',
+    _subject: 'SkuClinic signup',
     _honey: '',
     _captcha: 'false',
     'Would you pay $29/mo for this?': 'Maybe',
@@ -92,7 +92,7 @@ check('feedback payload excludes files and results', function () {
     price: 14
   });
   same(body, {
-    _subject: 'TrueMargin feedback',
+    _subject: 'SkuClinic feedback',
     _honey: '',
     _captcha: 'false',
     "What's missing or confusing?": 'The buffer note is easy to miss.',
@@ -163,7 +163,7 @@ check('a ready endpoint posts only the built payload', function () {
     assert.strictEqual(seen.options.method, 'POST');
     assert.strictEqual(seen.options.headers['Content-Type'], 'application/json');
     var sent = JSON.parse(seen.options.body);
-    assert.strictEqual(sent._subject, 'TrueMargin feedback');
+    assert.strictEqual(sent._subject, 'SkuClinic feedback');
     assert.strictEqual(sent._captcha, 'false');
     assert.strictEqual(sent._honey, '');
     assert.strictEqual(JSON.stringify(sent).indexOf('SECRET'), -1);

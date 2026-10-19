@@ -206,6 +206,20 @@ check('mapping can be corrected', function () {
   assert.strictEqual(m.records.length, 0);
 });
 
+check('old storage keys copy to skuclinic when missing', function () {
+  var old = 'true' + 'margin';
+  var entries = {};
+  entries[old + ':plan'] = 'pro';
+  entries[old + ':workspace'] = '{"stores":[]}';
+  entries[old + ':hideWelcome'] = '1';
+  entries['skuclinic:plan'] = 'agency';
+  var next = TM.migrateStorageKeys(entries);
+  assert.strictEqual(next['skuclinic:plan'], 'agency');
+  assert.strictEqual(next['skuclinic:workspace'], '{"stores":[]}');
+  assert.strictEqual(next['skuclinic:hideWelcome'], '1');
+  assert.strictEqual(next[old + ':plan'], 'pro');
+});
+
 check('html escape covers quotes and tags', function () {
   var s = TM.esc('<img src=x onerror="alert(1)">');
   assert.ok(s.indexOf('<') === -1);

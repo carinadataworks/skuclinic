@@ -31,7 +31,7 @@
     input = input || {};
     var body = {
       email: text(input.email),
-      _subject: 'TrueMargin signup',
+      _subject: 'SkuClinic signup',
       _honey: '',
       _captcha: 'false'
     };
@@ -46,7 +46,7 @@
   function feedbackPayload(input) {
     input = input || {};
     var body = {
-      _subject: 'TrueMargin feedback',
+      _subject: 'SkuClinic feedback',
       _honey: '',
       _captcha: 'false'
     };

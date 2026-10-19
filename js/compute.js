@@ -55,16 +55,16 @@
       TM.hasValue(p.returns) || TM.hasValue(p.payfee) || TM.hasValue(p.reffee);
 
     var trueCost = NaN;
-    var trueMarginFrac = NaN;
+    var feeMarginFrac = NaN;
     var trueGross = NaN;
     if (price != null && cogs != null) {
       trueCost = cogs + shipping + other + fees + price * (returnsPct + payfeePct + reffeePct);
       trueGross = price - trueCost;
-      trueMarginFrac = price > 0 ? trueGross / price : NaN;
+      feeMarginFrac = price > 0 ? trueGross / price : NaN;
     }
 
     var effGross = hasAdvCost ? trueGross : grossProfitPerUnit;
-    var effMargin = hasAdvCost ? trueMarginFrac : marginFrac;
+    var effMargin = hasAdvCost ? feeMarginFrac : marginFrac;
     var maxSpendPerConv = isFinite(effGross) ? effGross * (1 - bufferFrac) : NaN;
     var maxcpc = isFinite(maxSpendPerConv) && isFinite(convrate) ? maxSpendPerConv * convrate : NaN;
     var troas = price != null && isFinite(maxSpendPerConv) && maxSpendPerConv > 0 ? price / maxSpendPerConv : NaN;
@@ -123,7 +123,7 @@
     var advLines = [];
     if (hasAdvCost && isFinite(trueCost)) {
       advLines.push('True unit cost: ' + TM.fmtMoney(trueCost) + ' (COGS + shipping + other + fees)');
-      advLines.push('True margin: ' + TM.fmtPct(trueMarginFrac) + ' vs raw margin ' + TM.fmtPct(marginFrac));
+      advLines.push('Margin after fees: ' + TM.fmtPct(feeMarginFrac) + ' vs raw margin ' + TM.fmtPct(marginFrac));
       advLines.push('True max CPC: ' + TM.fmtMoney(maxcpc) + ' · True target ROAS: ' + TM.fmtX(troas));
     }
 

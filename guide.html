@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  TrueMargin
+  SkuClinic
   © 2026 Kyle Guy. All rights reserved.
 -->
 <html lang="en">
@@ -9,14 +9,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
-<title>How to export — TrueMargin</title>
+<title>How to export — SkuClinic</title>
 <link rel="icon" href="favicon.svg">
 <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
-  <a class="brand" href="index.html"><img src="favicon.svg" alt=""><span>TrueMargin</span></a>
+  <a class="brand" href="index.html"><img src="favicon.svg" alt=""><span>SkuClinic</span></a>
   <nav class="nav">
     <a href="index.html#pricing">Pricing</a>
     <a href="app/">Open the app</a>
@@ -24,7 +24,7 @@
 </header>
 <main id="main" class="narrow prose">
   <p class="kicker">How to export</p>
-  <h1>The files TrueMargin reads</h1>
+  <h1>The files SkuClinic reads</h1>
   <p>You need two files to start: a Shopify product export and a Google Ads product report. Orders, a cost sheet, and Amazon are optional. Drop them on the app in any order. Item ID in Google should match Variant SKU in Shopify. If Merchant Center adds a prefix, the rows will not join until the IDs match — the mapping preview shows you the values.</p>
   <p><a class="btn primary" href="app/">Open the app and load the samples</a></p>
 
@@ -35,7 +35,7 @@
     <li>Choose All products.</li>
     <li>Choose “CSV for Excel, Numbers, or other spreadsheet programs”.</li>
     <li>Click Export products. Shopify downloads the file or emails a link.</li>
-    <li>Drop the CSV on TrueMargin. It reads Variant SKU, Title, Variant Price, Cost per item, and inventory.</li>
+    <li>Drop the CSV on SkuClinic. It reads Variant SKU, Title, Variant Price, Cost per item, and inventory.</li>
   </ol>
   <p>Cost per item is blank unless you filled it in on the variant. If it is blank, use a <a href="samples/cost-sheet.csv">cost sheet</a> with SKU, unit cost, shipping, and other costs.</p>
   <p><a href="samples/shopify-products.csv">Sample Shopify product export</a></p>
@@ -45,7 +45,7 @@
     <li>Go to Orders.</li>
     <li>Click Export.</li>
     <li>Choose the same date range as the Google Ads report, and CSV.</li>
-    <li>Drop the file on TrueMargin. Line quantities are totaled by Lineitem SKU. Profit uses that unit count, not ad conversions.</li>
+    <li>Drop the file on SkuClinic. Line quantities are totaled by Lineitem SKU. Profit uses that unit count, not ad conversions.</li>
   </ol>
   <p><a href="samples/shopify-orders.csv">Sample Shopify orders export</a></p>
 
@@ -55,7 +55,7 @@
     <li>Open a Shopping or Performance Max campaign and choose the Products view. For the whole account, use Insights and reports, then Report editor, and build a product report.</li>
     <li>Include Item ID, Title, Cost, Clicks, and Conversions. Impressions and conversion value can stay; they are ignored for the bid math.</li>
     <li>Click the download icon and choose .csv.</li>
-    <li>Drop the file on TrueMargin. Leave the title rows and the Total row in. They are skipped. A product with spend and zero conversions is marked as losing money, not as “need data”.</li>
+    <li>Drop the file on SkuClinic. Leave the title rows and the Total row in. They are skipped. A product with spend and zero conversions is marked as losing money, not as “need data”.</li>
   </ol>
   <p><a href="samples/google-ads-product-report.csv">Sample Google Ads product report</a></p>
 
@@ -64,14 +64,14 @@
   <ol>
     <li>Fee preview: in Seller Central, open Reports, then Fulfillment, then Fee Preview. Request it and download the CSV.</li>
     <li>Or a settlement: open Payments, then Reports Repository, and download the flat-file settlement report.</li>
-    <li>Drop it on TrueMargin. A fee preview is read per SKU (estimated fee total). A settlement is totaled by SKU: principal becomes revenue, fee lines become fees, tax lines are ignored.</li>
+    <li>Drop it on SkuClinic. A fee preview is read per SKU (estimated fee total). A settlement is totaled by SKU: principal becomes revenue, fee lines become fees, tax lines are ignored.</li>
   </ol>
   <p><a href="samples/amazon-fee-preview.csv">Sample Amazon fee preview</a> · <a href="samples/amazon-settlement.csv">Sample settlement</a></p>
 
   <h2>Cost sheet (optional)</h2>
   <p>A plain CSV is enough when Shopify’s cost field is empty or you pay shipping the product export does not show.</p>
   <p><a href="samples/cost-sheet.csv">Sample cost sheet</a></p>
-  <p>Columns TrueMargin looks for: SKU, product name, unit cost, shipping, other costs, ASIN. A buffer of 1 means 1%, not 100%. 0.2 means 20%. 0 stays 0%.</p>
+  <p>Columns SkuClinic looks for: SKU, product name, unit cost, shipping, other costs, ASIN. A buffer of 1 means 1%, not 100%. 0.2 means 20%. 0 stays 0%.</p>
 </main>
 <footer class="foot">
   <div>© 2026 Kyle Guy. All rights reserved.</div>
