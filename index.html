@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="True profit per SKU for Shopify brands running Google Shopping or Performance Max. Flat price. No account connection. Your files never leave the browser.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>TrueMargin — the fix for every SKU</title>
 <link rel="icon" href="favicon.svg">
@@ -52,7 +52,7 @@
       </aside>
     </div>
     <ul class="points">
-      <li><strong>Flat price</strong><span>Pro is $29 a month or $290 a year. No percent of ad spend, no per-order fee.</span></li>
+      <li><strong>Flat price</strong><span>Planned founding price, not billed yet: $29 a month or $290 a year. No percent of ad spend, no per-order fee.</span></li>
       <li><strong>No connection</strong><span>Nothing logs into Shopify or Google Ads. Exports only.</span></li>
       <li><strong>Stays in the browser</strong><span>Your files are read on this computer. They are not uploaded.</span></li>
       <li><strong>A fix per SKU</strong><span>Max CPC, target ROAS, and one recommended action. Not another chart of revenue.</span></li>
@@ -84,11 +84,13 @@
   </div>
 
   <div class="wrap" id="pricing">
+    <p class="kicker" id="plannedLabel">Planned pricing</p>
     <h2 class="sec">Pricing</h2>
-    <p class="sub">Flat price. The free plan covers a real catalog slice so you can see the fixes before you pay. Checkout opens soon.</p>
+    <p class="sub">Nothing is billed yet. The free plan covers a real catalog slice so you can see the fixes before billing opens.</p>
+    <p class="founding">Founding members get a locked-in discount when billing opens.</p>
     <div class="bill-toggle" role="group" aria-label="Pro billing period">
       <button type="button" id="billMonthly" aria-pressed="true">Monthly</button>
-      <button type="button" id="billAnnual" aria-pressed="false">Annual · 2 months free</button>
+      <button type="button" id="billAnnual" aria-pressed="false">Annual</button>
     </div>
     <div class="price-grid">
       <article class="price">
@@ -108,24 +110,26 @@
         <h3>The whole catalog</h3>
         <p class="amount" id="proPrice">$29</p>
         <p class="per" id="proNote">per month</p>
+        <p class="planned-price" id="proSoon">Founding price, coming soon</p>
         <ul>
           <li>Unlimited SKUs</li>
           <li>Settings saved in this browser</li>
           <li>CSV export of the fixes</li>
         </ul>
-        <button type="button" class="btn primary" id="proCta">Coming soon</button>
+        <button type="button" class="btn primary" id="proCta">Join the founding list</button>
       </article>
       <article class="price">
-        <p class="who">Agency · $79/mo</p>
+        <p class="who">Agency</p>
         <h3>For freelance ad managers</h3>
         <p class="amount">$79</p>
         <p class="per">per month, every client</p>
+        <p class="planned-price" id="agencySoon">Founding price, coming soon</p>
         <ul>
           <li>Everything in Pro</li>
           <li>Separate store for each client</li>
           <li>Still no logins to their accounts</li>
         </ul>
-        <button type="button" class="btn teal" id="agencyCta">Coming soon</button>
+        <button type="button" class="btn teal" id="agencyCta">Join the founding list</button>
       </article>
     </div>
   </div>
@@ -133,7 +137,7 @@
   <div class="wrap">
     <div class="privacy-band">
       <h2>Your data never leaves your browser.</h2>
-      <p>Spreadsheets are processed on this device. TrueMargin does not upload them and does not store them. There is no Shopify connection and no Google Ads login. Saved settings, on a paid plan, stay in this browser’s local storage.</p>
+      <p>Spreadsheets are processed on this device. TrueMargin does not upload them and does not store them. Signup and feedback send only the email and answers you type. There is no Shopify connection and no Google Ads login. Saved settings, on a paid plan, stay in this browser’s local storage.</p>
     </div>
   </div>
 
@@ -154,7 +158,11 @@
       </details>
       <details>
         <summary>What happens after 25 SKUs on the free plan?</summary>
-        <p>The app keeps the first 25 and tells you how many were left out. Pro removes the cap, saves the workspace in this browser, and turns on CSV export.</p>
+        <p>The app keeps the first 25 and tells you how many were left out. Pro, at the planned founding price and not billed yet, removes the cap, saves the workspace in this browser, and turns on CSV export.</p>
+      </details>
+      <details>
+        <summary>Can I pay for Pro or Agency today?</summary>
+        <p>No. Planned pricing: Pro is a founding price of $29 a month or $290 a year, and Agency is $79 a month. Founding price, coming soon. Nothing is billed yet. The buttons join the founding list.</p>
       </details>
       <details>
         <summary>Will my numbers show up on another computer?</summary>
@@ -168,16 +176,39 @@
   </div>
 
   <div class="wrap" id="signup">
-    <h2 class="sec">Email when billing opens</h2>
-    <p class="sub">One note, when Pro and Agency can actually be paid for. No sequence, no newsletter.</p>
-    <form id="signupForm" class="signup" novalidate>
+    <h2 class="sec">Join the founding list</h2>
+    <p class="sub">One note when billing opens. No sequence, no newsletter. Nothing is charged now.</p>
+    <p id="planLine" class="note" hidden></p>
+    <form id="signupForm" class="signup-form" novalidate>
+      <label class="hp" for="honey">Leave this blank
+        <input id="honey" name="_honey" type="text" tabindex="-1" autocomplete="off">
+      </label>
+      <input id="planChoice" type="hidden" value="">
       <label class="field" for="email">Email
         <input id="email" name="email" type="email" autocomplete="email" placeholder="you@store.com" required>
       </label>
-      <button class="btn primary" type="submit">Email me</button>
+      <fieldset class="choice">
+        <legend>Would you pay $29/mo for this?</legend>
+        <label><input type="radio" name="wouldPay" value="Yes"> Yes</label>
+        <label><input type="radio" name="wouldPay" value="Maybe"> Maybe</label>
+        <label><input type="radio" name="wouldPay" value="No"> No</label>
+      </fieldset>
+      <label class="field" for="storeSize">Store size <span class="optional">optional</span>
+        <select id="storeSize">
+          <option value="">Select</option>
+          <option>under $10K/mo</option>
+          <option>$10K-$50K</option>
+          <option>$50K-$200K</option>
+          <option>$200K+</option>
+        </select>
+      </label>
+      <label class="field" for="worth">What would make this worth paying for? <span class="optional">optional</span>
+        <textarea id="worth" rows="3"></textarea>
+      </label>
+      <button class="btn primary" type="submit" id="signupSubmit">Join the list</button>
     </form>
-    <p>Email signup opens soon. Nothing is stored yet.</p>
-    <p id="signupMsg" hidden></p>
+    <p id="signupIdle">Email signup opens soon. Nothing is stored yet.</p>
+    <p id="signupMsg" hidden role="status"></p>
   </div>
 </main>
 <footer class="foot">
@@ -189,6 +220,8 @@
   </div>
 </footer>
 <script src="config.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/forms.js"></script>
 <script src="js/landing.js"></script>
 </body>
 </html>

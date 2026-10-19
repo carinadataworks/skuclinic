@@ -69,7 +69,8 @@
   background: var(--white);
   font-family: var(--mono);
 }
-.modal .field input, .modal .text-input { width: 100%; max-width: 420px; }
+.modal .field input, .modal .text-input, .modal textarea { width: 100%; max-width: 420px; font: inherit; }
+.modal textarea { border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: var(--white); }
 .note { color: var(--muted); font-size: 13px; max-width: 46rem; }
 
 .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }

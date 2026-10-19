@@ -1,0 +1,188 @@
+/* Payload checks for signup and feedback. Run: node tests/forms.test.js */
+var fs = require('fs');
+var path = require('path');
+var vm = require('vm');
+var assert = require('assert');
+
+var root = path.join(__dirname, '..');
+var context = { console: console };
+context.window = context;
+context.globalThis = context;
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(path.join(root, 'js/forms.js'), 'utf8'), context, { filename: 'js/forms.js' });
+var TM = context.TM;
+
+function same(actual, expected) {
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(actual)), expected);
+}
+
+var failed = 0;
+var pending = [];
+function check(name, fn) {
+  pending.push(Promise.resolve().then(fn).then(function () {
+    console.log('ok  ' + name);
+  }, function (err) {
+    failed++;
+    console.error('FAIL ' + name);
+    console.error(err.stack || err);
+  }));
+}
+
+var catalog = {
+  email: 'buyer@shop.example',
+  wouldPay: 'Maybe',
+  storeSize: '$10K-$50K',
+  worth: 'A clearer Google export',
+  plan: 'Pro monthly',
+  honey: '',
+  products: [{ sku: 'SECRET-SKU', price: 28, spend: 90, cogs: 8 }],
+  sku: 'SECRET-SKU',
+  results: [{ action: 'cut_ads', annual: 1200 }],
+  rows: 'Camp mug',
+  upc: 'SECRET-SKU',
+  spend: 700,
+  clicks: 400,
+  _honey: 'filled by a bot field name'
+};
+
+check('signup payload is only typed answers', function () {
+  var body = TM.signupPayload(catalog);
+  same(body, {
+    email: 'buyer@shop.example',
+    _subject: 'TrueMargin signup',
+    _honey: '',
+    _captcha: 'false',
+    'Would you pay $29/mo for this?': 'Maybe',
+    'Store size': '$10K-$50K',
+    'What would make this worth paying for?': 'A clearer Google export',
+    Plan: 'Pro monthly'
+  });
+  var raw = JSON.stringify(body);
+  assert.strictEqual(raw.indexOf('SECRET'), -1);
+  assert.strictEqual(raw.indexOf('cut_ads'), -1);
+  assert.strictEqual(raw.indexOf('Camp mug'), -1);
+  assert.strictEqual(body._honey, '');
+});
+
+check('signup drops blank optionals and unknown answers', function () {
+  var body = TM.signupPayload({
+    email: '  a@b.co ',
+    wouldPay: 'Absolutely',
+    storeSize: 'huge',
+    worth: '   ',
+    plan: '<script>',
+    products: [{ sku: 'NOPE' }]
+  });
+  assert.deepStrictEqual(Object.keys(body).sort(), ['_captcha', '_honey', '_subject', 'email']);
+  assert.strictEqual(body.email, 'a@b.co');
+  assert.strictEqual(JSON.stringify(body).indexOf('NOPE'), -1);
+  assert.strictEqual(JSON.stringify(body).indexOf('script'), -1);
+});
+
+check('feedback payload excludes files and results', function () {
+  var body = TM.feedbackPayload({
+    message: ' The buffer note is easy to miss. ',
+    wouldPay: 'No',
+    email: 'me@shop.example',
+    honey: '',
+    products: [{ sku: 'LEAK-SKU', net: -40 }],
+    results: 'annual leak $9,999',
+    rows: [{ name: 'Desk lamp' }],
+    spend: 180,
+    price: 14
+  });
+  same(body, {
+    _subject: 'TrueMargin feedback',
+    _honey: '',
+    _captcha: 'false',
+    "What's missing or confusing?": 'The buffer note is easy to miss.',
+    'Would you pay $29/mo?': 'No',
+    email: 'me@shop.example'
+  });
+  var raw = JSON.stringify(body);
+  assert.strictEqual(raw.indexOf('LEAK-SKU'), -1);
+  assert.strictEqual(raw.indexOf('9,999'), -1);
+  assert.strictEqual(raw.indexOf('Desk lamp'), -1);
+});
+
+check('feedback omits a blank email', function () {
+  var body = TM.feedbackPayload({ message: 'Confusing columns', wouldPay: 'Yes', email: '  ' });
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(body, 'email'), false);
+  assert.strictEqual(body['Would you pay $29/mo?'], 'Yes');
+});
+
+check('empty endpoint does not post', function () {
+  assert.strictEqual(TM.hasSignupEndpoint(''), false);
+  assert.strictEqual(TM.hasSignupEndpoint('   '), false);
+  assert.strictEqual(TM.hasSignupEndpoint(null), false);
+  same(TM.preparePost('', { email: 'a@b.co', sku: 'NO' }), { skip: true });
+  same(TM.preparePost('  ', TM.signupPayload(catalog)), { skip: true });
+  var calls = 0;
+  var signup = TM.submitSignup('', catalog, function () { calls++; });
+  var feedback = TM.submitFeedback('   ', { message: 'Hi', products: [{ sku: 'NO' }] }, function () { calls++; });
+  assert.strictEqual(calls, 0);
+  return Promise.all([signup, feedback]).then(function (results) {
+    assert.strictEqual(results[0].skipped, true);
+    assert.strictEqual(results[0].reason, 'empty');
+    assert.strictEqual(results[1].reason, 'empty');
+    assert.strictEqual(calls, 0);
+  });
+});
+
+check('a filled honeypot does not post', function () {
+  var calls = 0;
+  return TM.submitSignup('https://formsubmit.co/ajax/owner', {
+    email: 'a@b.co',
+    wouldPay: 'Yes',
+    honey: 'bot',
+    products: [{ sku: 'SECRET-SKU' }]
+  }, function () { calls++; }).then(function (result) {
+    assert.strictEqual(calls, 0);
+    assert.strictEqual(result.reason, 'honey');
+  });
+});
+
+check('a ready endpoint posts only the built payload', function () {
+  var seen = null;
+  return TM.submitFeedback('https://formsubmit.co/ajax/abc123', {
+    message: 'Need a sample for Performance Max',
+    wouldPay: 'Maybe',
+    email: 'a@b.co',
+    products: [{ sku: 'SECRET-SKU', spend: 10 }],
+    results: 'do not send'
+  }, function (url, options) {
+    seen = { url: url, options: options };
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      json: function () { return Promise.resolve({ success: 'true' }); }
+    });
+  }).then(function (result) {
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(seen.url, 'https://formsubmit.co/ajax/abc123');
+    assert.strictEqual(seen.options.method, 'POST');
+    assert.strictEqual(seen.options.headers['Content-Type'], 'application/json');
+    var sent = JSON.parse(seen.options.body);
+    assert.strictEqual(sent._subject, 'TrueMargin feedback');
+    assert.strictEqual(sent._captcha, 'false');
+    assert.strictEqual(sent._honey, '');
+    assert.strictEqual(JSON.stringify(sent).indexOf('SECRET'), -1);
+    assert.strictEqual(JSON.stringify(sent).indexOf('do not send'), -1);
+    assert.deepStrictEqual(Object.keys(sent).sort(), [
+      "What's missing or confusing?",
+      'Would you pay $29/mo?',
+      '_captcha',
+      '_honey',
+      '_subject',
+      'email'
+    ]);
+  });
+});
+
+Promise.all(pending).then(function () {
+  if (failed) {
+    console.error(failed + ' failed');
+    process.exit(1);
+  }
+  console.log('form checks passed');
+});

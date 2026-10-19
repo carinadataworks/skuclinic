@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="TrueMargin app. Drop Shopify and Google Ads exports. Your files stay in this browser.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>TrueMargin</title>
 <link rel="icon" href="../favicon.svg">
@@ -22,6 +22,7 @@
   <nav class="nav">
     <a href="../guide.html">How to export</a>
     <a href="../index.html#pricing">Pricing</a>
+    <button type="button" class="linkish" id="feedbackOpen" hidden>Give feedback</button>
     <button type="button" class="linkish" id="helpOpen">Help</button>
   </nav>
   <div class="plan-cluster">
@@ -153,6 +154,7 @@
         <button type="button" class="btn small" id="clearProducts">Clear products</button>
         <button type="button" class="btn small" id="exportBtn">Export fixes (CSV)</button>
         <button type="button" class="btn small" id="templateBtn">Blank cost sheet</button>
+        <button type="button" class="btn small" id="feedbackBid" hidden>Give feedback</button>
       </div>
       <p class="note">A product with ad spend and 0 sales is marked “Decrease — losing money.” Zeros are kept. A buffer of 1 imports as 1%, not 100%. Search only filters this table. Export, on Pro, includes every SKU.</p>
     </div>
@@ -179,6 +181,7 @@
       </label>
       <label class="field"><input id="leakProblems" type="checkbox"> Problems only</label>
       <button type="button" class="btn small" id="exportLeak">Export fixes (CSV)</button>
+      <button type="button" class="btn small" id="feedbackLeak" hidden>Give feedback</button>
     </div>
     <p class="note" id="leakNote"></p>
     <div class="table-scroll">
@@ -222,13 +225,16 @@
 
 <div id="upgradeModal" class="overlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle">
+    <p class="kicker">Planned pricing</p>
     <h2 id="upgradeTitle">Upgrade</h2>
     <p id="upgradeText"></p>
     <div class="row">
-      <button type="button" class="btn primary" id="proMonthBtn">Coming soon</button>
-      <button type="button" class="btn" id="proYearBtn">Coming soon</button>
-      <button type="button" class="btn teal" id="agencyBtn">Coming soon</button>
+      <button type="button" class="btn primary" id="proMonthBtn">Join the founding list</button>
+      <button type="button" class="btn" id="proYearBtn">Join the founding list</button>
+      <button type="button" class="btn teal" id="agencyBtn">Join the founding list</button>
     </div>
+    <p class="planned-price" id="upgradeSoon">Founding price, coming soon. Pro $29/mo or $290/yr. Agency $79/mo. Nothing is charged now.</p>
+    <p class="note">Founding members get a locked-in discount when billing opens.</p>
     <p class="note">Checkout opens soon. Until then, an unlock code applies to this browser only. It is not a subscription.</p>
     <label class="field">Unlock code
       <input id="unlockCode" class="text-input" autocomplete="off" aria-label="Unlock code">
@@ -288,7 +294,7 @@
     <section id="help-limits">
       <h3>What this can’t tell you</h3>
       <p>CPC and conversion rate move when you change bids. Max CPC describes the current numbers. It does not predict the point where more spend stops paying. The spend-level tests in Advanced are the only curve this tool will draw, and only between points you actually ran.</p>
-      <p>The free plan analyzes 25 SKUs. Pro ($29/mo or $290/yr) removes the cap, saves settings in this browser, and exports a CSV of the fixes. Agency ($79/mo) is for freelance ad managers and adds a separate store per client, still only on this device.</p>
+      <p>The free plan analyzes 25 SKUs. Planned pricing, not billed yet: Pro is a founding price of $29/mo or $290/yr, and Agency is $79/mo. Founding price, coming soon. Pro removes the cap, saves settings in this browser, and exports a CSV of the fixes. Agency is for freelance ad managers and adds a separate store per client, still only on this device.</p>
     </section>
     <div class="modal-actions"><button type="button" class="btn" id="helpClose">Close</button></div>
   </div>
@@ -305,10 +311,40 @@
     <label class="note"><input type="checkbox" id="dontShowAgain"> Don’t show this again</label>
   </div>
 </div>
+<div id="feedbackModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+    <h2 id="feedbackTitle">Give feedback</h2>
+    <p class="note">This sends only what you type. Your files and results stay in this browser.</p>
+    <form id="feedbackForm">
+      <label class="hp" for="feedbackHoney">Leave this blank
+        <input id="feedbackHoney" name="_honey" type="text" tabindex="-1" autocomplete="off">
+      </label>
+      <label class="field">What’s missing or confusing?
+        <textarea id="feedbackMessage" rows="4" required></textarea>
+      </label>
+      <fieldset class="choice">
+        <legend>Would you pay $29/mo?</legend>
+        <label><input type="radio" name="feedbackPay" value="Yes"> Yes</label>
+        <label><input type="radio" name="feedbackPay" value="Maybe"> Maybe</label>
+        <label><input type="radio" name="feedbackPay" value="No"> No</label>
+      </fieldset>
+      <label class="field">Email <span class="optional">optional</span>
+        <input id="feedbackEmail" type="email" autocomplete="email">
+      </label>
+      <p id="feedbackMsg" class="note" hidden role="status"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="feedbackClose">Close</button>
+        <button type="submit" class="btn primary" id="feedbackSend">Send feedback</button>
+      </div>
+    </form>
+  </div>
+</div>
 <div class="toasts" id="toastStack"></div>
 <script src="../config.js"></script>
+<script src="../js/analytics.js"></script>
 <script src="../vendor/xlsx.full.min.js"></script>
 <script src="../js/util.js"></script>
+<script src="../js/forms.js"></script>
 <script src="../js/compute.js"></script>
 <script src="../js/detect.js"></script>
 <script src="../js/leak.js"></script>

@@ -1,9 +1,17 @@
 /* TrueMargin configuration.
    Paste Stripe Payment Links here when you create them.
-   Leave a string empty and the matching pricing button says "Coming soon". */
+   Leave a Stripe string empty and that pricing button joins the founding list. */
 var STRIPE_PRO_MONTHLY_LINK = '';
 var STRIPE_PRO_YEARLY_LINK = '';
 var STRIPE_AGENCY_LINK = '';
+
+/* FormSubmit AJAX endpoint. No account required.
+   When filled it looks like 'https://formsubmit.co/ajax/<email-or-hash>'.
+   Leave it empty and the signup form does not send anything. */
+var SIGNUP_FORM_ENDPOINT = '';
+
+/* Cloudflare Web Analytics token. Leave empty and no beacon is added. */
+var CF_ANALYTICS_TOKEN = '';
 
 /* TODO: Replace these client-side unlock codes with real accounts and Stripe.
    There is no server. The code is compared in the browser and the result is
