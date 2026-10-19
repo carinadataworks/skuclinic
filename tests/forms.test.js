@@ -52,6 +52,8 @@ check('signup payload is only typed answers', function () {
     _subject: 'SkuClinic signup',
     _honey: '',
     _captcha: 'false',
+    _template: 'table',
+    _replyto: 'buyer@shop.example',
     'Would you pay $29/mo for this?': 'Maybe',
     'Store size': '$10K-$50K',
     'What would make this worth paying for?': 'A clearer Google export',
@@ -73,7 +75,10 @@ check('signup drops blank optionals and unknown answers', function () {
     plan: '<script>',
     products: [{ sku: 'NOPE' }]
   });
-  assert.deepStrictEqual(Object.keys(body).sort(), ['_captcha', '_honey', '_subject', 'email']);
+  assert.deepStrictEqual(Object.keys(body).sort(), ['_captcha', '_honey', '_replyto', '_subject', '_template', 'email']);
+  assert.strictEqual(body._captcha, 'false');
+  assert.strictEqual(body._template, 'table');
+  assert.strictEqual(body._replyto, 'a@b.co');
   assert.strictEqual(body.email, 'a@b.co');
   assert.strictEqual(JSON.stringify(body).indexOf('NOPE'), -1);
   assert.strictEqual(JSON.stringify(body).indexOf('script'), -1);
@@ -95,6 +100,8 @@ check('feedback payload excludes files and results', function () {
     _subject: 'SkuClinic feedback',
     _honey: '',
     _captcha: 'false',
+    _template: 'table',
+    _replyto: 'me@shop.example',
     "What's missing or confusing?": 'The buffer note is easy to miss.',
     'Would you pay $29/mo?': 'No',
     email: 'me@shop.example'
@@ -108,7 +115,42 @@ check('feedback payload excludes files and results', function () {
 check('feedback omits a blank email', function () {
   var body = TM.feedbackPayload({ message: 'Confusing columns', wouldPay: 'Yes', email: '  ' });
   assert.strictEqual(Object.prototype.hasOwnProperty.call(body, 'email'), false);
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(body, '_replyto'), false);
   assert.strictEqual(body['Would you pay $29/mo?'], 'Yes');
+  assert.strictEqual(body._captcha, 'false');
+  assert.strictEqual(body._template, 'table');
+});
+
+check('configured endpoint receives signup fields', function () {
+  var config = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
+  var match = config.match(/var SIGNUP_FORM_ENDPOINT = '([^']*)'/);
+  assert.ok(match);
+  assert.strictEqual(match[1], 'https://formsubmit.co/ajax/skuclinicapp@gmail.com');
+  var seen = null;
+  return TM.submitSignup(match[1], {
+    email: 'buyer@shop.example',
+    wouldPay: 'Yes',
+    storeSize: '$50K-$200K',
+    worth: 'Clearer fixes',
+    plan: 'Pro monthly',
+    products: [{ sku: 'SECRET-SKU' }]
+  }, function (url, options) {
+    seen = { url: url, options: options };
+    return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve({ success: 'true' }); } });
+  }).then(function (result) {
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(seen.url, 'https://formsubmit.co/ajax/skuclinicapp@gmail.com');
+    var sent = JSON.parse(seen.options.body);
+    assert.strictEqual(sent._subject, 'SkuClinic signup');
+    assert.strictEqual(sent._captcha, 'false');
+    assert.strictEqual(sent._template, 'table');
+    assert.strictEqual(sent.email, 'buyer@shop.example');
+    assert.strictEqual(sent['Would you pay $29/mo for this?'], 'Yes');
+    assert.strictEqual(sent['Store size'], '$50K-$200K');
+    assert.strictEqual(sent['What would make this worth paying for?'], 'Clearer fixes');
+    assert.strictEqual(sent.Plan, 'Pro monthly');
+    assert.strictEqual(JSON.stringify(sent).indexOf('SECRET'), -1);
+  });
 });
 
 check('empty endpoint does not post', function () {
@@ -165,6 +207,8 @@ check('a ready endpoint posts only the built payload', function () {
     var sent = JSON.parse(seen.options.body);
     assert.strictEqual(sent._subject, 'SkuClinic feedback');
     assert.strictEqual(sent._captcha, 'false');
+    assert.strictEqual(sent._template, 'table');
+    assert.strictEqual(sent._replyto, 'a@b.co');
     assert.strictEqual(sent._honey, '');
     assert.strictEqual(JSON.stringify(sent).indexOf('SECRET'), -1);
     assert.strictEqual(JSON.stringify(sent).indexOf('do not send'), -1);
@@ -173,7 +217,9 @@ check('a ready endpoint posts only the built payload', function () {
       'Would you pay $29/mo?',
       '_captcha',
       '_honey',
+      '_replyto',
       '_subject',
+      '_template',
       'email'
     ]);
   });
