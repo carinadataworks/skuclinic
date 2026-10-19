@@ -1,0 +1,11 @@
+settlement-id,settlement-start-date,settlement-end-date,currency,transaction-type,order-id,amount-type,amount-description,amount,posted-date,sku,quantity-purchased
+123456,2026-01-01,2026-01-31,USD,Order,111-1,ItemPrice,Principal,28.00,2026-01-05,CAMP-MUG,1
+123456,2026-01-01,2026-01-31,USD,Order,111-1,ItemPrice,Tax,2.24,2026-01-05,CAMP-MUG,1
+123456,2026-01-01,2026-01-31,USD,Order,111-1,ItemFees,Commission,-4.20,2026-01-05,CAMP-MUG,1
+123456,2026-01-01,2026-01-31,USD,Order,111-1,ItemFees,FBAPerUnitFulfillmentFee,-1.60,2026-01-05,CAMP-MUG,1
+123456,2026-01-01,2026-01-31,USD,Order,111-2,ItemPrice,Principal,56.00,2026-01-08,CAMP-MUG,2
+123456,2026-01-01,2026-01-31,USD,Order,111-2,ItemFees,Commission,-8.40,2026-01-08,CAMP-MUG,2
+123456,2026-01-01,2026-01-31,USD,Order,111-2,ItemFees,FBAPerUnitFulfillmentFee,-3.20,2026-01-08,CAMP-MUG,2
+123456,2026-01-01,2026-01-31,USD,Order,111-3,ItemPrice,Principal,42.00,2026-01-12,DESK-LAMP,1
+123456,2026-01-01,2026-01-31,USD,Order,111-3,ItemFees,Commission,-6.30,2026-01-12,DESK-LAMP,1
+123456,2026-01-01,2026-01-31,USD,Order,111-3,ItemFees,FBAPerUnitFulfillmentFee,-3.10,2026-01-12,DESK-LAMP,1

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<!--
+  TrueMargin
+  © 2026 Kyle Guy. All rights reserved.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="TrueMargin app. Drop Shopify and Google Ads exports. Your files stay in this browser.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f6e62">
+<title>TrueMargin</title>
+<link rel="icon" href="../favicon.svg">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><img src="../favicon.svg" alt=""><span>TrueMargin</span></a>
+  <nav class="nav">
+    <a href="../guide.html">How to export</a>
+    <a href="../index.html#pricing">Pricing</a>
+    <button type="button" class="linkish" id="helpOpen">Help</button>
+  </nav>
+  <div class="plan-cluster">
+    <span id="storeLabel">Main</span>
+    <select id="storeSelect" class="store-select" hidden aria-label="Client store"></select>
+    <button type="button" class="btn small" id="newStoreBtn">Add client store</button>
+    <div id="newStoreForm" hidden>
+      <input id="newStoreName" class="text-input" aria-label="Client store name" placeholder="Client name">
+      <button type="button" class="btn small" id="newStoreCreate">Create</button>
+    </div>
+    <button type="button" class="plan-pill" id="planBadge">Free · 0/25</button>
+  </div>
+</header>
+<main id="main" class="app-main">
+  <div class="app-intro">
+    <h1>True profit per SKU</h1>
+    <p>Drop a Shopify export and a Google Ads product report. Get a profit-safe bid and a fix for each SKU. Nothing is uploaded.</p>
+  </div>
+
+  <div id="dropZone" class="drop-zone">
+    <div>
+      <p><strong>Drop files here.</strong> Shopify products or orders, a Google Ads product report, a cost sheet, or an Amazon fee file.</p>
+      <p class="note">CSV or Excel. The header row is found for you, including Google’s title rows. You can correct the columns before anything is imported.</p>
+    </div>
+    <div class="drop-actions">
+      <button type="button" class="btn teal" id="browseBtn">Choose files</button>
+      <button type="button" class="btn" id="sampleBtn">Load sample files</button>
+      <input id="fileInput" type="file" accept=".csv,.xlsx,.xls,text/csv" multiple>
+    </div>
+  </div>
+  <div id="importStatus" class="status" role="status" aria-live="polite"></div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" class="tab on" id="tabBid" role="tab" aria-selected="true">Bid calculator</button>
+    <button type="button" class="tab" id="tabLeak" role="tab" aria-selected="false">Profit Leak Finder</button>
+  </div>
+
+  <section id="viewBid">
+    <div class="save-bar row">
+      <button type="button" class="btn small" id="saveSnap">Save snapshot</button>
+      <button type="button" class="btn small" id="loadSnap">Load last snapshot</button>
+      <button type="button" class="btn small" id="compareSnap">Compare to last snapshot</button>
+      <span class="note" id="snapStamp">No snapshot saved yet</span>
+    </div>
+    <div class="panel row">
+      <label class="field">Default profit buffer %
+        <input id="defaultBuffer" type="number" min="0" max="100" step="1" value="20">
+      </label>
+      <p class="note">Share of gross profit you want to keep after ads. 0% stays 0%. An empty cell uses this default. Rows with shipping, fees, or other costs use true margin.</p>
+    </div>
+
+    <div class="panel" id="impactPanel">
+      <h2>Ad spend impact — before vs after</h2>
+      <div class="row">
+        <button type="button" class="btn small mode-btn on" id="modePlan">Planning a budget</button>
+        <button type="button" class="btn small mode-btn" id="modeReview">Reviewing a campaign that already ran</button>
+      </div>
+      <div class="row">
+        <label class="field">Sale price $<input id="imPrice" type="number" step="0.01" value="100"></label>
+        <label class="field">Margin %<input id="imMargin" type="number" step="1" value="30"></label>
+        <label class="field">Baseline sales, zero ads<input id="imBaseline" type="number" step="0.1" value="1"></label>
+      </div>
+      <div class="row" id="imPlanFields">
+        <label class="field">Ad budget $<input id="imBudget" type="number" step="1" value="100"></label>
+        <label class="field">Expected CPC $<input id="imCpc" type="number" step="0.01" value="2.50"></label>
+        <label class="field">Expected conv. rate %<input id="imConv" type="number" step="0.1" value="5"></label>
+      </div>
+      <div class="row" id="imReviewFields" hidden>
+        <label class="field">Ad spend $ (actual)<input id="imActualSpend" type="number" step="1" value="100"></label>
+        <label class="field">Total sales while ads ran<input id="imActualSales" type="number" step="0.1" value="2"></label>
+      </div>
+      <div class="compare">
+        <div class="card"><div class="note">Without ads</div><div class="big" id="imBeforeSales">–</div><div id="imBeforeProfit">–</div></div>
+        <div class="card"><div class="note" id="imAfterLabel">With ads</div><div class="big" id="imAfterSales">–</div><div id="imAfterProfit">–</div></div>
+      </div>
+      <div class="banner" id="imGain">–</div>
+    </div>
+
+    <div class="stats" id="summaryRow"></div>
+
+    <div class="panel">
+      <div class="toolbar">
+        <div id="tableCount">0 products</div>
+        <input id="searchBox" class="search" type="search" placeholder="Search by name or SKU" aria-label="Search by name or SKU">
+        <div class="pager">
+          <span data-page-label></span>
+          <button type="button" data-page="first">First</button>
+          <button type="button" data-page="prev">Prev</button>
+          <span data-page-num></span>
+          <button type="button" data-page="next">Next</button>
+          <button type="button" data-page="last">Last</button>
+          <select id="pageSize" class="select tiny" aria-label="Rows per page">
+            <option value="25">25 / page</option>
+            <option value="50" selected>50 / page</option>
+            <option value="100">100 / page</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data">
+          <thead>
+            <tr>
+              <th></th>
+              <th>SKU</th>
+              <th>Product</th>
+              <th>Price $</th>
+              <th>COGS $</th>
+              <th>Buffer %</th>
+              <th>Spend $</th>
+              <th>Clicks</th>
+              <th><button type="button" class="sort" data-sort="sales">Sales <span class="sort-arrow" data-field="sales"></span></button></th>
+              <th><button type="button" class="sort" data-sort="cpc">CPC <span class="sort-arrow" data-field="cpc"></span></button></th>
+              <th><button type="button" class="sort" data-sort="convrate">Conv. <span class="sort-arrow" data-field="convrate"></span></button></th>
+              <th>Conf.</th>
+              <th><button type="button" class="sort" data-sort="effMarginFrac">Margin <span class="sort-arrow" data-field="effMarginFrac"></span></button></th>
+              <th><button type="button" class="sort" data-sort="maxcpc">Max CPC <span class="sort-arrow" data-field="maxcpc"></span></button></th>
+              <th><button type="button" class="sort" data-sort="troas">tROAS <span class="sort-arrow" data-field="troas"></span></button></th>
+              <th><button type="button" class="sort" data-sort="netProfit">Net <span class="sort-arrow" data-field="netProfit"></span></button></th>
+              <th><button type="button" class="sort" data-sort="cpcGap">CPC vs max <span class="sort-arrow" data-field="cpcGap"></span></button></th>
+              <th>Recommendation</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="toolbar">
+        <button type="button" class="btn small" id="addProduct">+ Add product</button>
+        <button type="button" class="btn small" id="clearProducts">Clear products</button>
+        <button type="button" class="btn small" id="exportBtn">Export fixes (CSV)</button>
+        <button type="button" class="btn small" id="templateBtn">Blank cost sheet</button>
+      </div>
+      <p class="note">A product with ad spend and 0 sales is marked “Decrease — losing money.” Zeros are kept. A buffer of 1 imports as 1%, not 100%. Search only filters this table. Export, on Pro, includes every SKU.</p>
+    </div>
+  </section>
+
+  <section id="viewLeak" hidden>
+    <div class="stats">
+      <div class="stat"><div class="label">SKUs</div><div class="value" id="leakCount">0</div></div>
+      <div class="stat"><div class="label">Need a fix</div><div class="value" id="leakBad">0</div></div>
+      <div class="stat"><div class="label">Estimated annual leak</div><div class="value neg" id="leakAnnual">–</div></div>
+    </div>
+    <div class="panel row">
+      <label class="field">Period these numbers cover
+        <select id="periodMode" class="select">
+          <option value="auto">Detected dates, or one month</option>
+          <option value="month">One month</option>
+          <option value="quarter">One quarter</option>
+          <option value="year">One year</option>
+          <option value="custom">Custom days</option>
+        </select>
+      </label>
+      <label class="field" id="customDaysWrap" hidden>Days
+        <input id="customDays" type="number" min="1" step="1" value="30">
+      </label>
+      <label class="field"><input id="leakProblems" type="checkbox"> Problems only</label>
+      <button type="button" class="btn small" id="exportLeak">Export fixes (CSV)</button>
+    </div>
+    <p class="note" id="leakNote"></p>
+    <div class="table-scroll">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>SKU</th><th>Product</th><th>Price</th><th>Product cost</th><th>Fees / unit</th>
+            <th>Ad spend</th><th>Units</th><th>Profit / unit</th><th>Profit for period</th>
+            <th>Annual leak</th><th>Action</th><th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="leakRows"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div>© 2026 Kyle Guy. All rights reserved.</div>
+  <div><a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div>
+</footer>
+
+<div id="mapModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
+    <h2 id="mapTitle">Check the columns</h2>
+    <p id="mapMeta" class="note"></p>
+    <label class="field">File type
+      <select id="mapType" class="select"></select>
+    </label>
+    <p id="mapBlurb" class="note"></p>
+    <div id="mapFields" class="map-grid"></div>
+    <p class="note">Buffer columns: 1 and 1% mean 1%. 0.2 means 20%. 0 stays 0%. Empty cells are left alone, so a real zero is not dropped.</p>
+    <div class="table-scroll"><table class="data"><thead id="mapHead"></thead><tbody id="mapPreview"></tbody></table></div>
+    <p id="mapInfo" class="note"></p>
+    <p id="mapWarn" class="warn-text"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="mapCancel">Cancel</button>
+      <button type="button" class="btn primary" id="mapConfirm">Import</button>
+    </div>
+  </div>
+</div>
+
+<div id="upgradeModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle">
+    <h2 id="upgradeTitle">Upgrade</h2>
+    <p id="upgradeText"></p>
+    <div class="row">
+      <button type="button" class="btn primary" id="proMonthBtn">Coming soon</button>
+      <button type="button" class="btn" id="proYearBtn">Coming soon</button>
+      <button type="button" class="btn teal" id="agencyBtn">Coming soon</button>
+    </div>
+    <p class="note">Checkout opens soon. Until then, an unlock code applies to this browser only. It is not a subscription.</p>
+    <label class="field">Unlock code
+      <input id="unlockCode" class="text-input" autocomplete="off" aria-label="Unlock code">
+    </label>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="upgradeClose">Close</button>
+      <button type="button" class="btn primary" id="unlockBtn">Unlock this browser</button>
+    </div>
+    <p id="unlockMsg" class="note"></p>
+  </div>
+</div>
+
+<div id="helpModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <h2 id="helpTitle">How the numbers work</h2>
+    <div class="help-nav">
+      <a href="#help-core">Core</a>
+      <a href="#help-buffer">Buffer</a>
+      <a href="#help-zero">Zero sales</a>
+      <a href="#help-import">Import</a>
+      <a href="#help-leak">Leak finder</a>
+      <a href="#help-snap">Snapshots</a>
+      <a href="#help-limits">Limits</a>
+    </div>
+    <section id="help-core">
+      <h3>The core idea</h3>
+      <div class="formula">
+        <div>Max CPC = (Price − cost) × (1 − buffer) × conversion rate</div>
+        <div>Target ROAS = Price ÷ [(Price − cost) × (1 − buffer)]</div>
+      </div>
+      <p>Cost is COGS, plus shipping, other costs, and fees when those cells are filled in. Conversion rate is sales ÷ clicks. Under 50 clicks the row is tagged low confidence. Confidence uses a Wilson lower bound and is a warning, not a different bid.</p>
+      <p>Increase bid: CPC is under 85% of max. Maintain: 85–105%. Decrease — losing profit: CPC is over max. Unprofitable: cost is already above price. Hold — low stock: stock on hand is below this period’s sales, and the row is not already losing money.</p>
+    </section>
+    <section id="help-buffer">
+      <h3>Buffer %</h3>
+      <p>The share of unit profit you refuse to spend on ads. 20% means you will spend at most 80% of unit profit to win the sale. The default at the top applies when a row’s own buffer is empty. Typing 0 keeps 0% — it does not silently become 20%.</p>
+      <p>On import, 20 and 20% are 20. 1 and 1% are 1, not 100. A value strictly between 0 and 1, such as 0.2, is treated as a fraction and becomes 20. That is how some spreadsheets store a percent.</p>
+    </section>
+    <section id="help-zero">
+      <h3>Spend with zero sales</h3>
+      <p>If ad spend is above zero and sales are 0, the row is “Decrease — losing money.” Net profit is minus the spend. A zero is kept. It is not treated as missing, and it is not labeled “Need data.”</p>
+    </section>
+    <section id="help-import">
+      <h3>Import</h3>
+      <p>Drop a Shopify product export, a Shopify orders export, a Google Ads shopping or product report, a cost sheet, or an Amazon fee preview or settlement. The header row is detected even when title rows sit above it. Google’s Total row is skipped. You get a mapping preview and can change the file type or any column before import. A file with no recognizable header, or a header and no data rows, is reported as an error. It is not imported as blank products.</p>
+      <p>Orders are totaled by SKU. Settlement fee lines become fees per unit; tax lines are ignored. Profit uses units from orders when that file is present, and otherwise falls back to ad conversions.</p>
+    </section>
+    <section id="help-leak">
+      <h3>Profit Leak Finder</h3>
+      <p>Profit per unit = price − product cost − fees − (ad spend ÷ units), when units are above zero. Product cost is unit cost + shipping + other. Fees come from an Amazon file when you add one; without it, profit is before marketplace fees and the table says so.</p>
+      <p>Cut ads: the SKU makes money before ads and loses money after them, or it has spend and zero units. Raise price: cost is over price, and a higher price would clear about a 15% margin. Stop selling: a 25% price increase still would not. Review fees: fees are at least 35% of price and the SKU loses money before ads. Annual leak adds up only the losses, scaled from the period in the file (or one month if no dates were found).</p>
+    </section>
+    <section id="help-snap">
+      <h3>Snapshots</h3>
+      <p>Save snapshot keeps one copy of the current store in this browser. Load replaces the list with that copy. Compare shows the change in total net profit on the summary card only. It does not put an arrow on each row. There is one snapshot slot. There are no profiles. Saving is part of Pro and Agency. The free plan keeps the list until you close the tab.</p>
+    </section>
+    <section id="help-limits">
+      <h3>What this can’t tell you</h3>
+      <p>CPC and conversion rate move when you change bids. Max CPC describes the current numbers. It does not predict the point where more spend stops paying. The spend-level tests in Advanced are the only curve this tool will draw, and only between points you actually ran.</p>
+      <p>The free plan analyzes 25 SKUs. Pro ($29/mo or $290/yr) removes the cap, saves settings in this browser, and exports a CSV of the fixes. Agency ($79/mo) is for freelance ad managers and adds a separate store per client, still only on this device.</p>
+    </section>
+    <div class="modal-actions"><button type="button" class="btn" id="helpClose">Close</button></div>
+  </div>
+</div>
+
+<div id="welcomeModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <h2 id="welcomeTitle">Your files stay in this browser</h2>
+    <p>Drop a Shopify product export and a Google Ads product report. TrueMargin joins them by SKU and tells you the most you can pay per click, and which products to fix. Nothing is uploaded.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="welcomeBlank">Start blank</button>
+      <button type="button" class="btn primary" id="welcomeSample">Load sample files</button>
+    </div>
+    <label class="note"><input type="checkbox" id="dontShowAgain"> Don’t show this again</label>
+  </div>
+</div>
+<div class="toasts" id="toastStack"></div>
+<script src="../config.js"></script>
+<script src="../vendor/xlsx.full.min.js"></script>
+<script src="../js/util.js"></script>
+<script src="../js/compute.js"></script>
+<script src="../js/detect.js"></script>
+<script src="../js/leak.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+Handle,Title,Vendor,Published,Option1 Name,Option1 Value,Variant SKU,Variant Price,Cost per item,Variant Inventory Qty
+camp-mug,Camp mug,Northwind,true,Title,Default Title,CAMP-MUG,28.00,8.00,120
+desk-lamp,Desk lamp,Northwind,true,Title,Default Title,DESK-LAMP,42.00,14.00,40
+usb-cable,USB-C cable,Northwind,true,Title,Default Title,USB-CABLE,14.00,6.50,300
+steel-bottle,Steel bottle,Northwind,true,Title,Default Title,STEEL-BOTTLE,32.00,7.00,80
+clear-case,Clear phone case,Northwind,true,Title,Default Title,CLEAR-CASE,15.00,6.40,100
+throw,Throw blanket,Northwind,true,Title,Default Title,THROW,49.00,16.00,20
+cedar-candle,Cedar candle,Northwind,true,Title,Default Title,CEDAR-CANDLE,16.00,12.80,60
+marble-table,Marble side table,Northwind,true,Title,Default Title,MARBLE-TABLE,90.00,82.00,8
+sticker-pack,Sticker pack,Northwind,true,Title,Default Title,STICKER-PACK,9.00,1.10,500
+yoga-mat,Yoga mat,Northwind,true,Title,Default Title,YOGA-MAT,36.00,11.00,30
