@@ -36,11 +36,17 @@ Edit `config.js`:
 var STRIPE_PRO_MONTHLY_LINK = ''; // $29/mo
 var STRIPE_PRO_YEARLY_LINK = '';  // $290/yr
 var STRIPE_AGENCY_LINK = '';      // $79/mo
+var SIGNUP_FORM_ENDPOINT = '';    // https://formsubmit.co/ajax/<email-or-hash>
+var CF_ANALYTICS_TOKEN = '';      // Cloudflare Web Analytics token
 ```
 
-Leave a string empty and that button says **Coming soon**.
+Leave a Stripe string empty and that button says **Join the founding list**. The prices on the page are marked planned and are not billed. Paste a Payment Link and that button opens checkout.
 
-There are no accounts yet. Pro and Agency can be unlocked in the browser with the codes in the same file (`PRO_UNLOCK_CODE`, `AGENCY_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. The note to replace it with real Stripe billing is a comment in `config.js` and in the app script, not copy on the site. The email form does not submit. The page says signup opens soon and that nothing is stored.
+`SIGNUP_FORM_ENDPOINT` is the FormSubmit AJAX address. Empty means the signup form does not send anything and says nothing is stored. The same address receives feedback from the app. Feedback buttons stay hidden until it is set.
+
+`CF_ANALYTICS_TOKEN` adds the Cloudflare Web Analytics beacon when set. Empty adds nothing.
+
+There are no accounts yet. Pro and Agency can be unlocked in the browser with the codes in the same file (`PRO_UNLOCK_CODE`, `AGENCY_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. The note to replace it with real Stripe billing is a comment in `config.js` and in the app script, not copy on the site.
 
 ## Layout
 
@@ -50,12 +56,13 @@ There are no accounts yet. Pro and Agency can be unlocked in the browser with th
 | `app/` | The calculator |
 | `guide.html` | How to export from Shopify, Google Ads, and Amazon |
 | `privacy.html`, `terms.html` | Drafts. Both say data is processed only in the browser. |
-| `config.js` | Stripe links and the temporary unlock codes |
+| `config.js` | Stripe links, FormSubmit endpoint, analytics token, unlock codes |
 | `js/` | App, import detection, bid math, leak math |
 | `css/` | Styles. No build step. |
 | `samples/` | One sample file for Shopify, Google Ads, and Amazon, plus orders, a cost sheet, and a small settlement |
 | `vendor/xlsx.full.min.js` | SheetJS Community Edition 0.20.3 (Apache-2.0). See `vendor/SHEETJS-LICENSE`. |
 | `tests/logic.test.js` | Parser and recommendation checks. `node tests/logic.test.js` |
+| `tests/forms.test.js` | Signup and feedback payloads. `node tests/forms.test.js` |
 
 ## Privacy
 

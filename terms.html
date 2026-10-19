@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>Terms — TrueMargin</title>
 <link rel="icon" href="favicon.svg">
@@ -27,7 +27,7 @@
   <h2>The tool</h2>
   <p>Results depend on the files you import and on assumptions the app states (default profit buffer, which units count as sold, how a date range is annualized). They are not a promise of profit, and they are not ads-management advice.</p>
   <h2>Plans</h2>
-  <p>The free plan analyzes up to 25 SKUs in the current browser tab. Pro is listed at $29 a month or $290 a year for unlimited SKUs, settings saved in this browser, and CSV export. Agency is listed at $79 a month for freelance ad managers and adds separate client stores on this device. Until checkout is available, paid buttons say “Coming soon.” An unlock code works only in this browser and is not a subscription.</p>
+  <p>The free plan analyzes up to 25 SKUs in the current browser tab. Planned pricing, not billed yet: Pro is a founding price of $29 a month or $290 a year for unlimited SKUs, settings saved in this browser, and CSV export. Agency is a founding price of $79 a month for freelance ad managers and adds separate client stores on this device. Founding price, coming soon. Those buttons join the founding list and do not charge a card. An unlock code works only in this browser and is not a subscription.</p>
   <h2>Your files</h2>
   <p>You keep your files. Because they are processed locally and are not uploaded, we do not have a copy to return, delete, or secure. If you save a workspace, it remains in your browser until you clear it.</p>
   <h2>No warranty</h2>
@@ -36,5 +36,7 @@
   <p>© 2026 Kyle Guy. All rights reserved. TrueMargin is not affiliated with Google, Shopify, Amazon, or Stripe.</p>
 </main>
 <footer class="foot"><div>© 2026 Kyle Guy. All rights reserved.</div></footer>
+<script src="config.js"></script>
+<script src="js/analytics.js"></script>
 </body>
 </html>

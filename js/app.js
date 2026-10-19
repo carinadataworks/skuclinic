@@ -174,31 +174,39 @@
 
   function paid() { return plan === 'pro' || plan === 'agency'; }
 
-  function paintPaidButton(node, url, label) {
+  function paintPaidButton(node, url, label, plan) {
     var href = String(url || '').trim();
-    node.textContent = href ? label : 'Coming soon';
-    node.classList.toggle('is-disabled', !href);
+    node.textContent = href ? label : 'Join the founding list';
+    node.classList.remove('is-disabled');
+    node.removeAttribute('aria-disabled');
     node.dataset.href = href;
-    if (href) node.removeAttribute('aria-disabled');
-    else node.setAttribute('aria-disabled', 'true');
+    node.dataset.plan = plan;
   }
 
   function openPaidLink(event) {
     var href = event.currentTarget.dataset.href;
-    if (!href) { event.preventDefault(); return; }
-    window.open(href, '_blank', 'noopener');
+    if (href) {
+      window.open(href, '_blank', 'noopener');
+      return;
+    }
+    var plan = event.currentTarget.dataset.plan || 'pro-monthly';
+    window.location.href = '../index.html?plan=' + encodeURIComponent(plan) + '#signup';
   }
 
   function openUpgrade(reason) {
-    var text = 'Pro is unlimited SKUs, settings saved in this browser, and a CSV of the fixes. Agency adds a store per client.';
-    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Pro is $29/mo or $290/yr for the whole catalog, saved settings, and a CSV of the fixes.';
-    if (reason === 'export') text = 'CSV export of the fixes is part of Pro. The free plan still shows every fix on screen, up to 25 SKUs.';
-    if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. On the free plan it lasts until you close the tab.';
-    if (reason === 'agency') text = 'Separate client stores are the Agency plan, $79/mo, for freelance ad managers. Pro keeps one saved store.';
+    var text = 'Planned pricing, not billed yet. Pro is unlimited SKUs, settings saved in this browser, and a CSV of the fixes. Agency adds a store per client.';
+    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Planned founding price, not billed yet: Pro is $29/mo or $290/yr for the whole catalog, saved settings, and a CSV of the fixes.';
+    if (reason === 'export') text = 'CSV export of the fixes is part of Pro. Planned founding price, not billed yet. The free plan still shows every fix on screen, up to 25 SKUs.';
+    if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. Planned founding price, not billed yet. On the free plan it lasts until you close the tab.';
+    if (reason === 'agency') text = 'Separate client stores are the Agency plan. Planned founding price, not billed yet: $79/mo. Pro keeps one saved store.';
     $('upgradeText').textContent = text;
-    paintPaidButton($('proMonthBtn'), window.STRIPE_PRO_MONTHLY_LINK, 'Pro · $29/mo');
-    paintPaidButton($('proYearBtn'), window.STRIPE_PRO_YEARLY_LINK, 'Pro · $290/yr');
-    paintPaidButton($('agencyBtn'), window.STRIPE_AGENCY_LINK, 'Agency · $79/mo');
+    paintPaidButton($('proMonthBtn'), window.STRIPE_PRO_MONTHLY_LINK, 'Pro · $29/mo', 'pro-monthly');
+    paintPaidButton($('proYearBtn'), window.STRIPE_PRO_YEARLY_LINK, 'Pro · $290/yr', 'pro-yearly');
+    paintPaidButton($('agencyBtn'), window.STRIPE_AGENCY_LINK, 'Agency · $79/mo', 'agency');
+    var billingReady = [window.STRIPE_PRO_MONTHLY_LINK, window.STRIPE_PRO_YEARLY_LINK, window.STRIPE_AGENCY_LINK].every(function (url) {
+      return String(url || '').trim();
+    });
+    $('upgradeSoon').hidden = billingReady;
     $('unlockMsg').textContent = '';
     $('upgradeModal').hidden = false;
   }
@@ -1184,6 +1192,49 @@
     $('saveSnap').addEventListener('click', saveSnapshot);
     $('loadSnap').addEventListener('click', loadSnapshot);
     $('compareSnap').addEventListener('click', compareSnapshot);
+    var feedbackOn = TM.hasSignupEndpoint(window.SIGNUP_FORM_ENDPOINT);
+    ['feedbackOpen', 'feedbackBid', 'feedbackLeak'].forEach(function (id) {
+      $(id).hidden = !feedbackOn;
+    });
+    function openFeedback() { $('feedbackModal').hidden = false; }
+    $('feedbackOpen').addEventListener('click', openFeedback);
+    $('feedbackBid').addEventListener('click', openFeedback);
+    $('feedbackLeak').addEventListener('click', openFeedback);
+    $('feedbackClose').addEventListener('click', function () { $('feedbackModal').hidden = true; });
+    $('feedbackForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var message = $('feedbackMessage').value.trim();
+      var pay = document.querySelector('input[name="feedbackPay"]:checked');
+      var status = $('feedbackMsg');
+      status.hidden = false;
+      if (!message) {
+        status.textContent = 'Tell us what’s missing or confusing.';
+        status.className = 'msg-bad';
+        return;
+      }
+      if (!pay) {
+        status.textContent = 'Choose Yes, Maybe, or No.';
+        status.className = 'msg-bad';
+        return;
+      }
+      $('feedbackSend').disabled = true;
+      TM.submitFeedback(window.SIGNUP_FORM_ENDPOINT, {
+        message: message,
+        wouldPay: pay.value,
+        email: $('feedbackEmail').value,
+        honey: $('feedbackHoney').value
+      }).then(function (result) {
+        $('feedbackSend').disabled = false;
+        if (result.ok || (result.skipped && result.reason === 'honey')) {
+          status.textContent = 'Thanks. We only received what you typed.';
+          status.className = 'msg-ok';
+          $('feedbackForm').reset();
+          return;
+        }
+        status.textContent = 'That didn’t send. Your files were not included. Try again in a moment.';
+        status.className = 'msg-bad';
+      });
+    });
     $('helpOpen').addEventListener('click', function () { $('helpModal').hidden = false; });
     $('helpClose').addEventListener('click', function () { $('helpModal').hidden = true; });
     $('planBadge').addEventListener('click', function () { openUpgrade('general'); });
