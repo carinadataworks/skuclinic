@@ -149,17 +149,18 @@ h1 {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 28px;
   align-items: end;
+  margin-bottom: 24px;
 }
 .fix-card {
   background: var(--ink);
   color: #f4efe6;
   border-radius: 18px;
-  padding: 18px 18px 8px;
+  padding: 24px 22px 14px;
   box-shadow: var(--shadow);
 }
-.fix-card h2 { font-family: var(--serif); font-size: 1.25rem; font-weight: 500; margin: 0 0 10px; }
+.fix-card h2 { font-family: var(--serif); font-size: 1.25rem; font-weight: 500; margin: 0 0 14px; }
 .fix-card table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.fix-card th { text-align: left; color: #c8bfb2; font-weight: 600; font-size: 12px; padding: 6px 6px 8px; }
+.fix-card th { text-align: left; color: #c8bfb2; font-weight: 600; font-size: 12px; padding: 10px 6px 8px; }
 .fix-card td { padding: 9px 6px; border-top: 1px solid rgba(255,255,255,0.08); vertical-align: top; }
 .tag {
   display: inline-block;
