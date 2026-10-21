@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="SkuClinic app. Find the SKUs losing you money. Your files stay in this browser.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://script.google.com https://script.googleusercontent.com https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>SkuClinic</title>
 <link rel="icon" href="../favicon.svg">
@@ -421,7 +421,7 @@
     <h2 id="feedbackTitle">Give feedback</h2>
     <p class="note">This sends only what you type. Your files and results stay in this browser.</p>
     <form id="feedbackForm">
-      <label class="hp" for="feedbackHoney">Leave this blank
+      <label class="hp" for="feedbackHoney" aria-hidden="true">Leave this blank
         <input id="feedbackHoney" name="_honey" type="text" tabindex="-1" autocomplete="off">
       </label>
       <label class="field">What’s missing or confusing?

@@ -74,8 +74,8 @@
   document.getElementById('foundingLine').textContent = TM.FOUNDING.text;
   paint();
 
-  var endpoint = String(window.SIGNUP_FORM_ENDPOINT || '').trim();
-  document.getElementById('signupIdle').hidden = endpoint.length > 0;
+  var target = TM.formTarget(window.SIGNUP_SCRIPT_URL, window.SIGNUP_FORM_ENDPOINT);
+  document.getElementById('signupIdle').hidden = TM.hasSignupEndpoint(target);
 
   var initial = new URLSearchParams(window.location.search).get('plan');
   if (TM.planOption(initial)) prefillPlan(initial);
@@ -88,7 +88,7 @@
       setMsg('Enter an email address. Nothing is stored.', true);
       return;
     }
-    if (!TM.hasSignupEndpoint(window.SIGNUP_FORM_ENDPOINT)) {
+    if (!TM.hasSignupEndpoint(target)) {
       setMsg('Thanks. Email signup opens soon. Nothing is stored yet.', false);
       email.value = '';
       return;
@@ -100,7 +100,7 @@
     }
     var button = document.getElementById('signupSubmit');
     button.disabled = true;
-    TM.submitSignup(window.SIGNUP_FORM_ENDPOINT, {
+    TM.submitSignup(target, {
       email: address,
       wouldPay: wouldPay,
       storeSize: document.getElementById('storeSize').value,

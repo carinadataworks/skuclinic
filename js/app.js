@@ -1645,7 +1645,8 @@
     $('saveSnap').addEventListener('click', saveSnapshot);
     $('loadSnap').addEventListener('click', loadSnapshot);
     $('compareSnap').addEventListener('click', compareSnapshot);
-    var feedbackOn = TM.hasSignupEndpoint(window.SIGNUP_FORM_ENDPOINT);
+    var feedbackTarget = TM.formTarget(window.SIGNUP_SCRIPT_URL, window.SIGNUP_FORM_ENDPOINT);
+    var feedbackOn = TM.hasSignupEndpoint(feedbackTarget);
     ['feedbackOpen', 'feedbackBid', 'feedbackLeak'].forEach(function (id) {
       $(id).hidden = !feedbackOn;
     });
@@ -1671,7 +1672,7 @@
         return;
       }
       $('feedbackSend').disabled = true;
-      TM.submitFeedback(window.SIGNUP_FORM_ENDPOINT, {
+      TM.submitFeedback(feedbackTarget, {
         message: message,
         wouldPay: pay.value,
         email: $('feedbackEmail').value,

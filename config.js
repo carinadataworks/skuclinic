@@ -11,6 +11,11 @@ var STRIPE_MULTI_YEARLY_LINK = '';   // Multichannel, $240/yr
    Leave it empty and the signup form does not send anything, and feedback stays hidden. */
 var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
 
+/* Google Apps Script web app (/exec URL) for skuclinicapp@gmail.com. See signup-backend/README.md.
+   When set, signup and feedback POST here instead of FormSubmit: a row goes to the
+   "SkuClinic signups" Sheet and a notification email lands in the inbox. Empty = FormSubmit. */
+var SIGNUP_SCRIPT_URL = '';
+
 /* Cloudflare Web Analytics token. Leave empty and no beacon is added. */
 var CF_ANALYTICS_TOKEN = '';
 

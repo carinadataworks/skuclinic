@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Find the products losing you money and get the fix for each. SkuClinic for Shopify brands on Google Shopping or Performance Max. Your files never leave the browser.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://script.google.com https://script.googleusercontent.com https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>SkuClinic — Find the products losing you money and get the fix for each.</title>
 <link rel="icon" href="favicon.svg">
@@ -194,7 +194,7 @@
     <p class="sub">One note when billing opens. No sequence, no newsletter. Nothing is charged now.</p>
     <p id="planLine" class="note" hidden></p>
     <form id="signupForm" class="signup-form" novalidate>
-      <label class="hp" for="honey">Leave this blank
+      <label class="hp" for="honey" aria-hidden="true">Leave this blank
         <input id="honey" name="_honey" type="text" tabindex="-1" autocomplete="off">
       </label>
       <input id="planChoice" type="hidden" value="">

@@ -15,8 +15,37 @@
     return String(value == null ? '' : value).trim();
   }
 
+  /* A target is a FormSubmit URL string (as before) or the result of formTarget(). */
   function endpoint(value) {
-    return text(value);
+    return text(value && typeof value === 'object' ? value.url : value);
+  }
+
+  /* SIGNUP_SCRIPT_URL (Google Apps Script web app) wins when set; otherwise FormSubmit as before. */
+  function formTarget(scriptUrl, formSubmitUrl) {
+    if (text(scriptUrl)) return { url: text(scriptUrl), mode: 'script' };
+    return { url: text(formSubmitUrl), mode: 'formsubmit' };
+  }
+
+  /* Apps Script gets plain fields: FormSubmit's _options dropped, plus form, app and an empty honeypot. */
+  function scriptFields(payload, form) {
+    var fields = { form: form, app: 'SkuClinic' };
+    Object.keys(payload).forEach(function (key) {
+      if (key.charAt(0) !== '_') fields[key] = payload[key];
+    });
+    fields._gotcha = '';
+    return fields;
+  }
+
+  /* no-cors gives an opaque response: a resolved fetch counts as sent, a network error as failed. */
+  function postScript(url, fields, fetchImpl) {
+    var fetchFn = fetchImpl || root.fetch;
+    return Promise.resolve().then(function () {
+      return fetchFn(url, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(fields) });
+    }).then(function () {
+      return { ok: true, skipped: false };
+    }, function () {
+      return { ok: false, skipped: false };
+    });
   }
 
   function hasSignupEndpoint(value) {
@@ -77,7 +106,11 @@
     };
   }
 
-  function postForm(target, payload, fetchImpl) {
+  function postForm(target, payload, fetchImpl, form) {
+    if (target && target.mode === 'script') {
+      if (!hasSignupEndpoint(target)) return Promise.resolve({ ok: false, skipped: true });
+      return postScript(endpoint(target), scriptFields(payload, form || 'signup'), fetchImpl);
+    }
     var prepared = preparePost(target, payload);
     if (prepared.skip) return Promise.resolve({ ok: false, skipped: true });
     var fetchFn = fetchImpl || root.fetch;
@@ -103,16 +136,19 @@
     input = input || {};
     if (!hasSignupEndpoint(target)) return Promise.resolve({ ok: false, skipped: true, reason: 'empty' });
     if (blockedByHoneypot(input.honey)) return Promise.resolve({ ok: false, skipped: true, reason: 'honey' });
-    return postForm(target, signupPayload(input), fetchImpl);
+    return postForm(target, signupPayload(input), fetchImpl, 'signup');
   }
 
   function submitFeedback(target, input, fetchImpl) {
     input = input || {};
     if (!hasSignupEndpoint(target)) return Promise.resolve({ ok: false, skipped: true, reason: 'empty' });
     if (blockedByHoneypot(input.honey)) return Promise.resolve({ ok: false, skipped: true, reason: 'honey' });
-    return postForm(target, feedbackPayload(input), fetchImpl);
+    return postForm(target, feedbackPayload(input), fetchImpl, 'feedback');
   }
 
+  TM.formTarget = formTarget;
+  TM.scriptFields = scriptFields;
+  TM.postScript = postScript;
   TM.hasSignupEndpoint = hasSignupEndpoint;
   TM.blockedByHoneypot = blockedByHoneypot;
   TM.signupPayload = signupPayload;

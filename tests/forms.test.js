@@ -5,7 +5,7 @@ var vm = require('vm');
 var assert = require('assert');
 
 var root = path.join(__dirname, '..');
-var context = { console: console };
+var context = { console: console, URLSearchParams: URLSearchParams };
 context.window = context;
 context.globalThis = context;
 vm.createContext(context);
@@ -222,6 +222,56 @@ check('a ready endpoint posts only the built payload', function () {
       '_template',
       'email'
     ]);
+  });
+});
+
+check('config: SIGNUP_SCRIPT_URL exists and is empty, so FormSubmit stays in use', function () {
+  var config = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
+  var match = config.match(/var SIGNUP_SCRIPT_URL = '([^']*)'/);
+  assert.ok(match);
+  assert.strictEqual(match[1], '');
+  same(TM.formTarget(match[1], 'https://formsubmit.co/ajax/skuclinicapp@gmail.com'), { url: 'https://formsubmit.co/ajax/skuclinicapp@gmail.com', mode: 'formsubmit' });
+  same(TM.formTarget(' https://script.google.com/macros/s/X/exec ', 'https://formsubmit.co/ajax/x'), { url: 'https://script.google.com/macros/s/X/exec', mode: 'script' });
+  assert.strictEqual(TM.hasSignupEndpoint(TM.formTarget('', '')), false);
+});
+
+check('script URL set: signup POSTs plain fields with no-cors, resolved fetch = success', function () {
+  var seen = null;
+  var target = TM.formTarget('https://script.google.com/macros/s/X/exec', 'https://formsubmit.co/ajax/x');
+  return TM.submitSignup(target, {
+    email: 'buyer@shop.example', wouldPay: 'Yes', storeSize: '$50K-$200K', worth: 'Clearer fixes', plan: 'Pro monthly',
+    products: [{ sku: 'SECRET-SKU' }]
+  }, function (url, options) {
+    seen = { url: url, options: options };
+    return Promise.resolve({ type: 'opaque', ok: false, status: 0 });
+  }).then(function (result) {
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(seen.url, 'https://script.google.com/macros/s/X/exec');
+    assert.strictEqual(seen.options.method, 'POST');
+    assert.strictEqual(seen.options.mode, 'no-cors');
+    assert.strictEqual(seen.options.headers, undefined);
+    same(Object.fromEntries(seen.options.body), {
+      form: 'signup', app: 'SkuClinic', email: 'buyer@shop.example',
+      'Would you pay $15/mo for this?': 'Yes', 'Store size': '$50K-$200K',
+      'What would make this worth paying for?': 'Clearer fixes', Plan: 'Pro monthly', _gotcha: ''
+    });
+  });
+});
+
+check('script URL set: feedback goes there too; a network error is a failure; honeypot still blocks', function () {
+  var target = TM.formTarget('https://script.google.com/macros/s/X/exec', '');
+  var body = null, calls = 0;
+  return TM.submitFeedback(target, { message: 'Hi', wouldPay: 'No', email: 'a@b.co' }, function (url, options) {
+    body = Object.fromEntries(options.body);
+    return Promise.reject(new TypeError('Failed to fetch'));
+  }).then(function (result) {
+    assert.strictEqual(result.ok, false);
+    assert.strictEqual(body.form, 'feedback');
+    assert.strictEqual(body.email, 'a@b.co');
+    return TM.submitSignup(target, { email: 'a@b.co', honey: 'bot' }, function () { calls++; });
+  }).then(function (result) {
+    assert.strictEqual(calls, 0);
+    assert.strictEqual(result.reason, 'honey');
   });
 });
 
