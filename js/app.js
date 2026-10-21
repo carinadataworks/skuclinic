@@ -320,7 +320,14 @@
     if (step) input.step = step;
     input.setAttribute('aria-label', label);
     if (value != null && value !== '') input.value = value;
+    fitInput(input);
     return input;
+  }
+
+  // Size a table input to its value (CSSOM custom property, allowed under style-src 'self').
+  function fitInput(input) {
+    var cap = input.dataset.field === 'name' ? 22 : input.dataset.field === 'upc' ? 16 : 9;
+    input.style.setProperty('--len', String(Math.min(cap, Math.max(3, String(input.value || '').length))));
   }
 
   function setOut(root, name, text, cls) {
@@ -345,9 +352,9 @@
     if (!c.confTier) conf.textContent = '–';
     else {
       var pill = el('span', 'conf ' + c.confTier);
-      pill.textContent = c.confLabel;
+      pill.textContent = String(c.confLabel).replace(/\s*\(.*\)$/, '');
       var bound = isFinite(c.confLower) ? (c.confLower * 100).toFixed(1) : '?';
-      pill.title = 'True conversion rate is at least ' + bound + '% with 95% confidence';
+      pill.title = c.confLabel + ': true conversion rate is at least ' + bound + '% with 95% confidence';
       conf.appendChild(pill);
     }
 
@@ -411,7 +418,17 @@
     del.dataset.action = 'delete';
     del.setAttribute('aria-label', 'Remove product');
     del.textContent = '×';
-    td().appendChild(del);
+    var first = td();
+    first.className = 'row-tools';
+    first.appendChild(del);
+    var adv = el('button', 'icon-btn adv-toggle');
+    adv.type = 'button';
+    adv.dataset.action = 'advanced';
+    adv.setAttribute('aria-expanded', expandedId === p.id ? 'true' : 'false');
+    adv.setAttribute('aria-label', 'Advanced costs, stock, and spend tests');
+    adv.title = 'Advanced: shipping, fees, stock, spend tests';
+    adv.textContent = expandedId === p.id ? '▴' : '▾';
+    first.appendChild(adv);
     td().appendChild(inputEl('upc', p.upc, 'SKU'));
     td().appendChild(inputEl('name', p.name, 'Product name'));
     td().appendChild(inputEl('price', p.price, 'Price', '0.01'));
@@ -424,11 +441,8 @@
       var cell = td();
       cell.dataset.out = name;
     });
-    var adv = el('button', 'btn small');
-    adv.type = 'button';
-    adv.dataset.action = 'advanced';
-    adv.textContent = expandedId === p.id ? 'Advanced ▴' : 'Advanced ▾';
-    td().appendChild(adv);
+    var BID_LABELS = ['', 'SKU', 'Product', 'Price $', 'COGS $', 'Buffer %', 'Spend $', 'Clicks', 'Sales', 'CPC', 'Conv.', 'Conf.', 'Margin', 'Max CPC', 'tROAS', 'Net', 'CPC vs max', 'Recommendation'];
+    Array.prototype.forEach.call(tr.children, function (cell, i) { if (BID_LABELS[i]) cell.dataset.label = BID_LABELS[i]; });
     fillOutputs(tr, p);
     return tr;
   }
@@ -437,7 +451,7 @@
     var tr = el('tr', 'advanced-row');
     tr.dataset.id = String(p.id);
     var cell = el('td');
-    cell.colSpan = 19;
+    cell.colSpan = 18;
     var grid = el('div', 'adv-grid');
 
     function numField(label, field, step) {
@@ -536,7 +550,7 @@
     if (!slice.length) {
       var tr = el('tr');
       var td = el('td');
-      td.colSpan = 19;
+      td.colSpan = 18;
       td.textContent = searchQuery ? 'No products match your search.' : 'No products yet. Add one, or drop a file.';
       tr.appendChild(td);
       body.appendChild(tr);
@@ -653,15 +667,17 @@
       var tr = el('tr');
       tr.dataset.sku = p.upc || '';
       tr.dataset.action = leak.action;
+      var LABELS = ['SKU', 'Product', 'Price', 'Product cost', 'Fees / unit', 'Ad spend', 'Units', 'Profit / unit', 'Profit for period', 'Annual leak', 'Action', 'Why'];
       function cell(text, cls) {
         var td = el('td');
+        td.dataset.label = LABELS[tr.cells.length] || '';
         if (cls) td.className = cls;
         td.textContent = text;
         tr.appendChild(td);
         return td;
       }
-      cell(p.upc || '');
-      cell(p.name || '');
+      cell(p.upc || '', 'sku');
+      cell(p.name || '', 'name');
       cell(leak.price == null ? '–' : TM.fmtMoney(leak.price));
       cell(isFinite(leak.productCost) ? TM.fmtMoney(leak.productCost) : '–');
       cell(leak.feesKnown ? TM.fmtMoney(leak.fees) : '–');
@@ -673,12 +689,14 @@
       cell(isFinite(leak.profitPerUnit) ? TM.fmtMoney(leak.profitPerUnit) : '–', isFinite(leak.profitPerUnit) ? (leak.profitPerUnit >= 0 ? 'pos' : 'neg') : '');
       cell(isFinite(leak.periodProfit) ? TM.fmtMoney(leak.periodProfit) : '–', isFinite(leak.periodProfit) ? (leak.periodProfit >= 0 ? 'pos' : 'neg') : '');
       cell(leak.annualLeak ? TM.fmtMoney(leak.annualLeak) : '–', leak.annualLeak ? 'neg' : '');
-      var action = el('td');
+      var action = el('td', 'action');
+      action.dataset.label = 'Action';
       var badge = el('span', 'badge ' + (leak.action === 'healthy' ? 'good' : leak.action === 'need_data' ? 'mute' : leak.action === 'raise_price' || leak.action === 'review_fees' || leak.action === 'check_data' ? 'warn' : 'bad'));
       badge.textContent = TM.ACTION_LABEL[leak.action] || leak.action;
       action.appendChild(badge);
       tr.appendChild(action);
       var why = el('td', 'reason');
+      why.dataset.label = 'Why';
       why.textContent = leak.reason;
       tr.appendChild(why);
       body.appendChild(tr);
@@ -1433,6 +1451,7 @@
 
   function wire() {
     $('rows').addEventListener('input', onRowInput);
+    $('rows').addEventListener('input', function (e) { if (e.target && e.target.matches && e.target.matches('tr.main-row input[data-field]')) fitInput(e.target); });
     $('rows').addEventListener('click', onRowClick);
     $('addProduct').addEventListener('click', addProduct);
     $('clearProducts').addEventListener('click', function () {

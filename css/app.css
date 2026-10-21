@@ -1,4 +1,4 @@
-.app-main { width: min(1280px, calc(100% - 28px)); margin: 0 auto; padding-bottom: 48px; }
+.app-main { width: min(1760px, calc(100% - 40px)); margin: 0 auto; padding-bottom: 48px; }
 .app-intro h1 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 6px; }
 .app-intro p { margin: 0 0 14px; color: var(--ink-soft); max-width: 46rem; }
 
@@ -280,4 +280,72 @@ th[title] { cursor: help; }
   .drop-zone { align-items: stretch; }
   .field input { width: 100%; }
   .modal { padding: 14px; }
+}
+
+/* Readable reasons: wrap long text instead of clipping it. */
+table.data th { white-space: normal; vertical-align: bottom; }
+table.data td.reason { white-space: normal; min-width: 240px; max-width: 420px; line-height: 1.35; }
+table.data td.name { white-space: normal; min-width: 110px; max-width: 180px; }
+#viewBid table.data td { padding: 6px 4px; }
+#viewBid table.data th { padding: 8px 4px; }
+table.data td input { min-width: 46px; padding: 6px 4px; }
+table.data input[data-field="name"] { min-width: 92px; }
+table.data input[data-field="upc"] { min-width: 80px; }
+.row-tools .icon-btn { padding: 0 3px; }
+#viewBid .gauge { width: 40px; }
+table.data td[data-out="rec"] { white-space: normal; min-width: 150px; max-width: 190px; }
+table.data td[data-out="rec"] .badge { white-space: normal; margin-bottom: 2px; }
+table.data td[data-out="rec"], table.data th.rec-col {
+  position: sticky; right: 0; background: var(--white); box-shadow: -6px 0 6px -6px rgba(28, 36, 48, 0.25);
+}
+table.data tr.advanced-row td { position: static; white-space: normal; }
+table.data tr.advanced-row td * { overflow-wrap: break-word; }
+.row-tools { white-space: nowrap; }
+.adv-toggle { font-size: 14px; }
+.adv-toggle:hover { color: var(--teal-dark); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Phones: each Leak Finder row becomes a card, so the Why text is readable without sideways scrolling. */
+@media (max-width: 720px) {
+  #viewLeak table.data thead { display: none; }
+  #viewLeak table.data, #viewLeak table.data tbody, #viewLeak table.data tr { display: block; width: 100%; }
+  #viewLeak table.data tr { border: 1px solid var(--line); border-radius: 12px; margin: 0 0 10px; padding: 6px 10px; background: var(--white); }
+  #viewLeak table.data td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 3px 0; white-space: normal; }
+  #viewLeak table.data td::before { content: attr(data-label); color: var(--muted); font-size: 12px; flex: none; }
+  #viewLeak table.data td.reason, #viewLeak table.data td.name { display: block; min-width: 0; max-width: none; }
+  #viewLeak table.data td.reason::before, #viewLeak table.data td.name::before { display: block; }
+  #viewLeak table.data td[colspan] { display: block; }
+  #viewLeak table.data td[colspan]::before { content: none; }
+}
+
+/* Inputs size to their value so SKUs, names, and numbers are never cut off; table number inputs drop the spinners. */
+table.data tr.main-row td input[data-field] { min-width: max(40px, calc(var(--len, 4) * 1ch + 11px)); }
+table.data tr.main-row td input[data-field="upc"], table.data tr.main-row td input[data-field="name"] { min-width: max(64px, calc(var(--len, 8) * 1ch + 11px)); }
+table.data td input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+table.data td input[type="number"]::-webkit-inner-spin-button, table.data td input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Phones: each Bid row becomes a two-column card of labelled fields; Recommendation spans the card. */
+@media (max-width: 720px) {
+  #viewBid table.data thead { display: none; }
+  #viewBid table.data, #viewBid table.data tbody { display: block; width: 100%; }
+  #viewBid table.data tr.main-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; border: 1px solid var(--line); border-radius: 12px 12px 0 0; margin: 10px 0 0; padding: 8px 10px; background: var(--white); }
+  #viewBid table.data tr.main-row:first-child { margin-top: 0; }
+  #viewBid table.data tr.main-row td { display: flex; flex-direction: column; gap: 2px; min-width: 0; max-width: none; border: 0; padding: 0; white-space: normal; position: static; box-shadow: none; }
+  #viewBid table.data tr.main-row td::before { content: attr(data-label); color: var(--muted); font-size: 12px; }
+  #viewBid table.data tr.main-row td.row-tools { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; }
+  #viewBid table.data tr.main-row td.row-tools .icon-btn { min-width: 36px; min-height: 36px; padding: 0 8px; }
+  #viewBid table.data tr.main-row td[data-out="rec"], #viewBid table.data tr.main-row td:nth-child(3) { grid-column: 1 / -1; }
+  #viewBid table.data td input, #viewBid table.data tr.main-row td input[data-field] { width: 100%; min-width: 0; font-size: 16px; }
+  #viewBid table.data tr.advanced-row, #viewBid table.data tr:not(.main-row):not(.advanced-row) { display: block; }
+  #viewBid table.data tr.advanced-row td, #viewBid table.data tr:not(.main-row) td { display: block; width: 100%; border: 1px solid var(--line); border-top: 0; }
+  #viewBid table.data tr.main-row + tr.main-row, #viewBid table.data tr.advanced-row + tr.main-row { margin-top: 10px; }
+  #viewBid .table-scroll { overflow-x: visible; border: 0; }
+}
+
+/* Wide 16:9 screens: let the reasons and the quick calculator use the room. */
+@media (min-width: 1500px) {
+  table.data td.reason { max-width: 620px; }
+  table.data td[data-out="rec"] { max-width: 260px; }
+  .drop-zone > div:first-child { flex: 1; }
+  .checklist .check-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
 }
