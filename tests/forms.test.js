@@ -225,12 +225,13 @@ check('a ready endpoint posts only the built payload', function () {
   });
 });
 
-check('config: SIGNUP_SCRIPT_URL exists and is empty, so FormSubmit stays in use', function () {
+check('config: SIGNUP_SCRIPT_URL is the Apps Script /exec URL, so signup and feedback use it', function () {
   var config = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
   var match = config.match(/var SIGNUP_SCRIPT_URL = '([^']*)'/);
   assert.ok(match);
-  assert.strictEqual(match[1], '');
-  same(TM.formTarget(match[1], 'https://formsubmit.co/ajax/skuclinicapp@gmail.com'), { url: 'https://formsubmit.co/ajax/skuclinicapp@gmail.com', mode: 'formsubmit' });
+  assert.ok(/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(match[1]));
+  same(TM.formTarget(match[1], 'https://formsubmit.co/ajax/skuclinicapp@gmail.com'), { url: match[1], mode: 'script' });
+  same(TM.formTarget('', 'https://formsubmit.co/ajax/skuclinicapp@gmail.com'), { url: 'https://formsubmit.co/ajax/skuclinicapp@gmail.com', mode: 'formsubmit' });
   same(TM.formTarget(' https://script.google.com/macros/s/X/exec ', 'https://formsubmit.co/ajax/x'), { url: 'https://script.google.com/macros/s/X/exec', mode: 'script' });
   assert.strictEqual(TM.hasSignupEndpoint(TM.formTarget('', '')), false);
 });

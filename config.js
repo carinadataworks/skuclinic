@@ -7,14 +7,14 @@ var STRIPE_PRO_YEARLY_LINK = '';     // Pro, $120/yr
 var STRIPE_MULTI_MONTHLY_LINK = '';  // Multichannel, $29/mo
 var STRIPE_MULTI_YEARLY_LINK = '';   // Multichannel, $240/yr
 
-/* FormSubmit AJAX endpoint. No account required.
-   Leave it empty and the signup form does not send anything, and feedback stays hidden. */
+/* FormSubmit AJAX endpoint: fallback only, used when SIGNUP_SCRIPT_URL is empty.
+   If both are empty the signup form does not send anything, and feedback stays hidden. */
 var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
 
 /* Google Apps Script web app (/exec URL) for skuclinicapp@gmail.com. See signup-backend/README.md.
    When set, signup and feedback POST here instead of FormSubmit: a row goes to the
    "SkuClinic signups" Sheet and a notification email lands in the inbox. Empty = FormSubmit. */
-var SIGNUP_SCRIPT_URL = '';
+var SIGNUP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg0aBNSYECEJKVYdv3tKddOshWXl_wRuuhg-7LX1Ww5uJRLrFFq6RYtcK7qB0zM1dThA/exec';
 
 /* Cloudflare Web Analytics token. Leave empty and no beacon is added. */
 var CF_ANALYTICS_TOKEN = '';

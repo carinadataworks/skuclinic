@@ -39,15 +39,15 @@ var STRIPE_PRO_YEARLY_LINK = '';     // Pro, $120/yr
 var STRIPE_MULTI_MONTHLY_LINK = '';  // Multichannel, $29/mo
 var STRIPE_MULTI_YEARLY_LINK = '';   // Multichannel, $240/yr
 var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
-var SIGNUP_SCRIPT_URL = '';       // Google Apps Script /exec URL; set it to replace FormSubmit
+var SIGNUP_SCRIPT_URL = 'https://script.google.com/macros/s/.../exec'; // Google Apps Script /exec URL (live); empty = FormSubmit fallback
 var CF_ANALYTICS_TOKEN = '';      // Cloudflare Web Analytics token
 ```
 
 Leave a Stripe string empty and that button says **Join founding list:** plus the plan and price (for example *Join founding list: Pro $15/mo*). The prices on the page are marked planned and are not billed. Paste a Payment Link and that button opens checkout.
 
-`SIGNUP_FORM_ENDPOINT` is the FormSubmit AJAX address. Empty means the signup form does not send anything and says nothing is stored. The same address receives feedback from the app. Feedback buttons stay hidden until it is set.
+`SIGNUP_FORM_ENDPOINT` is the FormSubmit AJAX address, used only as a fallback when `SIGNUP_SCRIPT_URL` is empty. If both are empty means the signup form does not send anything and says nothing is stored. The same address receives feedback from the app. Feedback buttons stay hidden until it is set.
 
-`SIGNUP_SCRIPT_URL` is the `/exec` URL of a Google Apps Script web app deployed from skuclinicapp@gmail.com (script and steps: `signup-backend/Code.gs` and `README.md`, kept outside this repo). When it is set, signup and feedback POST there instead of FormSubmit (`fetch` with `mode: 'no-cors'` and a form-encoded body). The script adds a row to the "SkuClinic signups" Sheet and emails the inbox from itself, so it is not flagged as spam. The response is opaque, so a completed request counts as sent and a network error as failed. Empty means FormSubmit is used exactly as before. The CSP `connect-src` already allows `script.google.com` and `script.googleusercontent.com`. When you switch, update the FormSubmit wording in `privacy.html`.
+`SIGNUP_SCRIPT_URL` is the `/exec` URL of a Google Apps Script web app deployed from skuclinicapp@gmail.com (script and steps: `signup-backend/Code.gs` and `README.md`, kept outside this repo). When it is set, signup and feedback POST there instead of FormSubmit (`fetch` with `mode: 'no-cors'` and a form-encoded body). The script adds a row to the "SkuClinic signups" Sheet and emails the inbox from itself, so it is not flagged as spam. The response is opaque, so a completed request counts as sent and a network error as failed. Empty means FormSubmit is used exactly as before. The CSP `connect-src` already allows `script.google.com` and `script.googleusercontent.com`. It is set and live; `privacy.html` says submissions are emailed to skuclinicapp@gmail.com and saved in a private Google Sheet via Google Apps Script.
 
 `CF_ANALYTICS_TOKEN` adds the Cloudflare Web Analytics beacon when set. Empty adds nothing.
 

@@ -33,8 +33,8 @@ function serve() {
   const browser = await pw.chromium.launch();
   let fails = 0;
   const ok = (name, v) => { console.log((v ? 'ok  ' : 'FAIL ') + name); if (!v) fails++; };
-  const config = fs.readFileSync(path.join(ROOT, 'config.js'), 'utf8').replace("var SIGNUP_SCRIPT_URL = '';", "var SIGNUP_SCRIPT_URL = '" + EXEC + "';");
-  ok('config.js has an empty SIGNUP_SCRIPT_URL to replace', config.includes(EXEC));
+  const config = fs.readFileSync(path.join(ROOT, 'config.js'), 'utf8').replace(/var SIGNUP_SCRIPT_URL = '[^']*';/, "var SIGNUP_SCRIPT_URL = '" + EXEC + "';");
+  ok('config.js has a SIGNUP_SCRIPT_URL to replace', config.includes(EXEC));
 
   async function context(mode) {
     const ctx = await browser.newContext();
