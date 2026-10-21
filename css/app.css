@@ -330,7 +330,7 @@ table.data td input[type="number"]::-webkit-inner-spin-button, table.data td inp
   #viewBid table.data tr.main-row:first-child { margin-top: 0; }
   #viewBid table.data tr.main-row td { display: flex; flex-direction: column; gap: 2px; min-width: 0; max-width: none; border: 0; padding: 0; white-space: normal; position: static; box-shadow: none; }
   #viewBid table.data tr.main-row td::before { content: attr(data-label); color: var(--muted); font-size: 12px; }
-  #viewBid table.data tr.main-row td.row-tools { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; }
+  #viewBid table.data tr.main-row td.row-tools { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; gap: var(--sp-2); }
   #viewBid table.data tr.main-row td.row-tools .icon-btn { min-width: 36px; min-height: 36px; padding: 0 8px; }
   #viewBid table.data tr.main-row td[data-out="rec"], #viewBid table.data tr.main-row td:nth-child(3) { grid-column: 1 / -1; }
   #viewBid table.data td input, #viewBid table.data tr.main-row td input[data-field] { width: 100%; min-width: 0; font-size: 16px; }
@@ -353,7 +353,7 @@ table.data td input[type="number"]::-webkit-inner-spin-button, table.data td inp
    small inline buttons with --sp-2. Stacks use flex gap so margins never collapse to 0. */
 .app-main { display: flex; flex-direction: column; gap: var(--sp-4); }
 .app-main > *, #viewLeak > *, #viewBid > *, #viewQuick > *, .stack-panel > * { margin-top: 0; margin-bottom: 0; }
-#viewLeak, #viewBid, #viewQuick { display: flex; flex-direction: column; gap: var(--sp-4); }
+#viewLeak, #viewBid, #viewQuick { display: flex; flex-direction: column; gap: var(--sp-4); padding: 0; }
 #viewLeak[hidden], #viewBid[hidden], #viewQuick[hidden] { display: none; }
 .app-intro h1 { margin-top: var(--sp-5); }
 .app-intro p { margin-bottom: 0; }

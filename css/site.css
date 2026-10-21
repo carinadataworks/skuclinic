@@ -335,3 +335,5 @@ details p { margin: 8px 0 0; color: var(--ink-soft); }
 .steps, .feature-grid, .price-grid, .faq { gap: var(--sp-4); }
 .privacy-band { margin: var(--sp-6) 0; }
 .hero-actions { gap: var(--sp-3); }
+.faq details { margin: 0; }
+#signup { margin-top: var(--sp-6); }
