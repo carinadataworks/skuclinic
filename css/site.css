@@ -320,3 +320,5 @@ details p { margin: 8px 0 0; color: var(--ink-soft); }
   .top { padding: 14px 20px; }
   .wrap, .narrow { width: min(1080px, calc(100% - 32px)); }
 }
+
+.cred { background: var(--paper, #f6f3ee); border-left: 3px solid var(--teal); padding: 10px 12px; border-radius: 10px; max-width: 42rem; margin: 0 0 18px; color: var(--ink-soft); }

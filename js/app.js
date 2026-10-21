@@ -31,6 +31,7 @@
   var mapFuzzy = {};
   var mapSavedInfo = null;
   var saveWarned = false;
+  var leakLimit = 200;
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls) {
@@ -644,6 +645,8 @@
       body.appendChild(empty);
       return;
     }
+    var total = shown.length;
+    shown = shown.slice(0, leakLimit);
     shown.forEach(function (row) {
       var p = row.p;
       var leak = row.leak;
@@ -663,7 +666,10 @@
       cell(isFinite(leak.productCost) ? TM.fmtMoney(leak.productCost) : '–');
       cell(leak.feesKnown ? TM.fmtMoney(leak.fees) : '–');
       cell(isFinite(leak.spend) ? TM.fmtMoney(leak.spend) : '–');
-      cell(isFinite(leak.units) ? String(leak.units) : '–');
+      var unitText = isFinite(leak.units) ? String(leak.units) : '–';
+      if (leak.amazon && isFinite(leak.amazon.units)) unitText += ' + ' + leak.amazon.units + ' Amazon';
+      cell(unitText);
+      if (leak.action === 'check_data') { leak.profitPerUnit = NaN; leak.periodProfit = NaN; }
       cell(isFinite(leak.profitPerUnit) ? TM.fmtMoney(leak.profitPerUnit) : '–', isFinite(leak.profitPerUnit) ? (leak.profitPerUnit >= 0 ? 'pos' : 'neg') : '');
       cell(isFinite(leak.periodProfit) ? TM.fmtMoney(leak.periodProfit) : '–', isFinite(leak.periodProfit) ? (leak.periodProfit >= 0 ? 'pos' : 'neg') : '');
       cell(leak.annualLeak ? TM.fmtMoney(leak.annualLeak) : '–', leak.annualLeak ? 'neg' : '');
@@ -677,6 +683,8 @@
       tr.appendChild(why);
       body.appendChild(tr);
     });
+    $('leakMore').hidden = total <= leakLimit;
+    $('leakMore').textContent = 'Show more (' + Math.min(leakLimit, total) + ' of ' + total + ' shown, worst first)';
   }
 
   function renderAll() {
@@ -720,7 +728,7 @@
     var main = document.querySelector('#rows tr.main-row[data-id="' + p.id + '"]');
     if (main) fillOutputs(main, p);
     renderSummary();
-    renderLeak();
+    if (activeTab === 'leak') renderLeak();
     renderPlan();
     renderChecklist();
     scheduleSave();
@@ -913,6 +921,16 @@
     head.textContent = '';
     body.textContent = '';
     var cols = fieldsFor(mapAnalysis.type).filter(function (pair) { return activeMapping[pair[0]] != null; });
+    var typeDef = null;
+    TM.FILE_TYPES.forEach(function (t) { if (t.id === mapAnalysis.type) typeDef = t; });
+    if (typeDef && typeDef.aggregate && result.records && result.records.length) {
+      /* Totals by SKU: preview what will be imported, not the raw columns. */
+      var OUT_LABELS = { sku: 'SKU', asin: 'ASIN', name: 'Product name', units: 'Units sold', price: 'Avg price', avgPrice: 'Avg price',
+        revenue: 'Revenue', amzUnits: 'Amazon units', amzAvgPrice: 'Amazon avg price', amzFees: 'Amazon fees / unit', amzPrice: 'Amazon price' };
+      var keys = [];
+      result.records.slice(0, 6).forEach(function (r) { Object.keys(r).forEach(function (k) { if (OUT_LABELS[k] && keys.indexOf(k) < 0) keys.push(k); }); });
+      cols = keys.map(function (k) { return [k, OUT_LABELS[k]]; });
+    }
     var hr = el('tr');
     cols.forEach(function (pair) {
       var th = el('th');
@@ -925,6 +943,7 @@
       cols.forEach(function (pair) {
         var td = el('td');
         var value = rec[pair[0]];
+        if (typeof value === 'number' && !Number.isInteger(value)) value = Math.round(value * 100) / 100;
         if (value == null && mapAnalysis.type && /^amazon/.test(mapAnalysis.type)) {
           var amz = { price: 'amzPrice', fees: 'amzFees', units: 'amzUnits' }[pair[0]];
           if (amz) value = rec[amz];
@@ -942,7 +961,7 @@
     if (result.skippedNoSku) info.push(result.skippedNoSku + ' rows with no SKU skipped');
     if (result.notes && result.notes.length) info.push(result.notes.join(' '));
     var rep = TM.columnReport(mapAnalysis, activeMapping);
-    $('mapInfo').textContent = info.join('. ') + '.';
+    $('mapInfo').textContent = info.map(function (t) { return t.replace(/\.\s*$/, ''); }).join('. ') + '.';
     $('mapIgnored').textContent = rep.ignored.length
       ? 'Columns not imported (' + rep.ignored.length + '): ' + rep.ignored.slice(0, 30).join(', ') + (rep.ignored.length > 30 ? ', …' : '')
       : 'Every column in the file is used.';
@@ -973,7 +992,8 @@
     var saved = $('mapSavedNote');
     if (mapSavedInfo) {
       saved.hidden = false;
-      $('mapSavedText').textContent = 'Using your saved column mapping for ' + typeLabelOf(mapAnalysis.type) + ' files' +
+      $('mapSavedText').textContent = 'Using your saved column mapping for ' +
+        (mapAnalysis.type === 'unknown' ? 'files with these columns' : typeLabelOf(mapAnalysis.type) + ' files') +
         (mapSavedInfo.missing.length ? ' (not in this file: ' + mapSavedInfo.missing.map(labelOf).join(', ') + ')' : '') + '.';
     } else saved.hidden = true;
   }
@@ -1332,7 +1352,7 @@
       ['Unit costs', count(function (p) { return TM.hasValue(p.cogs); }), 'Shopify “Cost per item”, a cost sheet, or the template', true],
       ['Units sold', count(function (p) { return TM.hasValue(p.units) || TM.hasValue(p.amzUnits); }), 'Shopify orders or sales report, Etsy sold items, or Amazon settlement', false],
       ['Ad spend', count(function (p) { return TM.hasValue(p.spend); }), 'Google Ads product report', false],
-      ['Fees', count(function (p) { return TM.hasValue(p.fees) || TM.hasValue(p.payfee) || TM.hasValue(p.reffee) || TM.hasValue(p.amzFees); }), 'Amazon fee preview, or fee columns in the template', false]
+      ['Fees (store or Amazon)', count(function (p) { return TM.hasValue(p.fees) || TM.hasValue(p.payfee) || TM.hasValue(p.reffee) || TM.hasValue(p.amzFees); }), 'Amazon fee preview, or fee columns in the template', false]
     ];
     var title = el('p', 'check-title');
     title.textContent = n ? 'Your data so far (' + n + ' SKU' + (n === 1 ? '' : 's') + '):' : 'What to bring: two files are enough to start.';
@@ -1510,7 +1530,8 @@
     });
     $('periodMode').addEventListener('change', function () { syncCustomDays(); renderLeak(); scheduleSave(); });
     $('customDays').addEventListener('input', function () { renderLeak(); scheduleSave(); });
-    $('leakProblems').addEventListener('change', renderLeak);
+    $('leakProblems').addEventListener('change', function () { leakLimit = 200; renderLeak(); });
+    $('leakMore').addEventListener('click', function () { leakLimit += 500; renderLeak(); });
     $('impactPanel').addEventListener('input', function () { recalcImpact(); scheduleSave(); });
     $('modePlan').addEventListener('click', function () { impactMode = 'plan'; syncImpactMode(); scheduleSave(); });
     $('modeReview').addEventListener('click', function () { impactMode = 'review'; syncImpactMode(); scheduleSave(); });

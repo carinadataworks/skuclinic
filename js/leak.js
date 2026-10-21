@@ -14,7 +14,7 @@
     if (mode === 'year') return { factor: 1, label: 'one year' };
     if (mode === 'custom') {
       var d = TM.parseNumber(customDays);
-      if (!(d > 0)) d = 30;
+      if (!(d > 0)) return { factor: 365 / 30, label: '30 days (the custom days box is empty or 0, so 30 is used)' };
       return { factor: 365 / d, label: d + ' days' };
     }
     if (detected && detected.days > 0) {
@@ -128,7 +128,8 @@
 
     var losingPeriod = isFinite(periodProfit) && periodProfit < -0.005;
     var losingUnit = isFinite(unitBeforeAds) && unitBeforeAds < -0.005;
-    var incomplete = price == null || (!costKnown && !feesKnown && !(units === 0 && spend > 0));
+    /* Without a unit cost there is no honest profit figure, even when fees are known. */
+    var incomplete = price == null || !costKnown;
     var issues = TM.dataIssues ? TM.dataIssues(p) : [];
 
     if (issues.length) {
@@ -136,8 +137,10 @@
       reason = 'Check data: ' + issues.join('; ') + '. Fix the value before acting on this row.';
     } else if (incomplete && !(units === 0 && spend > 0)) {
       action = 'need_data';
-      if (price == null) reason = 'No price yet. Import a Shopify product export or type a price.';
-      else reason = 'No unit cost yet. Add Cost per item in Shopify, or drop a cost sheet.';
+      if (/^shopify_[a-z]{2}_\d+_\d+$/i.test(String(p.upc || p.sku || ''))) {
+        reason = 'This Google item ID is a Shopify product/variant ID, not your SKU, so it cannot be matched to a product. Set the Merchant Center product ID to the SKU, or rename the Item ID column values to your SKUs.';
+      } else if (price == null) reason = 'No price yet. Import a product export, the SkuClinic template, or type a price.';
+      else reason = 'No unit cost yet. Drop a cost sheet or the SkuClinic template, or fill in Cost per item in Shopify.';
     } else if (units === 0 && spend > 0 && !losingUnit) {
       action = 'cut_ads';
       reason = 'Ad spend is ' + TM.fmtMoney(spend) + ' and units sold are 0. Exclude it or cut the bid. The spend is the leak' +
@@ -175,7 +178,13 @@
 
     var combinedPeriod = periodProfit;
     if (amazon && action !== 'check_data') {
-      if (isFinite(amazon.periodProfit)) combinedPeriod = (isFinite(periodProfit) ? periodProfit : 0) + amazon.periodProfit;
+      if (isFinite(amazon.periodProfit)) {
+        combinedPeriod = (isFinite(periodProfit) ? periodProfit : 0) + amazon.periodProfit;
+        if (amazon.unitProfit >= -0.005) {
+          reason += ' Amazon: ' + amazon.units + ' unit' + (amazon.units === 1 ? '' : 's') + ' at ' + TM.fmtMoney(amazon.price) +
+            ', ' + TM.fmtMoney(amazon.periodProfit) + ' profit after Amazon fees (included in the period total).';
+        }
+      }
       if (amazon.unitProfit < -0.005) {
         var amzLine = 'On Amazon, fees are ' + Math.round(amazon.feeShare * 100) + '% of the ' + TM.fmtMoney(amazon.price) +
           ' price and each unit loses ' + TM.fmtMoney(Math.abs(amazon.unitProfit)) + '.';
@@ -289,7 +298,7 @@
     raise_price: 'Raise price',
     stop_selling: 'Stop selling',
     review_fees: 'Review fees',
-    need_data: 'Need cost',
+    need_data: 'Need data',
     check_data: 'Check data'
   };
 

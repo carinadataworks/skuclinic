@@ -63,7 +63,7 @@
       <button type="button" class="btn teal" id="browseBtn">Choose files</button>
       <button type="button" class="btn" id="sampleBtn">Load sample files</button>
       <button type="button" class="btn" id="dropTemplate">Get the import template</button>
-      <input id="fileInput" type="file" accept=".csv,.xlsx,.xls,text/csv" multiple>
+      <input id="fileInput" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls,text/csv,text/tab-separated-values,text/plain" multiple>
     </div>
   </div>
   <div id="importStatus" class="status" role="status" aria-live="polite"></div>
@@ -118,6 +118,7 @@
         <tbody id="leakRows"></tbody>
       </table>
     </div>
+    <button type="button" class="btn small" id="leakMore" hidden>Show more</button>
     <p class="disclaimer">Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.</p>
   </section>
 

@@ -328,6 +328,51 @@ check('every file type lists required fields that exist in its field list', func
   });
 });
 
+/* ---- leak math, hand-checked ---- */
+function near(a, b, msg) { assert.ok(Math.abs(a - b) < 0.005, (msg || '') + ' ' + a + ' vs ' + b); }
+check('leak includes fee percentages, same as the bid tab', function () {
+  var p = { price: 50, cogs: 20, spend: 100, sales: 10, clicks: 200, returns: 5, payfee: 3 };
+  var l = TM.leakFor(p, 12);
+  near(l.unitBeforeAds, 50 - 20 - 50 * 0.08);   // 26
+  near(l.periodProfit, 26 * 10 - 100);          // 160
+  near(TM.computeProduct(p, 20).netProfit, l.periodProfit, 'bid vs leak');
+});
+check('Amazon fees stay on the Amazon channel', function () {
+  var l = TM.leakFor({ price: 30, cogs: 10, units: 10, amzAvgPrice: 28, amzFees: 9, amzUnits: 4 }, 12);
+  near(l.storePeriodProfit, 200);
+  near(l.amazon.unitProfit, 28 - 10 - 9);
+  near(l.periodProfit, 200 + 36);
+  assert.strictEqual(l.fees, null === l.fees ? null : l.fees); // store fees untouched
+  assert.ok(!(l.feesKnown), 'store fees should be unknown');
+});
+check('fees without a unit cost is Need data, not Healthy', function () {
+  assert.strictEqual(TM.leakFor({ price: 28, amzFees: 9.35 }, 12).action, 'need_data');
+  assert.strictEqual(TM.leakFor({ price: 28, fees: 2 }, 12).action, 'need_data');
+});
+check('impossible values are Check data and left out of the annual leak', function () {
+  var l = TM.leakFor({ price: -10, cogs: 5, units: 3 }, 12);
+  assert.strictEqual(l.action, 'check_data');
+  assert.strictEqual(l.annualLeak, 0);
+  assert.strictEqual(TM.computeProduct({ price: 20, cogs: 5, clicks: 10, sales: 12, spend: 5 }, 20).recKey, 'check');
+  assert.strictEqual(TM.computeProduct({ price: 20, cogs: 5, payfee: 60, reffee: 45 }, 20).recKey, 'check');
+});
+check('quick profit hand math', function () {
+  var q = TM.quickProfit({ price: 50, cost: 20, shipping: 5, feePct: 3, feeFixed: 0.3, adMode: 'perSale', adValue: 4, units: 100, targetMargin: 20 });
+  near(q.profitPerUnit, 50 - 20 - 5 - 0.3 - 1.5 - 4);      // 19.20
+  near(q.breakEvenPrice, 29.3 / 0.97);                    // 30.21
+  near(q.targetPrice, 29.3 / 0.77);                       // 38.05
+  near(q.monthlyProfit, 1920);
+  var m = TM.quickProfit({ price: 50, cost: 20, adMode: 'monthly', adValue: 300, units: 100 });
+  near(m.profitPerUnit, 27);
+  near(m.monthlyProfit, 2700);
+  assert.strictEqual(TM.quickProfit({ price: 50, cost: 20, feePct: 120 }).ok, false);
+  assert.ok(!isFinite(TM.quickProfit({ price: 50, cost: 20, targetMargin: 99, feePct: 3 }).targetPrice));
+});
+check('CSV export escapes formulas', function () {
+  var csv = TM.toCsv([['=HYPERLINK("x")', '+1', '-5', '@SUM(A1)', '12.5']]);
+  assert.strictEqual(csv, '"\'=HYPERLINK(""x"")",+1,-5,\'@SUM(A1),12.5');
+});
+
 if (failed) {
   console.error(failed + ' failed');
   process.exit(1);

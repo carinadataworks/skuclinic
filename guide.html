@@ -25,7 +25,8 @@
 <main id="main" class="narrow prose">
   <p class="kicker">How to export</p>
   <h1>The files SkuClinic reads</h1>
-  <p>You need two files to start: a Shopify product export and a Google Ads product report. Orders, a cost sheet, and Amazon are optional. Drop them on the app in any order. Item ID in Google should match Variant SKU in Shopify. If Merchant Center adds a prefix, the rows will not join until the IDs match — the mapping preview shows you the values.</p>
+  <p class="callout">Export formats change without notice. Review the column mapping on every import and spot-check a few rows against your source file.</p>
+  <p>You need two files to start: a product export with price and cost, plus a Google Ads product report or an orders export. Orders, a cost sheet, and Amazon are optional. No platform export? Use the <a href="templates/skuclinic-blueprint-example.csv" download>SkuClinic import template</a> (<a href="templates/skuclinic-blueprint-blank.csv" download>blank</a>, <a href="templates/HOW-TO-FILL.md">how to fill it</a>), or type one product into Quick profit. Drop them on the app in any order. Item ID in Google should match Variant SKU in Shopify. If Merchant Center adds a prefix, the rows will not join until the IDs match — the mapping preview shows you the values.</p>
   <p><a class="btn primary" href="app/">Open the app and load the samples</a></p>
 
   <h2>Shopify products</h2>
@@ -68,13 +69,34 @@
   </ol>
   <p><a href="samples/amazon-fee-preview.csv">Sample Amazon fee preview</a> · <a href="samples/amazon-settlement.csv">Sample settlement</a></p>
 
+  <h2>Shopify sales by product variant (optional)</h2>
+  <p>Analytics › Reports › “Sales by product variant”, export as CSV. Net items sold become units sold. Use it instead of the orders export, not with it, for the same dates.</p>
+
+  <h2>Etsy</h2>
+  <ol>
+    <li>Listings: Shop Manager › Settings › Options › Download data › Download CSV (Currently for sale listings). TITLE, PRICE, SKU, and QUANTITY are read. QUANTITY is stock on hand, not units sold.</li>
+    <li>Sold items: Download data › Orders › type “Order items”. SKU, Quantity, Price, and Discount Amount become units sold and average selling price.</li>
+    <li>Etsy does not export your cost. Add it with a cost sheet or the template.</li>
+  </ol>
+
+  <h2>Google Merchant Center feed (optional)</h2>
+  <p>A feed file or Google Sheet downloaded as CSV/TSV. id, title, price, sale_price, and cost_of_goods_sold are read. A sale price, when set, is used as the price.</p>
+
   <h2>Cost sheet (optional)</h2>
   <p>A plain CSV is enough when Shopify’s cost field is empty or you pay shipping the product export does not show.</p>
   <p><a href="samples/cost-sheet.csv">Sample cost sheet</a></p>
   <p>Columns SkuClinic looks for: SKU, product name, unit cost, shipping, other costs, ASIN. A buffer of 1 means 1%, not 100%. 0.2 means 20%. 0 stays 0%.</p>
+
+  <h2>FAQ</h2>
+  <h3>My file’s columns have different names. Will it still work?</h3>
+  <p>Usually. Column names are matched regardless of case and punctuation, and older and newer names both work. A column matched only by a similar name is marked “guessed”. If a key column (SKU, price, cost, units, or spend) is missing, the mapping step warns you and lets you pick it by hand. Tick “Remember this column mapping” to reuse it next time.</p>
+  <h3>Can I trust the import?</h3>
+  <p>Check it. Shopify, Amazon, Google, Etsy, and others change their export formats without notice, and no tool can guarantee every file is read correctly. After each import, open the file summary and compare a few rows with your source file before acting on the results.</p>
+  <h3>Is this financial advice?</h3>
+  <p>No. Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting. See the <a href="terms.html">Terms</a>.</p>
 </main>
 <footer class="foot">
-  <div>© 2026 Kyle Guy. All rights reserved.</div>
+  <div>© 2026 Kyle Guy. All rights reserved. Operated by Carina Dataworks.</div>
   <div><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
 </footer>
 <script src="config.js"></script>
