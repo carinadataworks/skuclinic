@@ -410,5 +410,5 @@ details.panel[open] > summary { margin-bottom: 0; }
 .plan-btns { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 @media (max-width: 720px) {
   .plan-group { grid-template-columns: 1fr; gap: var(--sp-2); }
-  .plan-btns .btn { flex: 1 1 100%; white-space: normal; }
+  .plan-btns .btn { flex: 1 1 100%; white-space: normal; font-size: 14px; padding-left: 12px; padding-right: 12px; }
 }
