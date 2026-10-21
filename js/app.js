@@ -200,9 +200,9 @@
 
   function paid() { return plan === 'pro' || plan === 'agency'; }
 
-  function paintPaidButton(node, url, label, plan) {
+  function paintPaidButton(node, url, label, plan, foundingLabel) {
     var href = String(url || '').trim();
-    node.textContent = href ? label : 'Join the founding list';
+    node.textContent = href ? label : foundingLabel;
     node.classList.remove('is-disabled');
     node.removeAttribute('aria-disabled');
     node.dataset.href = href;
@@ -226,9 +226,9 @@
     if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. Planned founding price, not billed yet. On the free plan it lasts until you close the tab.';
     if (reason === 'agency') text = 'Separate client stores are the Agency plan. Planned founding price, not billed yet: $79/mo. Pro keeps one saved store.';
     $('upgradeText').textContent = text;
-    paintPaidButton($('proMonthBtn'), window.STRIPE_PRO_MONTHLY_LINK, 'Pro · $29/mo', 'pro-monthly');
-    paintPaidButton($('proYearBtn'), window.STRIPE_PRO_YEARLY_LINK, 'Pro · $290/yr', 'pro-yearly');
-    paintPaidButton($('agencyBtn'), window.STRIPE_AGENCY_LINK, 'Agency · $79/mo', 'agency');
+    paintPaidButton($('proMonthBtn'), window.STRIPE_PRO_MONTHLY_LINK, 'Pro · $29/mo', 'pro-monthly', 'Join founding list: Pro $29/mo');
+    paintPaidButton($('proYearBtn'), window.STRIPE_PRO_YEARLY_LINK, 'Pro · $290/yr', 'pro-yearly', 'Join founding list: Pro $290/yr');
+    paintPaidButton($('agencyBtn'), window.STRIPE_AGENCY_LINK, 'Agency · $79/mo', 'agency', 'Join founding list: Agency $79/mo');
     var billingReady = [window.STRIPE_PRO_MONTHLY_LINK, window.STRIPE_PRO_YEARLY_LINK, window.STRIPE_AGENCY_LINK].every(function (url) {
       return String(url || '').trim();
     });
