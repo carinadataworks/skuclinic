@@ -9,7 +9,7 @@
     '$50K-$200K': true,
     '$200K+': true
   };
-  var PLANS = { 'Pro monthly': true, 'Pro yearly': true, Agency: true };
+  var PLANS = { 'Audit Pass': true, 'Pro monthly': true, 'Pro yearly': true, 'Multichannel monthly': true, 'Multichannel yearly': true };
 
   function text(value) {
     return String(value == null ? '' : value).trim();
@@ -38,7 +38,7 @@
       _template: 'table'
     };
     if (email) body._replyto = email;
-    if (PAY[input.wouldPay]) body['Would you pay $29/mo for this?'] = input.wouldPay;
+    if (PAY[input.wouldPay]) body['Would you pay $15/mo for this?'] = input.wouldPay;
     if (SIZES[input.storeSize]) body['Store size'] = input.storeSize;
     var worth = text(input.worth);
     if (worth) body['What would make this worth paying for?'] = worth;
@@ -56,7 +56,7 @@
     };
     var message = text(input.message);
     if (message) body["What's missing or confusing?"] = message;
-    if (PAY[input.wouldPay]) body['Would you pay $29/mo?'] = input.wouldPay;
+    if (PAY[input.wouldPay]) body['Would you pay $15/mo?'] = input.wouldPay;
     var email = text(input.email);
     if (email) {
       body.email = email;

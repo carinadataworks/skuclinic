@@ -285,13 +285,30 @@
     <p class="kicker">Planned pricing</p>
     <h2 id="upgradeTitle">Upgrade</h2>
     <p id="upgradeText"></p>
-    <div class="row">
-      <button type="button" class="btn primary" id="proMonthBtn">Join founding list: Pro $29/mo</button>
-      <button type="button" class="btn" id="proYearBtn">Join founding list: Pro $290/yr</button>
-      <button type="button" class="btn teal" id="agencyBtn">Join founding list: Agency $79/mo</button>
+    <div class="plan-options">
+      <div class="plan-group">
+        <p class="plan-name"><strong>Audit Pass</strong><span>30 days of Pro, paid once</span></p>
+        <div class="plan-btns">
+          <button type="button" class="btn" id="auditBtn" data-plan="audit">Join founding list: Audit $29 one-time</button>
+        </div>
+      </div>
+      <div class="plan-group">
+        <p class="plan-name"><strong>Pro</strong><span>Unlimited SKUs, saved settings, CSV export</span></p>
+        <div class="plan-btns">
+          <button type="button" class="btn primary" id="proMonthBtn" data-plan="pro-monthly">Join founding list: Pro $15/mo</button>
+          <button type="button" class="btn" id="proYearBtn" data-plan="pro-yearly">Join founding list: Pro $120/yr</button>
+        </div>
+      </div>
+      <div class="plan-group">
+        <p class="plan-name"><strong>Multichannel</strong><span>Everything in Pro, up to 5 stores or clients</span></p>
+        <div class="plan-btns">
+          <button type="button" class="btn teal" id="multiMonthBtn" data-plan="multichannel-monthly">Join founding list: Multichannel $29/mo</button>
+          <button type="button" class="btn" id="multiYearBtn" data-plan="multichannel-yearly">Join founding list: Multichannel $240/yr</button>
+        </div>
+      </div>
     </div>
-    <p class="planned-price" id="upgradeSoon">Founding price, coming soon. Pro $29/mo or $290/yr. Agency $79/mo. Nothing is charged now.</p>
-    <p class="note">Founding members get a locked-in discount when billing opens.</p>
+    <p class="planned-price" id="upgradeSoon">Planned pricing, not billed yet. Nothing is charged now.</p>
+    <p class="note" id="foundingNote">Founding members: 40% off for life on Pro and Multichannel while the subscription stays active. First 200 paid accounts.</p>
     <p class="note">Checkout opens soon. Until then, an unlock code applies to this browser only. It is not a subscription.</p>
     <label class="field">Unlock code
       <input id="unlockCode" class="text-input" autocomplete="off" aria-label="Unlock code">
@@ -354,7 +371,7 @@
     <section id="help-limits">
       <h3>What this can’t tell you</h3>
       <p>CPC and conversion rate move when you change bids. Max CPC describes the current numbers. It does not predict the point where more spend stops paying. The spend-level tests in Advanced are the only curve this tool will draw, and only between points you actually ran.</p>
-      <p>The free plan analyzes 25 SKUs. Planned pricing, not billed yet: Pro is a founding price of $29/mo or $290/yr, and Agency is $79/mo. Founding price, coming soon. Pro removes the cap, saves settings in this browser, and exports a CSV of the fixes. Agency is for freelance ad managers and adds a separate store per client, still only on this device.</p>
+      <p>The free plan analyzes 25 SKUs. Planned pricing, not billed yet: the Audit Pass is $29 one-time for 30 days of Pro. Pro is $15/mo or $120/yr: it removes the cap, saves settings in this browser, and exports a CSV of the fixes. Multichannel is $29/mo or $240/yr: everything in Pro plus up to 5 separate stores or clients, still only on this device. Founding members, the first 200 paid accounts, get 40% off for life on Pro and Multichannel while the subscription stays active.</p>
     </section>
     <div class="modal-actions"><button type="button" class="btn" id="helpClose">Close</button></div>
   </div>
@@ -408,7 +425,7 @@
         <textarea id="feedbackMessage" rows="4" required></textarea>
       </label>
       <fieldset class="choice">
-        <legend>Would you pay $29/mo?</legend>
+        <legend>Would you pay $15/mo?</legend>
         <label><input type="radio" name="feedbackPay" value="Yes"> Yes</label>
         <label><input type="radio" name="feedbackPay" value="Maybe"> Maybe</label>
         <label><input type="radio" name="feedbackPay" value="No"> No</label>
@@ -428,6 +445,7 @@
 <script src="../js/analytics.js"></script>
 <script src="../vendor/xlsx.full.min.js"></script>
 <script src="../js/util.js"></script>
+<script src="../js/plans.js"></script>
 <script src="../js/forms.js"></script>
 <script src="../js/compute.js"></script>
 <script src="../js/aliases.js"></script>

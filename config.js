@@ -1,9 +1,11 @@
 /* SkuClinic configuration.
    Paste Stripe Payment Links here when you create them.
    Leave a Stripe string empty and that pricing button joins the founding list. */
-var STRIPE_PRO_MONTHLY_LINK = '';
-var STRIPE_PRO_YEARLY_LINK = '';
-var STRIPE_AGENCY_LINK = '';
+var STRIPE_AUDIT_LINK = '';          // Audit Pass, $29 one-time (30 days of Pro)
+var STRIPE_PRO_MONTHLY_LINK = '';    // Pro, $15/mo
+var STRIPE_PRO_YEARLY_LINK = '';     // Pro, $120/yr
+var STRIPE_MULTI_MONTHLY_LINK = '';  // Multichannel, $29/mo
+var STRIPE_MULTI_YEARLY_LINK = '';   // Multichannel, $240/yr
 
 /* FormSubmit AJAX endpoint. No account required.
    Leave it empty and the signup form does not send anything, and feedback stays hidden. */
@@ -17,4 +19,4 @@ var CF_ANALYTICS_TOKEN = '';
    stored only in localStorage. Anyone who can read this file can unlock paid
    features. This is a temporary stand-in, not security. */
 var PRO_UNLOCK_CODE = 'SKUCLINIC-PRO';
-var AGENCY_UNLOCK_CODE = 'SKUCLINIC-AGENCY';
+var MULTICHANNEL_UNLOCK_CODE = 'SKUCLINIC-MULTICHANNEL';

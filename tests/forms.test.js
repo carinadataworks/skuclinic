@@ -54,7 +54,7 @@ check('signup payload is only typed answers', function () {
     _captcha: 'false',
     _template: 'table',
     _replyto: 'buyer@shop.example',
-    'Would you pay $29/mo for this?': 'Maybe',
+    'Would you pay $15/mo for this?': 'Maybe',
     'Store size': '$10K-$50K',
     'What would make this worth paying for?': 'A clearer Google export',
     Plan: 'Pro monthly'
@@ -103,7 +103,7 @@ check('feedback payload excludes files and results', function () {
     _template: 'table',
     _replyto: 'me@shop.example',
     "What's missing or confusing?": 'The buffer note is easy to miss.',
-    'Would you pay $29/mo?': 'No',
+    'Would you pay $15/mo?': 'No',
     email: 'me@shop.example'
   });
   var raw = JSON.stringify(body);
@@ -116,7 +116,7 @@ check('feedback omits a blank email', function () {
   var body = TM.feedbackPayload({ message: 'Confusing columns', wouldPay: 'Yes', email: '  ' });
   assert.strictEqual(Object.prototype.hasOwnProperty.call(body, 'email'), false);
   assert.strictEqual(Object.prototype.hasOwnProperty.call(body, '_replyto'), false);
-  assert.strictEqual(body['Would you pay $29/mo?'], 'Yes');
+  assert.strictEqual(body['Would you pay $15/mo?'], 'Yes');
   assert.strictEqual(body._captcha, 'false');
   assert.strictEqual(body._template, 'table');
 });
@@ -145,7 +145,7 @@ check('configured endpoint receives signup fields', function () {
     assert.strictEqual(sent._captcha, 'false');
     assert.strictEqual(sent._template, 'table');
     assert.strictEqual(sent.email, 'buyer@shop.example');
-    assert.strictEqual(sent['Would you pay $29/mo for this?'], 'Yes');
+    assert.strictEqual(sent['Would you pay $15/mo for this?'], 'Yes');
     assert.strictEqual(sent['Store size'], '$50K-$200K');
     assert.strictEqual(sent['What would make this worth paying for?'], 'Clearer fixes');
     assert.strictEqual(sent.Plan, 'Pro monthly');
@@ -214,7 +214,7 @@ check('a ready endpoint posts only the built payload', function () {
     assert.strictEqual(JSON.stringify(sent).indexOf('do not send'), -1);
     assert.deepStrictEqual(Object.keys(sent).sort(), [
       "What's missing or confusing?",
-      'Would you pay $29/mo?',
+      'Would you pay $15/mo?',
       '_captcha',
       '_honey',
       '_replyto',

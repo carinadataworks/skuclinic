@@ -214,9 +214,9 @@ check('old storage keys copy to skuclinic when missing', function () {
   entries[old + ':plan'] = 'pro';
   entries[old + ':workspace'] = '{"stores":[]}';
   entries[old + ':hideWelcome'] = '1';
-  entries['skuclinic:plan'] = 'agency';
+  entries['skuclinic:plan'] = 'multichannel';
   var next = TM.migrateStorageKeys(entries);
-  assert.strictEqual(next['skuclinic:plan'], 'agency');
+  assert.strictEqual(next['skuclinic:plan'], 'multichannel');
   assert.strictEqual(next['skuclinic:workspace'], '{"stores":[]}');
   assert.strictEqual(next['skuclinic:hideWelcome'], '1');
   assert.strictEqual(next[old + ':plan'], 'pro');

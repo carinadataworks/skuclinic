@@ -1,6 +1,6 @@
 /* SkuClinic app. All calculation stays in the browser. */
 (function () {
-  var FREE_CAP = 25;
+  var FREE_CAP = TM.FREE_SKU_CAP || 25;
   var plan = 'free';
   var stores = [];
   var active = 0;
@@ -126,7 +126,7 @@
   function persist() {
     if (plan === 'free') return;
     capture();
-    var payload = { version: 1, active: active, stores: plan === 'agency' ? stores : [stores[active]] };
+    var payload = { version: 1, active: active, stores: plan === 'multichannel' ? stores.slice(0, TM.MULTI_STORE_CAP) : [stores[active]] };
     var text = JSON.stringify(payload);
     try {
       localStorage.setItem('skuclinic:workspace', text);
@@ -159,7 +159,7 @@
         var data = JSON.parse(raw);
         if (data && data.stores && data.stores.length) {
           stores = data.stores;
-          if (plan !== 'agency') stores = stores.slice(0, 1);
+          stores = stores.slice(0, plan === 'multichannel' ? TM.MULTI_STORE_CAP : 1);
           active = Math.min(data.active || 0, stores.length - 1);
         }
       }
@@ -198,7 +198,7 @@
     $('importStatus').appendChild(p);
   }
 
-  function paid() { return plan === 'pro' || plan === 'agency'; }
+  function paid() { return plan === 'pro' || plan === 'multichannel'; }
 
   function paintPaidButton(node, url, label, plan, foundingLabel) {
     var href = String(url || '').trim();
@@ -219,31 +219,35 @@
     window.location.href = '../index.html?plan=' + encodeURIComponent(plan) + '#signup';
   }
 
+  var PLAN_BUTTONS = { auditBtn: 'audit', proMonthBtn: 'pro-monthly', proYearBtn: 'pro-yearly', multiMonthBtn: 'multichannel-monthly', multiYearBtn: 'multichannel-yearly' };
+
   function openUpgrade(reason) {
-    var text = 'Planned pricing, not billed yet. Pro is unlimited SKUs, settings saved in this browser, and a CSV of the fixes. Agency adds a store per client.';
-    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Planned founding price, not billed yet: Pro is $29/mo or $290/yr for the whole catalog, saved settings, and a CSV of the fixes.';
-    if (reason === 'export') text = 'CSV export of the fixes is part of Pro. Planned founding price, not billed yet. The free plan still shows every fix on screen, up to 25 SKUs.';
-    if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. Planned founding price, not billed yet. On the free plan it lasts until you close the tab.';
-    if (reason === 'agency') text = 'Separate client stores are the Agency plan. Planned founding price, not billed yet: $79/mo. Pro keeps one saved store.';
+    var text = 'Planned pricing, not billed yet. Pro is unlimited SKUs, settings saved in this browser, and a CSV of the fixes. Multichannel adds up to 5 separate stores or clients. The Audit Pass is 30 days of Pro, paid once.';
+    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Planned pricing, not billed yet: Pro is $15/mo or $120/yr for the whole catalog, saved settings, and a CSV of the fixes. Or take 30 days of Pro with the $29 Audit Pass.';
+    if (reason === 'export') text = 'CSV export of the fixes is part of Pro. Planned pricing, not billed yet. The free plan still shows every fix on screen, up to 25 SKUs.';
+    if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. Planned pricing, not billed yet. On the free plan it lasts until you close the tab.';
+    if (reason === 'stores') text = 'Separate client stores are the Multichannel plan: up to 5 stores or clients. Planned pricing, not billed yet: $29/mo or $240/yr. Pro keeps one saved store.';
     $('upgradeText').textContent = text;
-    paintPaidButton($('proMonthBtn'), window.STRIPE_PRO_MONTHLY_LINK, 'Pro · $29/mo', 'pro-monthly', 'Join founding list: Pro $29/mo');
-    paintPaidButton($('proYearBtn'), window.STRIPE_PRO_YEARLY_LINK, 'Pro · $290/yr', 'pro-yearly', 'Join founding list: Pro $290/yr');
-    paintPaidButton($('agencyBtn'), window.STRIPE_AGENCY_LINK, 'Agency · $79/mo', 'agency', 'Join founding list: Agency $79/mo');
-    var billingReady = [window.STRIPE_PRO_MONTHLY_LINK, window.STRIPE_PRO_YEARLY_LINK, window.STRIPE_AGENCY_LINK].every(function (url) {
-      return String(url || '').trim();
+    var billingReady = true;
+    Object.keys(PLAN_BUTTONS).forEach(function (id) {
+      var option = TM.planOption(PLAN_BUTTONS[id]);
+      var url = TM.planLink(option);
+      if (!url) billingReady = false;
+      paintPaidButton($(id), url, option.checkout, option.key, TM.foundingButtonText(option));
     });
+    $('foundingNote').textContent = TM.FOUNDING.text;
     $('upgradeSoon').hidden = billingReady;
     $('unlockMsg').textContent = '';
     $('upgradeModal').hidden = false;
   }
 
   function renderPlan() {
-    $('planBadge').textContent = plan === 'agency' ? 'Agency' : plan === 'pro' ? 'Pro' : 'Free · ' + products.length + '/25';
+    $('planBadge').textContent = plan === 'multichannel' ? 'Multichannel' : plan === 'pro' ? 'Pro' : 'Free · ' + products.length + '/' + FREE_CAP;
   }
 
   function renderStores() {
     var select = $('storeSelect');
-    if (plan === 'agency') {
+    if (plan === 'multichannel') {
       select.hidden = false;
       $('storeLabel').hidden = true;
       select.textContent = '';
@@ -1621,16 +1625,14 @@
     $('helpClose').addEventListener('click', function () { $('helpModal').hidden = true; });
     $('planBadge').addEventListener('click', function () { openUpgrade('general'); });
     $('upgradeClose').addEventListener('click', function () { $('upgradeModal').hidden = true; });
-    $('proMonthBtn').addEventListener('click', openPaidLink);
-    $('proYearBtn').addEventListener('click', openPaidLink);
-    $('agencyBtn').addEventListener('click', openPaidLink);
+    Object.keys(PLAN_BUTTONS).forEach(function (id) { $(id).addEventListener('click', openPaidLink); });
     /* TODO: replace this browser-only code check with Stripe billing. See config.js. */
     $('unlockBtn').addEventListener('click', function () {
       var code = $('unlockCode').value.trim();
-      var agencyCode = String(window.AGENCY_UNLOCK_CODE || '').trim();
+      var multiCode = String(window.MULTICHANNEL_UNLOCK_CODE || '').trim();
       var proCode = String(window.PRO_UNLOCK_CODE || '').trim();
       var next = null;
-      if (agencyCode && code === agencyCode) next = 'agency';
+      if (multiCode && code === multiCode) next = 'multichannel';
       else if (proCode && code === proCode) next = 'pro';
       if (!next) {
         $('unlockMsg').textContent = 'That code does not match. A matching code unlocks this browser only. It is not a subscription.';
@@ -1638,14 +1640,15 @@
       }
       plan = next;
       try { localStorage.setItem('skuclinic:plan', plan); } catch (err) {}
-      $('unlockMsg').textContent = (next === 'agency' ? 'Agency' : 'Pro') + ' is unlocked in this browser only.';
-      showToast(plan === 'agency' ? 'Agency unlocked' : 'Pro unlocked');
+      $('unlockMsg').textContent = (next === 'multichannel' ? 'Multichannel' : 'Pro') + ' is unlocked in this browser only.';
+      showToast(plan === 'multichannel' ? 'Multichannel unlocked' : 'Pro unlocked');
       persist();
       renderStores();
       renderAll();
     });
     $('newStoreBtn').addEventListener('click', function () {
-      if (plan !== 'agency') { openUpgrade('agency'); return; }
+      if (plan !== 'multichannel') { openUpgrade('stores'); return; }
+      if (stores.length >= TM.MULTI_STORE_CAP) { showToast('Multichannel keeps up to ' + TM.MULTI_STORE_CAP + ' stores or clients.'); return; }
       $('newStoreForm').hidden = false;
       $('newStoreName').focus();
     });
@@ -1742,7 +1745,8 @@
   function init() {
     migrateStorage();
     try { plan = localStorage.getItem('skuclinic:plan') || 'free'; } catch (err) { plan = 'free'; }
-    if (plan !== 'pro' && plan !== 'agency') plan = 'free';
+    if (plan === 'agency') { plan = 'multichannel'; try { localStorage.setItem('skuclinic:plan', plan); } catch (err) {} } // legacy value from before the Multichannel rename
+    if (plan !== 'pro' && plan !== 'multichannel') plan = 'free';
     wire();
     loadWorkspace();
     renderStores();
