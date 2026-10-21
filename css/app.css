@@ -404,7 +404,7 @@ details.panel[open] > summary { margin-bottom: 0; }
 
 /* Upgrade dialog: one row per plan, its buttons beside it (stacked on phones). */
 .plan-options { display: flex; flex-direction: column; gap: var(--sp-3); margin: var(--sp-3) 0; }
-.plan-group { display: grid; grid-template-columns: minmax(150px, 210px) 1fr; gap: var(--sp-3); align-items: center; padding-top: var(--sp-3); border-top: 1px solid var(--line); }
+.plan-group { display: grid; grid-template-columns: minmax(140px, 180px) 1fr; gap: var(--sp-3); align-items: center; padding-top: var(--sp-3); border-top: 1px solid var(--line); }
 .plan-name { margin: 0; display: flex; flex-direction: column; gap: 2px; }
 .plan-name span { color: var(--muted); font-size: 13px; }
 .plan-btns { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
@@ -412,3 +412,8 @@ details.panel[open] > summary { margin-bottom: 0; }
   .plan-group { grid-template-columns: 1fr; gap: var(--sp-2); }
   .plan-btns .btn { flex: 1 1 100%; white-space: normal; font-size: 14px; padding-left: 12px; padding-right: 12px; }
 }
+.upgrade-modal { width: min(980px, 100%); max-height: calc(100vh - 32px); }
+.upgrade-modal .planned-price, .upgrade-modal .note { margin: var(--sp-2) 0; }
+.unlock-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: flex-end; margin-top: var(--sp-3); }
+.unlock-row .field { flex: 1 1 240px; max-width: 420px; }
+.upgrade-modal .unlock-row .field input { max-width: none; }

@@ -281,7 +281,7 @@
 </div>
 
 <div id="upgradeModal" class="overlay" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle">
+  <div class="modal upgrade-modal" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle">
     <p class="kicker">Planned pricing</p>
     <h2 id="upgradeTitle">Upgrade</h2>
     <p id="upgradeText"></p>
@@ -310,14 +310,16 @@
     <p class="planned-price" id="upgradeSoon">Planned pricing, not billed yet. Nothing is charged now.</p>
     <p class="note" id="foundingNote">Founding members: 40% off for life on Pro and Multichannel while the subscription stays active. First 200 paid accounts.</p>
     <p class="note">Checkout opens soon. Until then, an unlock code applies to this browser only. It is not a subscription.</p>
-    <label class="field">Unlock code
-      <input id="unlockCode" class="text-input" autocomplete="off" aria-label="Unlock code">
-    </label>
-    <div class="modal-actions">
-      <button type="button" class="btn" id="upgradeClose">Close</button>
-      <button type="button" class="btn primary" id="unlockBtn">Unlock this browser</button>
+    <div class="unlock-row">
+      <label class="field">Unlock code
+        <input id="unlockCode" class="text-input" autocomplete="off" aria-label="Unlock code">
+      </label>
+      <button type="button" class="btn" id="unlockBtn">Unlock this browser</button>
     </div>
     <p id="unlockMsg" class="note"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="upgradeClose">Close</button>
+    </div>
   </div>
 </div>
 
