@@ -67,6 +67,7 @@
     </div>
   </div>
   <div id="importStatus" class="status" role="status" aria-live="polite"></div>
+  <div id="noticeTop" class="notices" role="status" aria-live="polite"></div>
 
   <div class="tabs" role="tablist">
     <button type="button" class="tab on" id="tabLeak" role="tab" aria-selected="true" aria-controls="viewLeak">Profit Leak Finder</button>
@@ -165,7 +166,7 @@
 
     <div class="stats" id="summaryRow"></div>
 
-    <div class="panel">
+    <div class="panel stack-panel">
       <div class="toolbar">
         <div id="tableCount">0 products</div>
         <input id="searchBox" class="search" type="search" placeholder="Search by name or SKU" aria-label="Search by name or SKU">
@@ -223,7 +224,7 @@
   </section>
 
   <section id="viewQuick" hidden>
-    <div class="panel">
+    <div class="panel stack-panel">
       <h2>Quick profit: one product or service, no file needed</h2>
       <p class="note">Type what you know. Empty boxes count as zero. Use it for a one-off product, a service, or a price you are thinking about.</p>
       <form id="qpForm" class="qp-grid" autocomplete="off">
@@ -423,7 +424,6 @@
     </form>
   </div>
 </div>
-<div class="toasts" id="toastStack"></div>
 <script src="../config.js"></script>
 <script src="../js/analytics.js"></script>
 <script src="../vendor/xlsx.full.min.js"></script>

@@ -167,11 +167,28 @@
     bindStore();
   }
 
+  // Notices sit in the page next to the control that was used, so they never cover content.
+  function noticeSlot() {
+    var a = document.activeElement;
+    var usable = a && a !== document.body && a.offsetParent && a.closest('main, .modal') && !a.closest('#dropZone, table');
+    if (!usable) return $('noticeTop');
+    var block = a.closest('.toolbar, .save-bar, .modal-actions, .row, p, .field');
+    if (!block) return $('noticeTop');
+    var next = block.nextElementSibling;
+    if (next && next.classList.contains('notices')) return next;
+    var slot = el('div', 'notices');
+    slot.setAttribute('role', 'status');
+    slot.setAttribute('aria-live', 'polite');
+    block.parentNode.insertBefore(slot, block.nextSibling);
+    return slot;
+  }
+
   function showToast(message) {
-    var node = el('div', 'toast');
+    var node = el('div', 'notice');
     node.textContent = message;
-    $('toastStack').appendChild(node);
-    setTimeout(function () { node.remove(); }, 2800);
+    noticeSlot().appendChild(node);
+    setTimeout(function () { node.classList.add('fade'); }, 4200);
+    setTimeout(function () { node.remove(); }, 4600);
   }
 
   function clearStatus() { $('importStatus').textContent = ''; }

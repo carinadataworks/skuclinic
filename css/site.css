@@ -21,6 +21,13 @@
   --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --shadow: 0 18px 50px rgba(28, 36, 48, 0.08);
+  /* Spacing scale: use these for every gap and margin between boxes. */
+  --sp-1: 4px;   /* inside a control */
+  --sp-2: 8px;   /* between small inline buttons */
+  --sp-3: 12px;  /* between items in one group (cards in a row, file summaries) */
+  --sp-4: 16px;  /* between blocks (drop zone, tabs, panels, tables) */
+  --sp-5: 24px;
+  --sp-6: 32px;  /* between page sections */
 }
 
 * { box-sizing: border-box; }
@@ -323,3 +330,8 @@ details p { margin: 8px 0 0; color: var(--ink-soft); }
 }
 
 .cred { background: var(--paper, #f6f3ee); border-left: 3px solid var(--teal); padding: 10px 12px; border-radius: 10px; max-width: 42rem; margin: 0 0 18px; color: var(--ink-soft); }
+
+/* Spacing scale applied to the marketing and docs pages. */
+.steps, .feature-grid, .price-grid, .faq { gap: var(--sp-4); }
+.privacy-band { margin: var(--sp-6) 0; }
+.hero-actions { gap: var(--sp-3); }

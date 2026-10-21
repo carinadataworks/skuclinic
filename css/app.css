@@ -211,8 +211,6 @@ table.data input[data-field="upc"] { min-width: 108px; }
 .help-nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 14px; }
 .help-nav a { background: var(--teal-soft); color: var(--teal-dark); text-decoration: none; border-radius: 999px; padding: 4px 10px; font-size: 13px; }
 .formula { font-family: var(--mono); background: var(--paper); border-radius: 10px; padding: 10px; font-size: 13px; }
-.toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 40; }
-.toast { background: var(--ink); color: white; border-radius: 10px; padding: 10px 12px; max-width: 280px; }
 
 .reason { white-space: normal; min-width: 220px; color: var(--ink-soft); font-size: 12.5px; }
 
@@ -348,4 +346,58 @@ table.data td input[type="number"]::-webkit-inner-spin-button, table.data td inp
   table.data td[data-out="rec"] { max-width: 260px; }
   .drop-zone > div:first-child { flex: 1; }
   .checklist .check-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+}
+
+/* ---------- Spacing scale (see --sp-* in site.css) ----------
+   Blocks in the page and in each tab stack with --sp-4; items inside a group with --sp-3;
+   small inline buttons with --sp-2. Stacks use flex gap so margins never collapse to 0. */
+.app-main { display: flex; flex-direction: column; gap: var(--sp-4); }
+.app-main > *, #viewLeak > *, #viewBid > *, #viewQuick > *, .stack-panel > * { margin-top: 0; margin-bottom: 0; }
+#viewLeak, #viewBid, #viewQuick { display: flex; flex-direction: column; gap: var(--sp-4); }
+#viewLeak[hidden], #viewBid[hidden], #viewQuick[hidden] { display: none; }
+.app-intro h1 { margin-top: var(--sp-5); }
+.app-intro p { margin-bottom: 0; }
+.status { display: flex; flex-direction: column; gap: var(--sp-3); min-height: 0; }
+.status:empty { display: none; }
+.status > * { margin: 0; }
+.status p { margin: 0; }
+.file-summary { margin: 0; }
+.tabs { margin: 0; gap: var(--sp-2); }
+.panel { margin-bottom: 0; padding: var(--sp-4); }
+.stack-panel { display: flex; flex-direction: column; gap: var(--sp-3); }
+.stack-panel > h2 { margin: 0; }
+details.panel > * + * { margin-top: var(--sp-3); }
+details.panel[open] > summary { margin-bottom: 0; }
+.stats { gap: var(--sp-3); margin: 0; }
+.stats:empty { display: none; }
+.row { gap: var(--sp-3); }
+.toolbar { gap: var(--sp-3); margin: 0; }
+.pager { gap: var(--sp-2); }
+.disclaimer { margin: 0; }
+.compare { gap: var(--sp-3); margin-top: 0; }
+.banner { margin-top: 0; }
+.qp-grid { gap: var(--sp-3); margin: 0; }
+.drop-actions, .modal-actions, .help-nav { gap: var(--sp-2); }
+.coach { margin: 0; }
+#feedbackForm { display: flex; flex-direction: column; gap: var(--sp-3); }
+#feedbackForm .choice { margin: 0; }
+.map-grid { gap: var(--sp-3); }
+.modal-actions { margin-top: var(--sp-4); }
+
+/* In-page notices replace the floating toast: they appear right after the control you used and never cover content. */
+.notices { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0; }
+.app-main > .notices, #viewLeak > .notices, #viewBid > .notices, #viewQuick > .notices, .stack-panel > .notices { margin: 0; }
+.notices:empty { display: none; }
+.notice { background: var(--ink); color: #fff; border-radius: 10px; padding: var(--sp-2) var(--sp-3); font-size: 14px; max-width: 46rem; transition: opacity 0.3s; }
+.notice.fade { opacity: 0; }
+
+@media (max-width: 720px) {
+  #viewLeak table.data tr { margin: 0 0 var(--sp-3); padding: var(--sp-2) var(--sp-3); }
+  #viewBid table.data tr.main-row { margin: var(--sp-3) 0 0; padding: var(--sp-3); }
+  #viewBid table.data tr.main-row:first-child { margin-top: 0; }
+  #viewBid table.data tr.main-row + tr.main-row, #viewBid table.data tr.advanced-row + tr.main-row { margin-top: var(--sp-3); }
+  .pager { row-gap: var(--sp-2); }
+}
+@media print {
+  .notices { display: none !important; }
 }
