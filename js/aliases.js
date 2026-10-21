@@ -52,7 +52,7 @@
         ['price', ['price', 'sale price']],
         ['cogs', ['unit cost', 'cost per unit', 'cogs']],
         ['shipping', ['shipping cost', 'shipping per unit', 'shipping']],
-        ['other', ['other costs', 'other cost']],
+        ['other', ['other costs', 'other cost', 'misc cost', 'misc costs', 'miscellaneous cost', 'packaging cost', 'handling cost']],
         ['fees', ['fees per unit', 'fee per unit']],
         ['payfee', ['payment fee', 'payment fee rate']],
         ['reffee', ['marketplace fee', 'marketplace fee rate', 'referral fee rate']],
@@ -257,13 +257,13 @@
       aggregate: null,
       required: ['sku', 'cogs'],
       strong: ['unit cost', 'cogs', 'cost per unit', 'cogs per unit', 'landed cost'],
-      support: ['shipping', 'shipping cost', 'other cost', 'other costs', 'asin', 'sku'],
+      support: ['shipping', 'shipping cost', 'other cost', 'other costs', 'misc cost', 'asin', 'sku'],
       fields: [
         ['sku', ['sku', 'upc sku', 'upc', 'item id', 'item sku', 'product code']],
         ['name', ['product', 'product name', 'name', 'title']],
         ['cogs', ['unit cost', 'cogs', 'cost per unit', 'cogs per unit', 'landed cost', 'cost per item', 'cost']],
         ['shipping', ['shipping', 'shipping cost', 'shipping per unit']],
-        ['other', ['other cost', 'other costs', 'other']],
+        ['other', ['other cost', 'other costs', 'other', 'misc cost', 'misc costs', 'misc', 'miscellaneous cost', 'packaging', 'packaging cost', 'handling cost']],
         ['asin', ['asin']],
         ['price', ['price', 'sale price']]
       ]
@@ -279,7 +279,7 @@
     ['price', ['sale price', 'variant price', 'your price', 'selling price', 'unit price', 'price']],
     ['cogs', ['unit cost', 'cogs per unit', 'cost per unit', 'cost per item', 'landed cost', 'cogs']],
     ['shipping', ['shipping cost', 'shipping per unit', 'shipping']],
-    ['other', ['other costs', 'other cost', 'packaging']],
+    ['other', ['other costs', 'other cost', 'packaging', 'packaging cost', 'misc cost', 'misc costs', 'miscellaneous cost', 'handling cost']],
     ['fees', ['estimated fee total', 'fees per unit', 'fee per unit', 'total fees', 'fees']],
     ['payfee', ['payment fee', 'payment fee rate', 'processing fee rate']],
     ['reffee', ['marketplace fee', 'referral fee rate', 'commission rate']],

@@ -142,9 +142,20 @@
 
   /* Read a dropped file. CSV and text exports are decoded as UTF-8 (codepage 65001)
      so names like Café and values like €12,50 survive files that have no BOM. */
+  function looksLegacyText(buf) {
+    var b = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    if (b.length >= 2 && ((b[0] === 0x50 && b[1] === 0x4b) || (b[0] === 0xd0 && b[1] === 0xcf) || (b[0] === 0xff && b[1] === 0xfe) || (b[0] === 0xfe && b[1] === 0xff))) return false;
+    if (b.length >= 3 && b[0] === 0xef && b[1] === 0xbb && b[2] === 0xbf) return false;
+    if (typeof TextDecoder === 'undefined') return false;
+    try { new TextDecoder('utf-8', { fatal: true }).decode(b); return false; } catch (e) { return true; }
+  }
+
   function readWorkbook(X, buf) {
     if (!X) throw new Error('Spreadsheet library is not loaded.');
-    return X.read(buf, { type: 'array', codepage: 65001 });
+    // Text files are read as UTF-8 unless they are not valid UTF-8 (Excel on Windows saves "CSV" as
+    // Windows-1252), in which case they are read as Windows-1252 so accented names do not swallow the
+    // next column. Workbooks (zip / OLE) and files with a byte-order mark are left to the library.
+    return X.read(buf, { type: 'array', codepage: looksLegacyText(buf) ? 1252 : 65001 });
   }
 
   TM.esc = esc;

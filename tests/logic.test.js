@@ -10,6 +10,7 @@ var root = path.join(__dirname, '..');
 var context = { console: console };
 context.window = context;
 context.globalThis = context;
+context.TextDecoder = TextDecoder;
 context.XLSX = require(path.join(root, 'vendor/xlsx.full.min.js'));
 vm.createContext(context);
 ['js/util.js', 'js/compute.js', 'js/aliases.js', 'js/detect.js', 'js/leak.js'].forEach(function (file) {
@@ -371,6 +372,16 @@ check('quick profit hand math', function () {
 check('CSV export escapes formulas', function () {
   var csv = TM.toCsv([['=HYPERLINK("x")', '+1', '-5', '@SUM(A1)', '12.5']]);
   assert.strictEqual(csv, '"\'=HYPERLINK(""x"")",+1,-5,\'@SUM(A1),12.5');
+});
+
+check('Windows-1252 CSV keeps accented names in their own column; UTF-8 still reads as UTF-8', function () {
+  var latin = Buffer.from('SKU,Title,Price,Misc cost\nA1,Caf\u00e9 mug,28,0.40\n', 'latin1');
+  var g = TM.gridFromWorkbook(TM.readWorkbook(XLSX, new Uint8Array(latin)));
+  assert.deepStrictEqual(g[1].map(String), ['A1', 'Caf\u00e9 mug', '28', '0.40']);
+  var utf8 = Buffer.from('SKU,Title,Price\nA1,Cr\u00e8me \u00a3,10\n', 'utf8');
+  assert.strictEqual(String(TM.gridFromWorkbook(TM.readWorkbook(XLSX, new Uint8Array(utf8)))[1][1]), 'Cr\u00e8me \u00a3');
+  var a = TM.analyze([['SKU', 'Unit cost', 'Misc cost'], ['A1', '8', '0.40']]);
+  assert.ok(Object.keys(a.mapping).some(function (f) { return f === 'other' && a.mapping[f] === 2; }), 'Misc cost maps to Other cost');
 });
 
 if (failed) {
