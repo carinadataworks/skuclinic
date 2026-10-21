@@ -17,6 +17,15 @@ check('plan table matches the approved pricing', function () {
   assert.strictEqual(TM.FREE_SKU_CAP, 25); assert.strictEqual(TM.MULTI_STORE_CAP, 5);
   assert.strictEqual(TM.FOUNDING.percentOff, 40); assert.strictEqual(TM.FOUNDING.seats, 200);
 });
+check('paid plans are capped at 50,000 SKUs (per store on Multichannel)', function () {
+  assert.strictEqual(TM.PAID_SKU_CAP, 50000);
+  assert.ok(/var limit = skuCap\(\);/.test(text['js/app.js']), 'import must enforce skuCap()');
+});
+check('no unlimited-SKU or whole-catalog claims', function () { assert.deepStrictEqual(hits(/unlimited|whole catalog|entire catalog|removes the cap|no sku limit/i), []); });
+check('pages state the 50,000-SKU paid limit', function () {
+  ['index.html', 'app/index.html', 'terms.html', 'README.md', 'js/app.js'].forEach(function (f) { assert.ok(/50,000 SKUs/.test(text[f]), f + ' does not mention 50,000 SKUs'); });
+  ['index.html', 'terms.html', 'README.md', 'app/index.html'].forEach(function (f) { assert.ok(/50,000 SKUs per store/.test(text[f]), f + ' does not say per store for Multichannel'); });
+});
 check('button labels name plan and price', function () {
   assert.deepStrictEqual(JSON.parse(JSON.stringify(TM.PLAN_OPTIONS.map(TM.foundingButtonText))), ['Join founding list: Audit $29 one-time', 'Join founding list: Pro $15/mo', 'Join founding list: Pro $120/yr', 'Join founding list: Multichannel $29/mo', 'Join founding list: Multichannel $240/yr']);
 });

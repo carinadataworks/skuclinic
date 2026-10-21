@@ -1,6 +1,13 @@
 /* SkuClinic app. All calculation stays in the browser. */
 (function () {
   var FREE_CAP = TM.FREE_SKU_CAP || 25;
+  var PAID_CAP = TM.PAID_SKU_CAP || 50000;
+  function skuCap() { return plan === 'free' ? FREE_CAP : PAID_CAP; }
+  function capText() { return plan === 'multichannel' ? PAID_CAP.toLocaleString('en-US') + ' SKUs per store' : PAID_CAP.toLocaleString('en-US') + ' SKUs'; }
+  function paidCapNotice() {
+    return 'Your plan holds up to ' + capText() + '. Split the file (for example by vendor or collection)' +
+      (plan === 'multichannel' ? ' into separate stores' : '') + ', or contact us with Give feedback if you need more.';
+  }
   var plan = 'free';
   var stores = [];
   var active = 0;
@@ -123,23 +130,58 @@
     syncCustomDays();
   }
 
+  /* Small workspaces live in localStorage. A big catalog (thousands of SKUs) does not fit its
+     ~5 MB quota, so it is written to IndexedDB on this device and localStorage keeps a small marker. */
+  var WS_KEY = 'skuclinic:workspace';
+  var LOCAL_MAX = 1500000;
+  var IDB_MARKER = '{"version":1,"idb":true}';
+  var idbLoading = false;
+  var dbPromise = null;
+  function idb() {
+    if (!dbPromise) dbPromise = new Promise(function (resolve, reject) {
+      if (typeof indexedDB === 'undefined') { reject(new Error('no indexedDB')); return; }
+      var req = indexedDB.open('skuclinic', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('kv'); };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+      req.onblocked = function () { reject(new Error('blocked')); };
+    });
+    return dbPromise;
+  }
+  function idbDo(mode, fn) {
+    return idb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('kv', mode);
+        var req = fn(tx.objectStore('kv'));
+        tx.oncomplete = function () { resolve(req && req.result); };
+        tx.onerror = tx.onabort = function () { reject(tx.error || new Error('idb')); };
+      });
+    });
+  }
+  function saveFailed() {
+    if (saveWarned) return;
+    saveWarned = true;
+    setStatus('Could not save this workspace in the browser (storage is full or blocked). Your numbers are still on screen. Export your fixes before closing the tab.', 'bad');
+    showToast('Not saved: browser storage is full');
+  }
+  function saveBig(text) {
+    idbDo('readwrite', function (s) { return s.put(text, WS_KEY); }).then(function () {
+      try { localStorage.setItem(WS_KEY, IDB_MARKER); } catch (err) {}
+    }).catch(saveFailed);
+  }
+
   function persist() {
-    if (plan === 'free') return;
+    if (plan === 'free' || idbLoading) return;
     capture();
     var payload = { version: 1, active: active, stores: plan === 'multichannel' ? stores.slice(0, TM.MULTI_STORE_CAP) : [stores[active]] };
     var text = JSON.stringify(payload);
+    if (text.length > LOCAL_MAX) { saveBig(text); return; }
     try {
-      localStorage.setItem('skuclinic:workspace', text);
-      if (text.length > 3500000 && !saveWarned) {
-        saveWarned = true;
-        showToast('This workspace is close to the browser storage limit. Export your fixes as a backup.');
-      }
+      var wasBig = localStorage.getItem(WS_KEY) === IDB_MARKER;
+      localStorage.setItem(WS_KEY, text);
+      if (wasBig) idbDo('readwrite', function (s) { return s.delete(WS_KEY); }).catch(function () {});
     } catch (err) {
-      if (!saveWarned) {
-        saveWarned = true;
-        setStatus('Could not save this workspace in the browser (storage is full or blocked). Your numbers are still on screen. Export your fixes before closing the tab.', 'bad');
-        showToast('Not saved: browser storage is full');
-      }
+      saveBig(text);
     }
   }
 
@@ -149,22 +191,43 @@
     saveTimer = setTimeout(persist, 300);
   }
 
+  function useSaved(data) {
+    if (data && data.stores && data.stores.length) {
+      stores = data.stores;
+      stores = stores.slice(0, plan === 'multichannel' ? TM.MULTI_STORE_CAP : 1);
+      active = Math.min(data.active || 0, stores.length - 1);
+    }
+  }
+
   function loadWorkspace() {
     stores = [blankStore('Main')];
     active = 0;
     if (plan === 'free') { bindStore(); return; }
     try {
-      var raw = localStorage.getItem('skuclinic:workspace');
-      if (raw) {
-        var data = JSON.parse(raw);
-        if (data && data.stores && data.stores.length) {
-          stores = data.stores;
-          stores = stores.slice(0, plan === 'multichannel' ? TM.MULTI_STORE_CAP : 1);
-          active = Math.min(data.active || 0, stores.length - 1);
-        }
-      }
+      var raw = localStorage.getItem(WS_KEY);
+      if (raw === IDB_MARKER) loadBig();
+      else if (raw) useSaved(JSON.parse(raw));
     } catch (err) { stores = [blankStore('Main')]; active = 0; }
     bindStore();
+  }
+
+  function loadBig() {
+    idbLoading = true;
+    setStatus('Loading your saved workspace…');
+    idbDo('readonly', function (s) { return s.get(WS_KEY); }).then(function (text) {
+      idbLoading = false;
+      clearStatus();
+      if (!text) return;
+      useSaved(JSON.parse(text));
+      bindStore();
+      renderStores();
+      renderAll();
+      if (products.length && termsAccepted()) $('welcomeModal').hidden = true;
+    }).catch(function () {
+      idbLoading = false;
+      clearStatus();
+      setStatus('Could not read the saved workspace from this browser. Import your files again.', 'bad');
+    });
   }
 
   // Notices sit in the page next to the control that was used, so they never cover content.
@@ -222,8 +285,8 @@
   var PLAN_BUTTONS = { auditBtn: 'audit', proMonthBtn: 'pro-monthly', proYearBtn: 'pro-yearly', multiMonthBtn: 'multichannel-monthly', multiYearBtn: 'multichannel-yearly' };
 
   function openUpgrade(reason) {
-    var text = 'Planned pricing, not billed yet. Pro is unlimited SKUs, settings saved in this browser, and a CSV of the fixes. Multichannel adds up to 5 separate stores or clients. The Audit Pass is 30 days of Pro, paid once.';
-    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Planned pricing, not billed yet: Pro is $15/mo or $120/yr for the whole catalog, saved settings, and a CSV of the fixes. Or take 30 days of Pro with the $29 Audit Pass.';
+    var text = 'Planned pricing, not billed yet. Pro is up to 50,000 SKUs, settings saved in this browser, and a CSV of the fixes. Multichannel adds up to 5 separate stores or clients, up to 50,000 SKUs each. The Audit Pass is 30 days of Pro, paid once.';
+    if (reason === 'cap') text = 'The free plan analyzes 25 SKUs. Planned pricing, not billed yet: Pro is $15/mo or $120/yr for up to 50,000 SKUs, saved settings, and a CSV of the fixes. Or take 30 days of Pro with the $29 Audit Pass.';
     if (reason === 'export') text = 'CSV export of the fixes is part of Pro. Planned pricing, not billed yet. The free plan still shows every fix on screen, up to 25 SKUs.';
     if (reason === 'save') text = 'Saving this workspace in the browser is part of Pro. Planned pricing, not billed yet. On the free plan it lasts until you close the tab.';
     if (reason === 'stores') text = 'Separate client stores are the Multichannel plan: up to 5 stores or clients. Planned pricing, not billed yet: $29/mo or $240/yr. Pro keeps one saved store.';
@@ -743,7 +806,7 @@
   }
 
   function addProduct() {
-    if (plan === 'free' && products.length >= FREE_CAP) { openUpgrade('cap'); return; }
+    if (products.length >= skuCap()) { if (plan === 'free') openUpgrade('cap'); else showToast(paidCapNotice()); return; }
     products.push({ id: nextId++, tests: [] });
     currentPage = Math.max(1, Math.ceil(filtered().length / pageSize));
     renderAll();
@@ -825,7 +888,7 @@
 
   function applyRecords(result) {
     var added = 0, updated = 0, held = 0;
-    var limit = plan === 'free' ? FREE_CAP : Infinity;
+    var limit = skuCap();
     var index = buildIndex();
     result.records.forEach(function (rec) {
       if (!rec.sku) return;
@@ -850,9 +913,13 @@
     if (result.skippedTotal) text += ', skipped ' + result.skippedTotal + ' totals row' + (result.skippedTotal === 1 ? '' : 's');
     if (result.skippedBlank) text += ', skipped ' + result.skippedBlank + ' blank';
     if (result.skippedNoSku) text += ', skipped ' + result.skippedNoSku + ' with no SKU';
-    if (held) {
+    if (held && plan === 'free') {
       text += '. Free plan kept ' + products.length + ' SKUs and left out ' + held;
       openUpgrade('cap');
+    } else if (held) {
+      text += '. Kept the first ' + products.length.toLocaleString('en-US') + ' SKUs and held back ' + held.toLocaleString('en-US') + ' new SKUs over the limit';
+      setStatus('Held back ' + held.toLocaleString('en-US') + ' SKUs. ' + paidCapNotice(), 'bad');
+      showToast('SKU limit reached: ' + held.toLocaleString('en-US') + ' SKUs held back');
     }
     return { added: added, updated: updated, held: held, text: text };
   }
@@ -1096,7 +1163,7 @@
     if (result.skippedTotal) skips.push(result.skippedTotal + ' totals row' + (result.skippedTotal === 1 ? '' : 's'));
     if (result.skippedBlank) skips.push(result.skippedBlank + ' blank');
     if (result.skippedNoSku) skips.push(result.skippedNoSku + ' with no SKU');
-    if (stats.held) skips.push(stats.held + ' over the free 25-SKU limit');
+    if (stats.held) skips.push(stats.held + (plan === 'free' ? ' over the free 25-SKU limit' : ' over the ' + capText() + ' limit'));
     line('Rows:', analysis.data.length + ' in the file, ' + result.records.length + ' SKUs imported (' + stats.added + ' new, ' + stats.updated + ' updated)' +
       (skips.length ? '. Skipped: ' + skips.join(', ') : '') + '.');
     var miss = missingFields(analysis, mapping);
@@ -1127,8 +1194,8 @@
       return;
     }
     if ($('mapRemember').checked) rememberMapping(mapAnalysis, activeMapping);
-    finishImport(mapFileName, mapAnalysis, activeMapping, result, mapFuzzy);
-    showToast('Imported ' + result.records.length + ' rows');
+    var st = finishImport(mapFileName, mapAnalysis, activeMapping, result, mapFuzzy);
+    showToast(st.held ? 'Imported ' + (st.added + st.updated).toLocaleString('en-US') + ' rows, held back ' + st.held.toLocaleString('en-US') : 'Imported ' + result.records.length + ' rows');
     renderAll();
     scheduleSave();
     showCoach();
@@ -1444,7 +1511,7 @@
   }
   function addQuickToList() {
     if (!TM.hasValue(qv('qpPrice'))) { renderQuick(); return; }
-    if (plan === 'free' && products.length >= FREE_CAP) { openUpgrade('cap'); return; }
+    if (products.length >= skuCap()) { if (plan === 'free') openUpgrade('cap'); else showToast(paidCapNotice()); return; }
     var mode = document.querySelector('input[name="qpAdMode"]:checked');
     var units = qv('qpUnits');
     var ad = TM.parseNumber(qv('qpAd'));

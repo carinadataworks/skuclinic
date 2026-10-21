@@ -26,7 +26,7 @@ Opening `index.html` as a `file://` URL loads the pages, but **Load sample files
 - The header row is found for you, including the title rows on a Google Ads CSV. You get a mapping preview and can change the file type or any column.
 - Bid calculator: max CPC, target ROAS, and a recommendation per SKU. Spend with zero sales is “Decrease — losing money.” A buffer of 0% stays 0%. An imported buffer of `1` is 1%, not 100%. `0.2` is read as 20%.
 - Profit Leak Finder: profit per unit and per SKU after cost, fees, and ad spend, plus an estimated annual leak.
-- Plans (planned, not billed yet; the single source is `js/plans.js`): Free, 25 SKUs, this tab only. Audit Pass, $29 one-time for 30 days of Pro. Pro, $15/mo or $120/yr: unlimited SKUs, settings saved in this browser, CSV of the fixes. Multichannel, $29/mo or $240/yr: everything in Pro plus up to 5 separate stores or clients. Founding members: 40% off for life on Pro and Multichannel for the first 200 paid accounts, while the subscription stays active.
+- Plans (planned, not billed yet; the single source is `js/plans.js`): Free, 25 SKUs, this tab only. Audit Pass, $29 one-time for 30 days of Pro. Pro, $15/mo or $120/yr: up to 50,000 SKUs, settings saved in this browser, CSV of the fixes. Multichannel, $29/mo or $240/yr: everything in Pro plus up to 5 separate stores or clients, up to 50,000 SKUs per store. Founding members: 40% off for life on Pro and Multichannel for the first 200 paid accounts, while the subscription stays active.
 
 ## Where the Stripe links go
 
@@ -68,4 +68,4 @@ There are no accounts yet. Pro and Multichannel can be unlocked in the browser w
 
 ## Privacy
 
-Product files, orders, costs, and ad numbers are processed locally in the browser. They are never uploaded and we never store them. Paid “saved settings” use this browser’s local storage only.
+Product files, orders, costs, and ad numbers are processed locally in the browser. They are never uploaded and we never store them. Paid “saved settings” use this browser’s local storage only (IndexedDB in the same browser when a large workspace does not fit local storage).

@@ -4,6 +4,7 @@
 (function (root) {
   var TM = root.TM = root.TM || {};
   TM.FREE_SKU_CAP = 25;
+  TM.PAID_SKU_CAP = 50000; // Pro and Audit Pass: 50,000 SKUs. Multichannel: 50,000 SKUs per store.
   TM.MULTI_STORE_CAP = 5;
   TM.FOUNDING = { percentOff: 40, seats: 200, text: 'Founding members: 40% off for life on Pro and Multichannel while the subscription stays active. First 200 paid accounts.' };
   // key: value in ?plan= links. label: value sent as "Plan" with the signup form. short: button text after "Join founding list: ".
