@@ -384,6 +384,13 @@ check('Windows-1252 CSV keeps accented names in their own column; UTF-8 still re
   assert.ok(Object.keys(a.mapping).some(function (f) { return f === 'other' && a.mapping[f] === 2; }), 'Misc cost maps to Other cost');
 });
 
+check('money shows thousands separators and never a negative zero', function () {
+  assert.strictEqual(TM.fmtMoney(7453.06), '$7,453.06');
+  assert.strictEqual(TM.fmtMoney(-1412.9), '\u2212$1,412.90');
+  assert.strictEqual(TM.fmtMoney(1234567.5), '$1,234,567.50');
+  assert.strictEqual(TM.fmtMoney(-0.004), '$0.00');
+});
+
 if (failed) {
   console.error(failed + ' failed');
   process.exit(1);

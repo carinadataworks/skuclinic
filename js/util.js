@@ -89,8 +89,9 @@
 
   function fmtMoney(v) {
     if (!isFinite(v)) return '–';
-    var sign = v < 0 ? '−' : '';
-    return sign + '$' + Math.abs(v).toFixed(2);
+    var sign = v < 0 && Math.abs(v) >= 0.005 ? '−' : '';
+    var parts = Math.abs(v).toFixed(2).split('.');
+    return sign + '$' + parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + parts[1];
   }
 
   function fmtPct(fraction) {
