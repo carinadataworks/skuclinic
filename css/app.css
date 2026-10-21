@@ -263,8 +263,8 @@ th[title] { cursor: help; }
 .choice { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; }
 
 .cred { background: var(--paper); border-left: 3px solid var(--teal); padding: 8px 10px; border-radius: 8px; }
-.steps { padding-left: 20px; }
-.steps li { margin: 6px 0; }
+.welcome-steps { padding-left: 20px; }
+.welcome-steps li { margin: 6px 0; }
 .agree { margin-top: 8px; }
 
 @media print {
