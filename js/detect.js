@@ -2,135 +2,16 @@
 (function (root) {
   var TM = root.TM || (root.TM = {});
 
-  var FILE_TYPES = [
-    {
-      id: 'google_ads',
-      label: 'Google Ads shopping / product report',
-      blurb: 'Spend, clicks, and conversions by item.',
-      aggregate: null,
-      strong: ['item id', 'product item id'],
-      support: ['clicks', 'impressions', 'impr', 'conversions', 'conv value', 'conversion value', 'avg cpc', 'campaign', 'ad group', 'currency code', 'cost', 'ad spend'],
-      fields: [
-        ['sku', ['item id', 'product item id', 'merchant product id']],
-        ['name', ['title', 'product title', 'item title']],
-        ['spend', ['cost', 'ad spend', 'spend']],
-        ['clicks', ['clicks']],
-        ['sales', ['conversions', 'conv', 'all conv']],
-        ['convValue', ['conv value', 'conversion value', 'all conv value']]
-      ]
-    },
-    {
-      id: 'shopify_products',
-      label: 'Shopify product export',
-      blurb: 'Variant SKU, price, and cost per item.',
-      aggregate: null,
-      strong: ['variant sku', 'variant price', 'cost per item'],
-      support: ['handle', 'vendor', 'published', 'option1 name', 'variant inventory qty', 'variant barcode'],
-      fields: [
-        ['sku', ['variant sku']],
-        ['name', ['title']],
-        ['price', ['variant price']],
-        ['cogs', ['cost per item']],
-        ['stock', ['variant inventory qty']]
-      ]
-    },
-    {
-      id: 'shopify_orders',
-      label: 'Shopify orders export',
-      blurb: 'Units sold, totaled by line-item SKU.',
-      aggregate: 'orders',
-      strong: ['lineitem sku', 'line item sku', 'lineitem quantity', 'line item quantity'],
-      support: ['lineitem name', 'line item name', 'lineitem price', 'line item price', 'financial status', 'fulfillment status'],
-      fields: [
-        ['sku', ['lineitem sku', 'line item sku']],
-        ['name', ['lineitem name', 'line item name']],
-        ['units', ['lineitem quantity', 'line item quantity']],
-        ['price', ['lineitem price', 'line item price']]
-      ]
-    },
-    {
-      id: 'shopify_sales',
-      label: 'Shopify sales by product',
-      blurb: 'Units and net sales by variant.',
-      aggregate: 'sales',
-      strong: ['product variant sku', 'net quantity'],
-      support: ['net sales', 'gross sales', 'product title'],
-      fields: [
-        ['sku', ['product variant sku', 'variant sku']],
-        ['name', ['product title', 'title']],
-        ['units', ['net quantity', 'ordered item quantity']],
-        ['revenue', ['net sales']]
-      ]
-    },
-    {
-      id: 'amazon_fee_preview',
-      label: 'Amazon fee preview',
-      blurb: 'Estimated Amazon fees per SKU. Optional.',
-      aggregate: null,
-      strong: ['estimated fee total', 'expected fulfillment fee per unit', 'fnsku', 'estimated referral fee per unit'],
-      support: ['your price', 'sales price', 'asin', 'product name', 'fulfilled by', 'amazon store'],
-      fields: [
-        ['sku', ['sku', 'seller sku']],
-        ['asin', ['asin']],
-        ['name', ['product name', 'item name']],
-        ['price', ['your price', 'sales price']],
-        ['fees', ['estimated fee total']]
-      ]
-    },
-    {
-      id: 'amazon_settlement',
-      label: 'Amazon settlement',
-      blurb: 'Revenue and fees totaled by SKU. Optional.',
-      aggregate: 'settlement',
-      strong: ['amount type', 'settlement id', 'quantity purchased'],
-      support: ['amount description', 'amount', 'posted date', 'transaction type', 'marketplace name', 'settlement start date', 'settlement end date'],
-      fields: [
-        ['sku', ['sku']],
-        ['asin', ['asin']],
-        ['amountType', ['amount type']],
-        ['amountDesc', ['amount description']],
-        ['amount', ['amount']],
-        ['units', ['quantity purchased']],
-        ['periodStart', ['settlement start date']],
-        ['periodEnd', ['settlement end date']]
-      ]
-    },
-    {
-      id: 'cost_sheet',
-      label: 'Cost sheet',
-      blurb: 'Unit cost, shipping, and other costs by SKU.',
-      aggregate: null,
-      strong: ['unit cost', 'cogs', 'cost per unit', 'cogs per unit'],
-      support: ['shipping', 'shipping cost', 'other cost', 'other costs', 'asin', 'sku'],
-      fields: [
-        ['sku', ['sku', 'upc sku', 'upc', 'item id']],
-        ['name', ['product', 'product name', 'name', 'title']],
-        ['cogs', ['unit cost', 'cogs', 'cost per unit', 'cogs per unit', 'cost']],
-        ['shipping', ['shipping', 'shipping cost', 'shipping per unit']],
-        ['other', ['other cost', 'other costs', 'other']],
-        ['asin', ['asin']],
-        ['price', ['price', 'sale price']]
-      ]
-    }
-  ];
-
-  var OPTIONAL = [
-    ['sku', ['sku', 'variant sku', 'item id', 'product item id', 'upc sku', 'upc']],
-    ['asin', ['asin']],
-    ['name', ['product name', 'product title', 'title', 'name']],
-    ['price', ['sale price', 'variant price', 'your price', 'price']],
-    ['cogs', ['unit cost', 'cogs per unit', 'cost per unit', 'cost per item', 'cogs']],
-    ['shipping', ['shipping cost', 'shipping per unit', 'shipping']],
-    ['other', ['other costs', 'other cost']],
-    ['fees', ['estimated fee total', 'fees per unit', 'fee per unit', 'total fees', 'fees']],
-    ['spend', ['ad spend', 'spend']],
-    ['clicks', ['clicks']],
-    ['sales', ['conversions', 'all conv', 'sales']],
-    ['units', ['units sold', 'units', 'net quantity', 'quantity']],
-    ['stock', ['stock units', 'stock', 'variant inventory qty']],
-    ['buffer', ['desired profit buffer', 'buffer']],
-    ['revenue', ['net sales', 'revenue']]
-  ];
+  /* Alias tables live in js/aliases.js (load it first). */
+  var FILE_TYPES = TM.FILE_TYPES;
+  var OPTIONAL = TM.FIELD_ALIASES;
+  var AVOID = TM.ALIAS_AVOID || {};
+  var FIELD_LABELS = TM.FIELD_LABELS;
+  var TEXT_FIELDS = { sku: 1, asin: 1, name: 1, amountType: 1, amountDesc: 1, periodStart: 1, periodEnd: 1,
+    txnType: 1, orderId: 1, finStatus: 1, cancelledAt: 1, handle: 1, opt1: 1, opt2: 1, opt3: 1, variantTitle: 1 };
+  var PERCENT_FIELDS = { buffer: 1, payfee: 1, reffee: 1, returns: 1 };
+  var GENERIC_FIELDS = ['sku', 'asin', 'name', 'price', 'cogs', 'shipping', 'other', 'fees', 'payfee', 'reffee', 'returns',
+    'spend', 'clicks', 'sales', 'units', 'stock', 'buffer', 'revenue'];
 
   var KNOWN = [];
   FILE_TYPES.forEach(function (t) {
@@ -184,27 +65,119 @@
           (hasAlias(norms, 'conversions') || hasAlias(norms, 'sales') || hasAlias(norms, 'conv'))) {
         score += 6;
       }
-      if (t.id === 'shopify_products' && hasAlias(norms, 'handle') && hasAlias(norms, 'variant sku')) score += 3;
+      if (t.id === 'shopify_products' && (hasAlias(norms, 'handle') || hasAlias(norms, 'url handle')) &&
+          (hasAlias(norms, 'variant sku') || hasAlias(norms, 'sku'))) score += 3;
+      if (t.id === 'skuclinic_template' && hasAlias(norms, 'sku') && hasAlias(norms, 'unit cost') && hasAlias(norms, 'price') &&
+          (hasAlias(norms, 'ad spend') || hasAlias(norms, 'units sold') || hasAlias(norms, 'fees per unit') ||
+           hasAlias(norms, 'desired profit buffer') || hasAlias(norms, 'stock units'))) {
+        score += 30;
+      }
       scores[t.id] = score;
     });
     return scores;
   }
 
-  function suggestMapping(typeId, norms) {
+  /* Fuzzy fallback for a header the exact pass missed. */
+  function editDistanceAtMost1(a, b) {
+    if (a === b) return true;
+    var la = a.length, lb = b.length;
+    if (Math.abs(la - lb) > 1) return false;
+    var i = 0, j = 0, edits = 0;
+    while (i < la && j < lb) {
+      if (a[i] === b[j]) { i++; j++; continue; }
+      if (++edits > 1) return false;
+      if (la > lb) i++;
+      else if (lb > la) j++;
+      else { i++; j++; }
+    }
+    return edits + (la - i) + (lb - j) <= 1;
+  }
+  function fuzzyMatch(norm, alias, field) {
+    if (!norm || !alias) return false;
+    var avoid = AVOID[field] || [];
+    var words = norm.split(' ');
+    for (var k = 0; k < avoid.length; k++) {
+      if (avoid[k].indexOf(' ') >= 0 ? norm.indexOf(avoid[k]) >= 0 : words.indexOf(avoid[k]) >= 0) {
+        if (alias.indexOf(avoid[k]) < 0) return false;
+      }
+    }
+    var cn = norm.replace(/\s+/g, '');
+    var ca = alias.replace(/\s+/g, '');
+    if (cn === ca) return true;
+    if (ca.length >= 6 && editDistanceAtMost1(cn, ca)) return true;
+    var need = alias.split(' ');
+    if (alias.length < 4 && need.length === 1) return false;
+    for (var w = 0; w < need.length; w++) if (words.indexOf(need[w]) < 0) return false;
+    return words.length <= need.length + 3;
+  }
+  function fuzzyCol(norms, aliases, used, field) {
+    for (var a = 0; a < aliases.length; a++) {
+      for (var i = 0; i < norms.length; i++) {
+        if (used[i] || !norms[i]) continue;
+        if (fuzzyMatch(norms[i], aliases[a], field)) return i;
+      }
+    }
+    return -1;
+  }
+
+  /* Map fields to columns. Returns { mapping, fuzzy, missing, saved }.
+     saved (optional) is { field: normalized header } from a mapping the user
+     kept for this file type. It wins when that header is in the file. */
+  function mapColumns(typeId, norms, saved) {
     var type = typeById(typeId);
     var used = {};
     var mapping = {};
-    function claim(field, aliases) {
-      if (mapping[field] != null) return;
-      var idx = findCol(norms, aliases, used);
-      if (idx >= 0) {
-        mapping[field] = idx;
-        used[idx] = field;
-      }
+    var fuzzy = {};
+    var savedUsed = {};
+    var savedMissing = [];
+    if (saved) {
+      Object.keys(saved).forEach(function (field) {
+        var want = saved[field];
+        if (want == null || want === '') return;
+        var idx = norms.indexOf(want);
+        if (idx >= 0 && !used[idx]) { mapping[field] = idx; used[idx] = field; savedUsed[field] = true; }
+        else savedMissing.push(field);
+      });
     }
-    if (type) type.fields.forEach(function (f) { claim(f[0], f[1]); });
-    OPTIONAL.forEach(function (f) { claim(f[0], f[1]); });
-    return mapping;
+    var lists = [];
+    if (type) type.fields.forEach(function (f) { lists.push(f); });
+    if (!type || !type.ownFieldsOnly) OPTIONAL.forEach(function (f) { lists.push(f); });
+    lists.forEach(function (f) {
+      if (mapping[f[0]] != null) return;
+      var idx = findCol(norms, f[1], used);
+      if (idx >= 0) { mapping[f[0]] = idx; used[idx] = f[0]; }
+    });
+    lists.forEach(function (f) {
+      if (mapping[f[0]] != null) return;
+      var idx = fuzzyCol(norms, f[1], used, f[0]);
+      if (idx >= 0) { mapping[f[0]] = idx; used[idx] = f[0]; fuzzy[f[0]] = true; }
+    });
+    var required = (type && type.required) || ['sku'];
+    var missing = required.filter(function (f) { return mapping[f] == null; });
+    return { mapping: mapping, fuzzy: fuzzy, missing: missing, savedUsed: savedUsed, savedMissing: savedMissing };
+  }
+
+  function suggestMapping(typeId, norms, saved) {
+    return mapColumns(typeId, norms, saved).mapping;
+  }
+
+  function requiredFor(typeId) {
+    var type = typeById(typeId);
+    return (type && type.required) || ['sku'];
+  }
+
+  /* Which columns a mapping reads and which it leaves out, by header name. */
+  function columnReport(analysis, mapping) {
+    var byIdx = {};
+    Object.keys(mapping || {}).forEach(function (f) { if (mapping[f] != null) byIdx[mapping[f]] = f; });
+    var used = [];
+    var ignored = [];
+    analysis.headers.forEach(function (h, i) {
+      if (!String(h || '').trim()) return;
+      if (byIdx[i] != null) used.push({ header: h, field: byIdx[i], label: FIELD_LABELS[byIdx[i]] || byIdx[i] });
+      else ignored.push(h);
+    });
+    return { used: used, ignored: ignored };
   }
 
   function headerScore(cells) {
@@ -217,6 +190,18 @@
       nonempty++;
       if (typeof cell === 'number') numeric++;
       else if (isKnownHeader(TM.normHeader(cell))) known++;
+    }
+    if (known < 2 && nonempty >= 3) {
+      /* Renamed columns: allow fuzzy hits on short text cells. */
+      var fz = 0;
+      for (var j = 0; j < cells.length; j++) {
+        var c2 = cells[j];
+        if (c2 == null || typeof c2 === 'number') continue;
+        var nm = TM.normHeader(c2);
+        if (!nm || nm.length > 40 || /\d{3,}/.test(nm)) continue;
+        if (KNOWN.some(function (a) { return a.length >= 4 && fuzzyMatch(nm, a, ''); })) fz++;
+      }
+      if (fz >= 3) known = fz;
     }
     if (nonempty < 2 || known < 2) return 0;
     if (numeric > known) return 0;
@@ -255,6 +240,7 @@
     return { start: a.toISOString().slice(0, 10), end: b.toISOString().slice(0, 10), days: days, label: label };
   }
 
+
   function analyze(grid) {
     var rows = grid || [];
     var best = -1;
@@ -266,6 +252,18 @@
       if (score > bestScore) {
         bestScore = score;
         best = i;
+      }
+    }
+    if (best < 0) {
+      /* No known column names at all. If the first filled row looks like a
+         header (2+ text cells, nothing numeric) with rows under it, offer it
+         for manual mapping instead of refusing the file. */
+      for (var f = 0; f < limit; f++) {
+        var cand = (rows[f] || []).filter(function (c) { return c != null && String(c).trim() !== ''; });
+        if (!cand.length) continue;
+        var allText = cand.every(function (c) { return typeof c !== 'number' && !/^[-+$€£]?\d[\d.,]*%?$/.test(String(c).trim()); });
+        if (cand.length >= 2 && allText && rows.length > f + 1) best = f;
+        break;
       }
     }
     if (best < 0) {
@@ -294,15 +292,15 @@
     }
     var scores = scoreTypes(norms);
     var ranked = Object.keys(scores).sort(function (a, b) { return scores[b] - scores[a]; });
-    var typeId = scores[ranked[0]] >= 5 ? ranked[0] : 'cost_sheet';
-    if (scores[ranked[0]] < 5) typeId = 'unknown';
+    var typeId = scores[ranked[0]] >= 5 ? ranked[0] : 'unknown';
     var preamble = [];
     for (var p = 0; p < best; p++) {
       var line = (rows[p] || []).filter(function (cell) { return String(cell || '').trim() !== ''; }).join(' ');
       if (line) preamble.push(line);
     }
     var period = periodFromText(preamble.join(' | '));
-    var mapping = typeId === 'unknown' ? suggestMapping('cost_sheet', norms) : suggestMapping(typeId, norms);
+    var cols = mapColumns(typeId === 'unknown' ? 'cost_sheet' : typeId, norms);
+    var mapping = cols.mapping;
     var type = typeById(typeId);
     return {
       ok: true,
@@ -317,20 +315,35 @@
       typeBlurb: type ? type.blurb : 'Map the columns yourself. Nothing is imported until you confirm.',
       scores: scores,
       mapping: mapping,
+      fuzzy: cols.fuzzy,
+      missing: typeId === 'unknown' ? ['sku'].filter(function (f) { return mapping[f] == null; }) : cols.missing,
+      rowCount: data.length,
       recognized: bestScore
     };
   }
 
-  function junkId(s) {
-    var t = String(s == null ? '' : s).trim().toLowerCase();
-    return t === '--' || t === '—' || t === '-' || t === 'total' || t === 'totals' || t === '#';
+  /* Columns the mapping screen offers for a file type, as [field, label]. */
+  function fieldsForType(typeId) {
+    var type = typeById(typeId);
+    var keys = [];
+    if (type) type.fields.forEach(function (f) { keys.push(f[0]); });
+    if (!type || !type.ownFieldsOnly) GENERIC_FIELDS.forEach(function (k) { if (keys.indexOf(k) < 0) keys.push(k); });
+    return keys.map(function (k) { return [k, FIELD_LABELS[k] || k]; });
   }
 
+  function junkId(s) {
+    var t = String(s == null ? '' : s).trim().toLowerCase();
+    return t === '--' || t === '—' || t === '-' || t === '#';
+  }
+
+  /* Total, Totals, and Google Ads rows such as "Total: Account" or
+     "Total: Shopping campaigns". A product named "Total gym" is kept. */
+  var TOTAL_RE = /^totals?\s*(?::.*)?$/i;
   function isTotal(rec, raw) {
-    if (junkId(rec.sku) || String(rec.sku || '').trim().toLowerCase() === 'total') return true;
+    if (TOTAL_RE.test(String(rec.sku || '').trim())) return true;
     if (String(rec.name || '').trim().toLowerCase() === 'total') return true;
-    var first = String((raw && raw[0]) || '').trim().toLowerCase();
-    if (first === 'total' || first === 'totals' || first === '--' || first === '—') return true;
+    var first = String((raw && raw[0]) || '').trim();
+    if (TOTAL_RE.test(first) || first === '--' || first === '—') return true;
     return false;
   }
 
@@ -341,7 +354,7 @@
 
   function assignNum(rec, key, raw) {
     if (raw == null || String(raw).trim() === '') return;
-    var n = key === 'buffer' ? TM.parsePercent(raw) : TM.parseNumber(raw);
+    var n = PERCENT_FIELDS[key] ? TM.parsePercent(raw) : TM.parseNumber(raw);
     if (n === undefined) return;
     rec[key] = n;
   }
@@ -352,103 +365,221 @@
       var idx = mapping[field];
       if (idx == null || idx < 0) return;
       var raw = row[idx];
-      if (field === 'sku' || field === 'asin' || field === 'name' || field === 'amountType' || field === 'amountDesc' || field === 'periodStart' || field === 'periodEnd') {
-        assignText(rec, field, raw);
-      } else {
-        assignNum(rec, field, raw);
-      }
+      if (TEXT_FIELDS[field]) assignText(rec, field, raw);
+      else assignNum(rec, field, raw);
     });
     return rec;
+  }
+
+  var SUM_FIELDS = ['spend', 'clicks', 'sales', 'convValue'];
+  var AMAZON_RENAME = { price: 'amzPrice', fees: 'amzFees', units: 'amzUnits', avgPrice: 'amzAvgPrice' };
+
+  function toAmazonChannel(result) {
+    result.records = result.records.map(function (rec) {
+      var out = {};
+      Object.keys(rec).forEach(function (k) { out[AMAZON_RENAME[k] || k] = rec[k]; });
+      return out;
+    });
+    result.notes = (result.notes || []).concat(['Amazon numbers are kept as their own channel. They do not replace your store price, fees, or units.']);
+    return result;
+  }
+
+  function variantName(title, rec) {
+    var opts = [rec.opt1, rec.opt2, rec.opt3].filter(function (o) {
+      return o && String(o).toLowerCase() !== 'default title';
+    });
+    if (!title) return opts.length ? opts.join(' / ') : undefined;
+    return opts.length ? title + ' - ' + opts.join(' / ') : title;
   }
 
   function materialize(analysis, mapping) {
     if (!analysis || !analysis.ok) return { records: [], error: analysis && analysis.error };
     mapping = mapping || analysis.mapping || {};
     if (mapping.sku == null) {
-      return { records: [], skippedBlank: 0, skippedTotal: 0, error: 'Choose the SKU column before importing. Nothing was imported.' };
+      return { records: [], skippedBlank: 0, skippedTotal: 0, skippedNoSku: 0, error: 'Choose the SKU column before importing. Nothing was imported.' };
     }
     var type = typeById(analysis.type);
     var aggregate = type ? type.aggregate : null;
-    if (analysis.type === 'unknown') aggregate = null;
+    var result;
+    if (aggregate === 'settlement') result = materializeSettlement(analysis, mapping);
+    else if (aggregate === 'orders' || aggregate === 'sales') result = materializeRollup(analysis, mapping, aggregate);
+    else result = materializeRows(analysis, mapping, type);
+    if (type && type.channel === 'amazon' && !result.error) result = toAmazonChannel(result);
+    return result;
+  }
 
+  function materializeRows(analysis, mapping, type) {
     var skippedBlank = 0;
     var skippedTotal = 0;
-    var records = [];
-
-    if (aggregate === 'settlement') {
-      return materializeSettlement(analysis, mapping);
-    }
-    if (aggregate === 'orders' || aggregate === 'sales') {
-      return materializeRollup(analysis, mapping, aggregate);
-    }
+    var skippedNoSku = 0;
+    var merged = 0;
+    var dupKeys = {};
+    var byKey = {};
+    var order = [];
+    var sumDup = !!(type && type.sumDuplicates);
+    var isShopify = type && type.id === 'shopify_products';
+    var isMerchant = type && type.id === 'google_merchant';
+    var titleByHandle = {};
 
     analysis.data.forEach(function (row) {
       var rec = readMapped(row, mapping);
       if (isTotal(rec, row)) { skippedTotal++; return; }
-      if (junkId(rec.sku)) { skippedBlank++; return; }
-      if (!TM.hasValue(rec.sku) && !TM.hasValue(rec.name)) { skippedBlank++; return; }
-      records.push(rec);
+      if (isShopify) {
+        if (rec.handle && rec.name) titleByHandle[rec.handle] = rec.name;
+        var parent = rec.name || (rec.handle ? titleByHandle[rec.handle] : undefined);
+        var full = variantName(parent, rec);
+        if (full) rec.name = full;
+      }
+      ['handle', 'opt1', 'opt2', 'opt3'].forEach(function (k) { delete rec[k]; });
+      if (isMerchant && rec.salePrice != null) { rec.listPrice = rec.price; rec.price = rec.salePrice; }
+      delete rec.salePrice;
+      if (!TM.hasValue(rec.sku) || junkId(rec.sku)) {
+        var hasData = Object.keys(rec).some(function (k) { return k !== 'name' && rec[k] != null; });
+        if (TM.hasValue(rec.name) || hasData) skippedNoSku++;
+        else skippedBlank++;
+        return;
+      }
+      var key = TM.skuKey(rec.sku);
+      var prev = byKey[key];
+      if (!prev) {
+        byKey[key] = rec;
+        order.push(key);
+        return;
+      }
+      dupKeys[key] = (dupKeys[key] || 1) + 1;
+      merged++;
+      Object.keys(rec).forEach(function (k) {
+        if (k === 'sku') return;
+        if (sumDup && SUM_FIELDS.indexOf(k) !== -1) prev[k] = (prev[k] || 0) + rec[k];
+        else if (k !== 'name' || !prev.name) prev[k] = rec[k];
+      });
     });
 
+    var records = order.map(function (k) { return byKey[k]; });
     var notes = [];
+    var warnings = [];
     if (analysis.period) notes.push('Date range in the file: ' + analysis.period.label + '.');
+    var dupList = Object.keys(dupKeys);
+    if (dupList.length) {
+      var sample = dupList.slice(0, 3).map(function (k) { return byKey[k].sku + ' ×' + dupKeys[k]; }).join(', ');
+      if (sumDup) notes.push(dupList.length + ' SKU' + (dupList.length === 1 ? ' appears' : 's appear') + ' in more than one row (' + sample + '). Spend, clicks, and conversions were added together.');
+      else warnings.push(dupList.length + ' SKU' + (dupList.length === 1 ? ' appears' : 's appear') + ' more than once (' + sample + '). The later row’s values were used. Check the file if that was not intended.');
+    }
+    if (isMerchant && records.some(function (r) { return r.listPrice != null; })) notes.push('Where a sale price is set, it is used as the price.');
+    records.forEach(function (r) { delete r.listPrice; });
     return {
       records: records,
       skippedBlank: skippedBlank,
       skippedTotal: skippedTotal,
+      skippedNoSku: skippedNoSku,
+      mergedRows: merged,
+      duplicates: dupList.length,
       aggregated: false,
       period: analysis.period || null,
       notes: notes,
-      error: records.length ? null : 'Header recognized, but every row under it was blank or a totals row. Nothing was imported.'
+      warnings: warnings,
+      error: records.length ? null : 'Header recognized, but no row under it has a SKU. Nothing was imported.'
     };
   }
 
+  var DEAD_STATUS = { refunded: 1, voided: 1 };
+
   function materializeRollup(analysis, mapping, kind) {
-    var groups = {};
-    var order = [];
     var skippedBlank = 0;
     var skippedTotal = 0;
+    var skippedNoSku = 0;
+    var lines = [];
+    var orders = {};
     analysis.data.forEach(function (row) {
       var rec = readMapped(row, mapping);
       if (isTotal(rec, row)) { skippedTotal++; return; }
-      if (!TM.hasValue(rec.sku) && !TM.hasValue(rec.name)) { skippedBlank++; return; }
-      var key = TM.skuKey(rec.sku || rec.name);
+      var ord = null;
+      if (rec.orderId) {
+        ord = orders[rec.orderId] || (orders[rec.orderId] = { status: '', cancelled: false, refunded: 0, lines: [] });
+        if (rec.finStatus) ord.status = String(rec.finStatus).trim().toLowerCase();
+        if (rec.cancelledAt) ord.cancelled = true;
+        if (rec.refunded != null && rec.refunded > 0) ord.refunded = Math.max(ord.refunded, rec.refunded);
+      }
+      if (!TM.hasValue(rec.sku) || junkId(rec.sku)) {
+        if (TM.hasValue(rec.name) || rec.units != null) skippedNoSku++;
+        else skippedBlank++;
+        return;
+      }
+      var line = { rec: rec, ord: ord, units: rec.units != null ? rec.units : null, revenue: null };
+      if (kind === 'orders') {
+        if (rec.units != null && rec.price != null) line.revenue = rec.units * rec.price - (rec.discount || 0);
+      } else if (rec.revenue != null) {
+        line.revenue = rec.revenue;
+      }
+      lines.push(line);
+      if (ord) ord.lines.push(line);
+    });
+
+    var droppedOrders = 0;
+    var refundAdjusted = 0;
+    Object.keys(orders).forEach(function (id) {
+      var ord = orders[id];
+      if (ord.cancelled || DEAD_STATUS[ord.status]) {
+        droppedOrders++;
+        ord.lines.forEach(function (l) { l.dead = true; });
+        return;
+      }
+      if (ord.refunded > 0) {
+        var total = ord.lines.reduce(function (s, l) { return s + (l.revenue || 0); }, 0);
+        if (total > 0) {
+          refundAdjusted++;
+          ord.lines.forEach(function (l) {
+            if (!l.revenue || !l.units) return;
+            var share = Math.min(l.revenue, ord.refunded * (l.revenue / total));
+            var unitPrice = l.revenue / l.units;
+            l.units = Math.max(0, l.units - share / unitPrice);
+            l.revenue -= share;
+          });
+        }
+      }
+    });
+
+    var groups = {};
+    var order = [];
+    lines.forEach(function (l) {
+      if (l.dead) return;
+      var rec = l.rec;
+      var key = TM.skuKey(rec.sku);
       if (!groups[key]) {
-        groups[key] = { sku: rec.sku, name: rec.name, asin: rec.asin, units: 0, revenue: 0, hasUnits: false, hasRevenue: false };
+        groups[key] = { sku: rec.sku, name: undefined, units: 0, revenue: 0, revUnits: 0, hasUnits: false, hasRevenue: false };
         order.push(key);
       }
       var g = groups[key];
-      if (!g.name && rec.name) g.name = rec.name;
-      if (!g.sku && rec.sku) g.sku = rec.sku;
-      if (kind === 'orders') {
-        var qty = rec.units != null ? rec.units : 0;
-        var unitPrice = rec.price != null ? rec.price : 0;
-        if (rec.units != null) { g.units += rec.units; g.hasUnits = true; }
-        if (rec.price != null && rec.units != null) { g.revenue += unitPrice * qty; g.hasRevenue = true; }
-      } else {
-        if (rec.units != null) { g.units += rec.units; g.hasUnits = true; }
-        if (rec.revenue != null) { g.revenue += rec.revenue; g.hasRevenue = true; }
+      if (!g.name && rec.name) {
+        g.name = kind === 'sales' && rec.variantTitle && rec.variantTitle.toLowerCase() !== 'default title'
+          ? rec.name + ' - ' + rec.variantTitle : rec.name;
       }
+      if (l.units != null) { g.units += l.units; g.hasUnits = true; }
+      if (l.revenue != null) { g.revenue += l.revenue; g.hasRevenue = true; if (l.units != null) g.revUnits += l.units; }
     });
     var records = order.map(function (key) {
       var g = groups[key];
-      var rec = {};
-      if (g.sku) rec.sku = g.sku;
+      var rec = { sku: g.sku };
       if (g.name) rec.name = g.name;
-      if (g.hasUnits) rec.units = g.units;
-      if (g.hasRevenue && g.units > 0) rec.avgPrice = g.revenue / g.units;
+      if (g.hasUnits) rec.units = Math.round(g.units * 100) / 100;
+      if (g.hasRevenue && g.revUnits > 0) rec.avgPrice = g.revenue / g.revUnits;
       return rec;
     });
     var notes = [kind === 'orders'
-      ? 'Orders are totaled by SKU. Units sold add up; price becomes the average selling price and does not replace a list price you already imported.'
+      ? 'Orders are totaled by SKU. Units sold add up; price becomes the average selling price after line discounts and does not replace a list price you already imported.'
       : 'Sales rows are totaled by SKU.'];
+    if (droppedOrders) notes.push('Left out ' + droppedOrders + ' refunded, voided, or cancelled order' + (droppedOrders === 1 ? '' : 's') + '.');
+    if (refundAdjusted) notes.push(refundAdjusted + ' partly refunded order' + (refundAdjusted === 1 ? ' was' : 's were') + ' reduced by the refunded amount.');
     return {
       records: records,
       skippedBlank: skippedBlank,
       skippedTotal: skippedTotal,
+      skippedNoSku: skippedNoSku,
+      droppedOrders: droppedOrders,
       aggregated: true,
       period: analysis.period || null,
       notes: notes,
+      warnings: [],
       error: records.length ? null : 'No SKUs found under that header. Nothing was imported.'
     };
   }
@@ -459,35 +590,49 @@
         records: [],
         skippedBlank: 0,
         skippedTotal: 0,
+        skippedNoSku: 0,
         error: 'A settlement file needs a SKU column and an amount column. Nothing was imported.'
       };
     }
     var groups = {};
     var order = [];
-    var skippedBlank = 0;
+    var skippedNoSku = 0;
     var start = null;
     var end = null;
     analysis.data.forEach(function (row) {
       var rec = readMapped(row, mapping);
-      if (!TM.hasValue(rec.sku) || junkId(rec.sku)) { skippedBlank++; return; }
+      /* In V2 flat files the dates sit only on the summary row, which has no SKU. */
+      if (!start && rec.periodStart) start = parseDateToken(rec.periodStart);
+      if (!end && rec.periodEnd) end = parseDateToken(rec.periodEnd);
+      if (!TM.hasValue(rec.sku) || junkId(rec.sku)) { skippedNoSku++; return; }
       var key = TM.skuKey(rec.sku);
       if (!groups[key]) {
-        groups[key] = { sku: rec.sku, asin: rec.asin, revenue: 0, fees: 0, units: 0 };
+        groups[key] = { sku: rec.sku, asin: rec.asin, orderRev: 0, orderUnits: 0, refundRev: 0, refundUnits: 0, refundNoQty: 0, promo: 0, fees: 0 };
         order.push(key);
       }
       var g = groups[key];
       if (!g.asin && rec.asin) g.asin = rec.asin;
       var type = TM.normHeader(rec.amountType || '');
       var desc = TM.normHeader(rec.amountDesc || '');
+      var txn = TM.normHeader(rec.txnType || '');
       var amount = rec.amount || 0;
+      var isRefund = txn.indexOf('refund') !== -1;
       if (type.indexOf('tax') !== -1 || desc.indexOf('tax') !== -1) return;
-      if (type.indexOf('fee') !== -1) g.fees += Math.abs(amount);
-      else if (desc.indexOf('principal') !== -1 || type.indexOf('promotion') !== -1) {
-        g.revenue += amount;
-        if (desc.indexOf('principal') !== -1 && rec.units != null) g.units += rec.units;
+      if (type.indexOf('fee') !== -1) {
+        /* Fees are negative; a refunded fee is positive and lowers the total. */
+        g.fees += -amount;
+      } else if (desc.indexOf('principal') !== -1) {
+        if (isRefund || amount < 0) {
+          g.refundRev += amount;
+          if (rec.units != null) g.refundUnits += Math.abs(rec.units);
+          else g.refundNoQty += amount;
+        } else {
+          g.orderRev += amount;
+          if (rec.units != null) g.orderUnits += rec.units;
+        }
+      } else if (type.indexOf('promotion') !== -1) {
+        g.promo += amount;
       }
-      if (!start && rec.periodStart) start = parseDateToken(rec.periodStart);
-      if (!end && rec.periodEnd) end = parseDateToken(rec.periodEnd);
     });
     var period = analysis.period;
     if (start && end) {
@@ -502,24 +647,34 @@
         };
       }
     }
+    var refunds = 0;
     var records = [];
     order.forEach(function (key) {
       var g = groups[key];
-      if (!g.units && !g.revenue && !g.fees) return;
+      if (!g.orderUnits && !g.orderRev && !g.fees && !g.refundRev) return;
+      var unitPrice = g.orderUnits > 0 ? g.orderRev / g.orderUnits : NaN;
+      var refundedUnits = g.refundUnits + (isFinite(unitPrice) && unitPrice > 0 ? Math.abs(g.refundNoQty) / unitPrice : 0);
+      if (g.refundRev) refunds++;
+      var netUnits = Math.max(0, g.orderUnits - refundedUnits);
+      netUnits = Math.round(netUnits * 100) / 100;
       var rec = { sku: g.sku };
       if (g.asin) rec.asin = g.asin;
-      if (g.units) rec.units = g.units;
-      if (g.units > 0) rec.avgPrice = g.revenue / g.units;
-      if (g.units > 0 && g.fees) rec.fees = g.fees / g.units;
+      rec.units = netUnits;
+      if (g.orderUnits > 0) rec.avgPrice = (g.orderRev + g.promo) / g.orderUnits;
+      if (netUnits > 0 && g.fees) rec.fees = g.fees / netUnits;
       records.push(rec);
     });
+    var notes = ['Settlement lines are totaled by SKU. Principal becomes revenue, fee lines become fees per unit, tax lines are ignored.'];
+    if (refunds) notes.push('Refunds on ' + refunds + ' SKU' + (refunds === 1 ? '' : 's') + ' were taken out of units sold; refunded fees lower the fee total.');
     return {
       records: records,
-      skippedBlank: skippedBlank,
+      skippedBlank: 0,
       skippedTotal: 0,
+      skippedNoSku: skippedNoSku,
       aggregated: true,
       period: period || null,
-      notes: ['Settlement lines are totaled by SKU. Principal becomes revenue, fee lines become fees per unit, tax lines are ignored.'],
+      notes: notes,
+      warnings: [],
       error: records.length ? null : 'No SKU amounts found in that settlement file. Nothing was imported.'
     };
   }
@@ -533,11 +688,16 @@
     return X.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '', raw: false });
   }
 
-  TM.FILE_TYPES = FILE_TYPES;
+  TM.fieldsForType = fieldsForType;
   TM.analyze = analyze;
   TM.suggestMapping = suggestMapping;
+  TM.mapColumns = mapColumns;
+  TM.requiredFor = requiredFor;
+  TM.columnReport = columnReport;
+  TM.fuzzyHeaderMatch = fuzzyMatch;
   TM.materialize = materialize;
   TM.gridFromWorkbook = gridFromWorkbook;
   TM.periodFromText = periodFromText;
   TM.isKnownHeader = isKnownHeader;
+  TM.isTotalRow = isTotal;
 })(typeof window !== 'undefined' ? window : globalThis);

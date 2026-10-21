@@ -25,7 +25,10 @@
       neg = true;
       s = s.slice(1, -1);
     }
-    s = s.replace(/[$€£¥\s]/g, '').replace(/%/g, '');
+    s = s.replace(/^(?:usd|eur|gbp|cad|aud|nzd|chf|jpy|sek|nok|dkk|mxn|brl|inr)\s*/i, '')
+      .replace(/\s*(?:usd|eur|gbp|cad|aud|nzd|chf|jpy|sek|nok|dkk|mxn|brl|inr)$/i, '')
+      .replace(/^(?:us|ca|a|nz|r|mx|hk|s)\$/i, '$');
+    s = s.replace(/[$€£¥\s\u00a0]/g, '').replace(/%/g, '');
     if (!s) return undefined;
     var lastComma = s.lastIndexOf(',');
     var lastDot = s.lastIndexOf('.');
@@ -104,8 +107,16 @@
     return String(s == null ? '' : s).trim().toLowerCase();
   }
 
+  /* Cells that start with = + - @ (or a tab / carriage return) run as formulas in
+     Excel and Sheets. Prefix them with an apostrophe unless they are plain numbers. */
+  function escapeFormula(s) {
+    if (!/^[=+\-@\t\r]/.test(s)) return s;
+    if (/^[-+]?\d+(?:\.\d+)?$/.test(s)) return s;
+    return "'" + s;
+  }
+
   function csvCell(v) {
-    var s = v == null ? '' : String(v);
+    var s = v == null ? '' : escapeFormula(String(v));
     if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
     return s;
   }
@@ -129,7 +140,16 @@
     return copy;
   }
 
+  /* Read a dropped file. CSV and text exports are decoded as UTF-8 (codepage 65001)
+     so names like Café and values like €12,50 survive files that have no BOM. */
+  function readWorkbook(X, buf) {
+    if (!X) throw new Error('Spreadsheet library is not loaded.');
+    return X.read(buf, { type: 'array', codepage: 65001 });
+  }
+
   TM.esc = esc;
+  TM.escapeFormula = escapeFormula;
+  TM.readWorkbook = readWorkbook;
   TM.hasValue = hasValue;
   TM.parseNumber = parseNumber;
   TM.parsePercent = parsePercent;

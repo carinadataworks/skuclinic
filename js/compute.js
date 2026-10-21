@@ -24,8 +24,45 @@
     downZero: { cls: 'bad', text: 'Decrease — losing money', stripe: 'down' },
     unprofitable: { cls: 'bad', text: 'Unprofitable — cost exceeds price', stripe: 'down' },
     stock: { cls: 'info', text: 'Hold — low stock', stripe: 'stock' },
-    wait: { cls: 'mute', text: 'Need data', stripe: 'wait' }
+    wait: { cls: 'mute', text: 'Need data', stripe: 'wait' },
+    check: { cls: 'warn', text: 'Check data', stripe: 'wait' }
   };
+
+  /* Values that cannot be right. A row with any of these is flagged "Check data"
+     instead of getting a bid or a fix. opts.bid adds the checks that only matter
+     for the bid math (buffer, conversions vs clicks). */
+  function dataIssues(p, opts) {
+    var issues = [];
+    function v(k) { return TM.hasValue(p[k]) ? TM.parseNumber(p[k]) : undefined; }
+    var price = v('price');
+    if (price != null && price <= 0) issues.push('price is ' + (price === 0 ? 'zero' : 'negative'));
+    var amzPrice = v('amzPrice');
+    if (amzPrice != null && amzPrice <= 0) issues.push('Amazon price is zero or negative');
+    [['cogs', 'unit cost'], ['shipping', 'shipping'], ['other', 'other cost'], ['fees', 'fees'],
+     ['spend', 'ad spend'], ['clicks', 'clicks'], ['sales', 'conversions'], ['units', 'units sold'], ['stock', 'stock']].forEach(function (pair) {
+      var n = v(pair[0]);
+      if (n != null && n < 0) issues.push(pair[1] + ' is negative');
+    });
+    var pctSum = 0;
+    [['returns', 'returns %'], ['payfee', 'payment fee %'], ['reffee', 'marketplace fee %']].forEach(function (pair) {
+      var n = v(pair[0]);
+      if (n == null) return;
+      if (n < 0 || n >= 100) issues.push(pair[1] + ' must be between 0 and 100');
+      else pctSum += n;
+    });
+    if (pctSum >= 100) issues.push('percentage fees add up to 100% or more');
+    if (opts && opts.bid) {
+      var clicks = v('clicks');
+      var sales = v('sales');
+      if (clicks != null && sales != null && sales > clicks) issues.push('conversions are higher than clicks');
+      if (clicks === 0 && sales != null && sales > 0) issues.push('conversions with zero clicks');
+      if (TM.hasValue(p.buffer)) {
+        var b = TM.parsePercent(p.buffer);
+        if (b != null && (b < 0 || b >= 100)) issues.push('buffer must be at least 0% and below 100%');
+      }
+    }
+    return issues;
+  }
 
   function computeProduct(p, defaultBufferPct) {
     var price = num(p.price);
@@ -91,7 +128,11 @@
     var recKey = 'wait';
     var gaugePct = null;
     var gaugeTone = null;
-    if (isFinite(effGross) && effGross < 0) {
+    var issues = dataIssues(p, { bid: true });
+    if (!issues.length && bufferPct != null && (bufferPct < 0 || bufferPct >= 100)) issues.push('default buffer must be at least 0% and below 100%');
+    if (issues.length) {
+      recKey = 'check';
+    } else if (isFinite(effGross) && effGross < 0) {
       recKey = 'unprofitable';
     } else if (spend != null && spend > 0 && sales === 0) {
       recKey = 'downZero';
@@ -117,7 +158,7 @@
       }
     }
 
-    var lowConfidence = !!(clicks && clicks < 50 && recKey !== 'wait' && recKey !== 'unprofitable' && recKey !== 'stock');
+    var lowConfidence = !!(clicks && clicks < 50 && recKey !== 'wait' && recKey !== 'unprofitable' && recKey !== 'stock' && recKey !== 'check');
     var rec = REC[recKey];
 
     var advLines = [];
@@ -203,6 +244,8 @@
       confLower: confLower,
       recKey: recKey,
       recText: rec.text,
+      issues: issues,
+      recReason: issues.length ? 'Check data: ' + issues.join('; ') + '.' : '',
       recClass: rec.cls,
       statusKey: rec.stripe,
       lowConfidence: lowConfidence,
@@ -219,5 +262,6 @@
   }
 
   TM.computeProduct = computeProduct;
+  TM.dataIssues = dataIssues;
   TM.wilsonLower = wilsonLower;
 })(typeof window !== 'undefined' ? window : globalThis);

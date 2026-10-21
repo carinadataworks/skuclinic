@@ -1,0 +1,4 @@
+Campaign,Conv.,Product ID,Weird metric,Cost (USD),Clicks,Impr.
+Shopping,3,MUG-1,9,12.50,40,900
+PMax,1,MUG-1,1,7.50,20,300
+Shopping,0,LAMP-1,2,30,60,1200

@@ -22,19 +22,15 @@
   var mapFileName = '';
   var activeMapping = {};
 
-  var MAP_FIELDS = [
-    ['sku', 'SKU'], ['asin', 'ASIN'], ['name', 'Product name'], ['price', 'Price'],
-    ['cogs', 'Unit cost'], ['shipping', 'Shipping'], ['other', 'Other cost'],
-    ['fees', 'Fees per unit'], ['spend', 'Ad spend'], ['clicks', 'Clicks'],
-    ['sales', 'Conversions'], ['units', 'Units sold'], ['stock', 'Stock'],
-    ['buffer', 'Buffer %'], ['revenue', 'Revenue']
-  ];
-  var SETTLEMENT_FIELDS = [
-    ['sku', 'SKU'], ['asin', 'ASIN'], ['amountType', 'Amount type'],
-    ['amountDesc', 'Amount description'], ['amount', 'Amount'],
-    ['units', 'Quantity'], ['periodStart', 'Period start'], ['periodEnd', 'Period end']
-  ];
-  var NUM_FIELDS = ['price', 'cogs', 'shipping', 'other', 'fees', 'spend', 'clicks', 'sales', 'units', 'stock', 'buffer', 'avgPrice', 'convValue'];
+  var NUM_FIELDS = ['price', 'cogs', 'shipping', 'other', 'fees', 'payfee', 'reffee', 'returns', 'spend', 'clicks', 'sales',
+    'units', 'stock', 'buffer', 'avgPrice', 'convValue', 'amzPrice', 'amzFees', 'amzUnits', 'amzAvgPrice'];
+  var TERMS_VERSION = '2026-10-21';
+  var DISCLAIMER = 'Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.';
+  var ACCURACY = 'Export formats from Shopify, Amazon, Google, Etsy and others can change without notice. Always review the column mapping and spot-check a few rows to make sure your data imported correctly.';
+  var activeTab = 'leak';
+  var mapFuzzy = {};
+  var mapSavedInfo = null;
+  var saveWarned = false;
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls) {
@@ -130,8 +126,20 @@
     if (plan === 'free') return;
     capture();
     var payload = { version: 1, active: active, stores: plan === 'agency' ? stores : [stores[active]] };
-    try { localStorage.setItem('skuclinic:workspace', JSON.stringify(payload)); }
-    catch (err) { /* private mode or full storage */ }
+    var text = JSON.stringify(payload);
+    try {
+      localStorage.setItem('skuclinic:workspace', text);
+      if (text.length > 3500000 && !saveWarned) {
+        saveWarned = true;
+        showToast('This workspace is close to the browser storage limit. Export your fixes as a backup.');
+      }
+    } catch (err) {
+      if (!saveWarned) {
+        saveWarned = true;
+        setStatus('Could not save this workspace in the browser (storage is full or blocked). Your numbers are still on screen. Export your fixes before closing the tab.', 'bad');
+        showToast('Not saved: browser storage is full');
+      }
+    }
   }
 
   function scheduleSave() {
@@ -254,16 +262,18 @@
 
   function exportRows() {
     var info = TM.periodInfo($('periodMode').value, detectedPeriod, $('customDays').value);
-    var header = ['SKU', 'Product', 'Price', 'Unit cost', 'Shipping', 'Other cost', 'Fees per unit', 'Buffer %', 'Ad spend', 'Clicks', 'Conversions', 'Units sold', 'CPC', 'Max CPC', 'Target ROAS', 'Net profit', 'Bid recommendation', 'Profit per unit', 'Period profit', 'Estimated annual leak', 'Action', 'Why'];
+    var header = ['SKU', 'Product', 'Price', 'Unit cost', 'Shipping', 'Other cost', 'Fees per unit', 'Returns %', 'Payment fee %', 'Marketplace fee %', 'Buffer %', 'Ad spend', 'Clicks', 'Conversions', 'Units sold', 'Stock', 'Amazon price', 'Amazon fees per unit', 'Amazon units', 'CPC', 'Max CPC', 'Target ROAS', 'Net profit', 'Bid recommendation', 'Profit per unit', 'Period profit', 'Estimated annual leak', 'Action', 'Why'];
     var rows = [header];
     products.forEach(function (p) {
       var c = TM.computeProduct(p, readBuffer());
       var leak = TM.leakFor(p, info.factor);
       rows.push([
         p.upc || '', p.name || '', numOrBlank(p.price), numOrBlank(p.cogs), numOrBlank(p.shipping), numOrBlank(p.other),
-        numOrBlank(p.fees), c.bufferPct, numOrBlank(p.spend), numOrBlank(p.clicks), numOrBlank(p.sales), numOrBlank(p.units),
+        numOrBlank(p.fees), numOrBlank(p.returns), numOrBlank(p.payfee), numOrBlank(p.reffee), c.bufferPct,
+        numOrBlank(p.spend), numOrBlank(p.clicks), numOrBlank(p.sales), numOrBlank(p.units), numOrBlank(p.stock),
+        numOrBlank(p.amzAvgPrice != null ? p.amzAvgPrice : p.amzPrice), numOrBlank(p.amzFees), numOrBlank(p.amzUnits),
         isFinite(c.cpc) ? c.cpc.toFixed(2) : '', isFinite(c.maxcpc) ? c.maxcpc.toFixed(2) : '', isFinite(c.troas) ? c.troas.toFixed(2) : '',
-        isFinite(c.netProfit) ? c.netProfit.toFixed(2) : '', c.recText,
+        isFinite(c.netProfit) ? c.netProfit.toFixed(2) : '', c.recText + (c.recReason ? ' (' + c.recReason + ')' : ''),
         isFinite(leak.profitPerUnit) ? leak.profitPerUnit.toFixed(2) : '',
         isFinite(leak.periodProfit) ? leak.periodProfit.toFixed(2) : '',
         leak.annualLeak ? leak.annualLeak.toFixed(2) : 0,
@@ -271,6 +281,9 @@
         leak.reason
       ]);
     });
+    rows.push([]);
+    rows.push([DISCLAIMER]);
+    rows.push(['Exported ' + new Date().toISOString().slice(0, 10) + ' from SkuClinic (operated by Carina Dataworks). Period: ' + info.label + '.']);
     return '\uFEFF' + TM.toCsv(rows);
   }
 
@@ -352,7 +365,13 @@
     rec.textContent = '';
     var badge = el('span', 'badge ' + c.recClass);
     badge.textContent = c.recText;
+    if (c.recReason) badge.title = c.recReason;
     rec.appendChild(badge);
+    if (c.recReason) {
+      var why = el('div', 'rec-why');
+      why.textContent = c.recReason;
+      rec.appendChild(why);
+    }
     if (c.lowConfidence) {
       var low = el('span', 'badge mute');
       low.textContent = 'Low confidence';
@@ -601,15 +620,17 @@
     });
     rows.sort(function (a, b) { return b.leak.annualLeak - a.leak.annualLeak; });
     var shown = problemsOnly ? rows.filter(function (r) { return r.leak.action !== 'healthy'; }) : rows;
-    var bad = rows.filter(function (r) { return r.leak.action !== 'healthy' && r.leak.action !== 'need_data'; }).length;
+    var bad = rows.filter(function (r) { return r.leak.action !== 'healthy' && r.leak.action !== 'need_data' && r.leak.action !== 'check_data'; }).length;
     var annual = rows.reduce(function (sum, r) { return sum + r.leak.annualLeak; }, 0);
     $('leakCount').textContent = String(products.length);
     $('leakBad').textContent = String(bad);
     $('leakAnnual').textContent = TM.fmtMoney(annual);
     var convFallback = rows.some(function (r) { return r.leak.unitsSource === 'conversions'; });
     var feesKnown = rows.some(function (r) { return r.leak.feesKnown; });
+    var amazonRows = rows.some(function (r) { return r.leak.amazon || r.leak.amazonOnly; });
     $('leakNote').textContent = 'Annual leak treats this file as ' + info.label + ' and counts only SKUs that lose money. ' +
-      (feesKnown ? 'Amazon fees are included where a fee file matched the SKU. ' : 'No fee file is loaded, so profit is before marketplace fees. ') +
+      (feesKnown ? 'Fees per unit and fee percentages (returns, payment, marketplace) are included where you have them. ' : 'No fees are loaded, so profit is before payment and marketplace fees. ') +
+      (amazonRows ? 'Amazon is counted as its own channel and added to the period total. ' : '') +
       (convFallback ? 'Some rows use ad conversions as units because no orders file set units sold.' : 'Units sold come from an orders or settlement file when one was imported.');
 
     var body = $('leakRows');
@@ -647,7 +668,7 @@
       cell(isFinite(leak.periodProfit) ? TM.fmtMoney(leak.periodProfit) : '–', isFinite(leak.periodProfit) ? (leak.periodProfit >= 0 ? 'pos' : 'neg') : '');
       cell(leak.annualLeak ? TM.fmtMoney(leak.annualLeak) : '–', leak.annualLeak ? 'neg' : '');
       var action = el('td');
-      var badge = el('span', 'badge ' + (leak.action === 'healthy' ? 'good' : leak.action === 'need_data' ? 'mute' : leak.action === 'raise_price' || leak.action === 'review_fees' ? 'warn' : 'bad'));
+      var badge = el('span', 'badge ' + (leak.action === 'healthy' ? 'good' : leak.action === 'need_data' ? 'mute' : leak.action === 'raise_price' || leak.action === 'review_fees' || leak.action === 'check_data' ? 'warn' : 'bad'));
       badge.textContent = TM.ACTION_LABEL[leak.action] || leak.action;
       action.appendChild(badge);
       tr.appendChild(action);
@@ -659,6 +680,7 @@
   }
 
   function renderAll() {
+    renderChecklist();
     renderTable();
     renderSummary();
     renderLeak();
@@ -684,7 +706,8 @@
   function onRowInput(event) {
     var input = event.target;
     if (!input.dataset || !input.dataset.field) return;
-    var tr = input.closest('tr');
+    var tr = input.closest('tr[data-id]');
+    if (!tr) return;
     var p = findId(+tr.dataset.id);
     if (!p) return;
     if (input.dataset.testIndex != null) {
@@ -699,13 +722,15 @@
     renderSummary();
     renderLeak();
     renderPlan();
+    renderChecklist();
     scheduleSave();
   }
 
   function onRowClick(event) {
     var btn = event.target.closest('button');
     if (!btn) return;
-    var tr = btn.closest('tr');
+    var tr = btn.closest('tr[data-id]');
+    if (!tr) return;
     var id = +tr.dataset.id;
     var p = findId(id);
     if (btn.dataset.action === 'delete') {
@@ -730,29 +755,40 @@
     }
   }
 
-  function findProduct(rec) {
+  /* SKU and ASIN lookups built once per import, so big files stay linear. */
+  function buildIndex() {
+    var bySku = new Map();
+    var byAsin = new Map();
+    products.forEach(function (p) {
+      var k = TM.skuKey(p.upc);
+      if (k && !bySku.has(k)) bySku.set(k, p);
+      var a = TM.skuKey(p.asin);
+      if (a && !byAsin.has(a)) byAsin.set(a, p);
+    });
+    return { bySku: bySku, byAsin: byAsin };
+  }
+
+  function findProduct(rec, index) {
     var key = TM.skuKey(rec.sku);
     var asin = TM.skuKey(rec.asin);
-    var i;
-    if (key) {
-      for (i = 0; i < products.length; i++) if (TM.skuKey(products[i].upc) === key) return products[i];
-    }
-    if (asin) {
-      for (i = 0; i < products.length; i++) if (TM.skuKey(products[i].asin) === asin) return products[i];
-    }
+    if (key && index.bySku.has(key)) return index.bySku.get(key);
+    if (asin && index.byAsin.has(asin)) return index.byAsin.get(asin);
     return null;
   }
 
   function applyRecords(result) {
     var added = 0, updated = 0, held = 0;
     var limit = plan === 'free' ? FREE_CAP : Infinity;
+    var index = buildIndex();
     result.records.forEach(function (rec) {
       if (!rec.sku) return;
-      var existing = findProduct(rec);
+      var existing = findProduct(rec, index);
       if (!existing) {
         if (products.length >= limit) { held++; return; }
         existing = { id: nextId++, tests: [] };
         products.push(existing);
+        index.bySku.set(TM.skuKey(rec.sku), existing);
+        if (rec.asin) index.byAsin.set(TM.skuKey(rec.asin), existing);
         added++;
       } else updated++;
       existing.upc = rec.sku;
@@ -766,6 +802,7 @@
     var text = added + ' new, ' + updated + ' updated';
     if (result.skippedTotal) text += ', skipped ' + result.skippedTotal + ' totals row' + (result.skippedTotal === 1 ? '' : 's');
     if (result.skippedBlank) text += ', skipped ' + result.skippedBlank + ' blank';
+    if (result.skippedNoSku) text += ', skipped ' + result.skippedNoSku + ' with no SKU';
     if (held) {
       text += '. Free plan kept ' + products.length + ' SKUs and left out ' + held;
       openUpgrade('cap');
@@ -774,17 +811,75 @@
   }
 
   function fieldsFor(type) {
-    return type === 'amazon_settlement' ? SETTLEMENT_FIELDS : MAP_FIELDS;
+    return TM.fieldsForType(type === 'unknown' ? null : type);
   }
+
+  /* ---- saved column mappings, per file type, kept by header name ---- */
+  function mappingKey(analysis) {
+    if (analysis.type && analysis.type !== 'unknown') return analysis.type;
+    return 'unknown:' + analysis.headerNorms.filter(Boolean).slice().sort().join('|');
+  }
+  function readSavedMappings() {
+    try { return JSON.parse(localStorage.getItem('skuclinic:mappings') || '{}') || {}; } catch (err) { return {}; }
+  }
+  function writeSavedMappings(all) {
+    try { localStorage.setItem('skuclinic:mappings', JSON.stringify(all)); } catch (err) {}
+  }
+  function savedMappingFor(analysis) {
+    var all = readSavedMappings();
+    return all[mappingKey(analysis)] || null;
+  }
+  function rememberMapping(analysis, mapping) {
+    var all = readSavedMappings();
+    var byName = {};
+    Object.keys(mapping).forEach(function (field) {
+      if (mapping[field] != null) byName[field] = analysis.headerNorms[mapping[field]];
+    });
+    all[mappingKey(analysis)] = byName;
+    writeSavedMappings(all);
+  }
+  function forgetMapping(analysis) {
+    var all = readSavedMappings();
+    delete all[mappingKey(analysis)];
+    writeSavedMappings(all);
+  }
+  function typeLabelOf(id) {
+    var found = null;
+    TM.FILE_TYPES.forEach(function (t) { if (t.id === id) found = t; });
+    return found ? found.label : 'Unrecognized file';
+  }
+
+  /* Pick columns for the current type: saved mapping first, then aliases. */
+  function suggestFor(analysis) {
+    var typeId = analysis.type === 'unknown' ? 'cost_sheet' : analysis.type;
+    var saved = savedMappingFor(analysis);
+    var cols = TM.mapColumns(typeId, analysis.headerNorms, saved);
+    if (analysis.type === 'unknown') cols.missing = cols.mapping.sku == null ? ['sku'] : [];
+    mapFuzzy = cols.fuzzy || {};
+    mapSavedInfo = saved ? { used: Object.keys(cols.savedUsed || {}).length, missing: cols.savedMissing || [] } : null;
+    return cols.mapping;
+  }
+
+  function missingFields(analysis, mapping) {
+    var req = analysis.type === 'unknown' ? ['sku'] : TM.requiredFor(analysis.type);
+    return req.filter(function (f) { return mapping[f] == null; });
+  }
+  function labelOf(field) { return (TM.FIELD_LABELS && TM.FIELD_LABELS[field]) || field; }
 
   function renderMapFields() {
     var host = $('mapFields');
     host.textContent = '';
     var headers = mapAnalysis.headers;
+    var missing = missingFields(mapAnalysis, activeMapping);
     fieldsFor(mapAnalysis.type).forEach(function (pair) {
       var field = pair[0];
       var label = el('label', 'field');
-      label.appendChild(document.createTextNode(pair[1]));
+      if (missing.indexOf(field) >= 0) label.classList.add('missing');
+      if (mapFuzzy[field] && activeMapping[field] != null) label.classList.add('guessed');
+      var text = pair[1];
+      if (missing.indexOf(field) >= 0) text += ' (key column, not found)';
+      else if (mapFuzzy[field] && activeMapping[field] != null) text += ' (guessed, check it)';
+      label.appendChild(document.createTextNode(text));
       var select = el('select', 'select');
       select.dataset.mapField = field;
       var none = el('option');
@@ -802,6 +897,8 @@
       select.addEventListener('change', function () {
         if (select.value === '') delete activeMapping[field];
         else activeMapping[field] = +select.value;
+        delete mapFuzzy[field];
+        renderMapFields();
         renderMapPreview();
       });
       label.appendChild(select);
@@ -828,18 +925,41 @@
       cols.forEach(function (pair) {
         var td = el('td');
         var value = rec[pair[0]];
+        if (value == null && mapAnalysis.type && /^amazon/.test(mapAnalysis.type)) {
+          var amz = { price: 'amzPrice', fees: 'amzFees', units: 'amzUnits' }[pair[0]];
+          if (amz) value = rec[amz];
+        }
         td.textContent = value == null ? '' : String(value);
         tr.appendChild(td);
       });
       body.appendChild(tr);
     });
     var info = [];
+    info.push(mapAnalysis.data.length + ' data rows in the file');
     if (result.records) info.push(result.records.length + ' SKUs ready');
     if (result.skippedTotal) info.push(result.skippedTotal + ' totals row skipped');
     if (result.skippedBlank) info.push(result.skippedBlank + ' blank rows skipped');
-    if (result.notes) info.push(result.notes.join(' '));
-    $('mapInfo').textContent = info.join('. ');
-    $('mapWarn').textContent = result.error || '';
+    if (result.skippedNoSku) info.push(result.skippedNoSku + ' rows with no SKU skipped');
+    if (result.notes && result.notes.length) info.push(result.notes.join(' '));
+    var rep = TM.columnReport(mapAnalysis, activeMapping);
+    $('mapInfo').textContent = info.join('. ') + '.';
+    $('mapIgnored').textContent = rep.ignored.length
+      ? 'Columns not imported (' + rep.ignored.length + '): ' + rep.ignored.slice(0, 30).join(', ') + (rep.ignored.length > 30 ? ', …' : '')
+      : 'Every column in the file is used.';
+    var warn = [];
+    if (result.error) warn.push(result.error);
+    var missing = missingFields(mapAnalysis, activeMapping);
+    if (missing.length) {
+      warn.push('Key column not found: ' + missing.map(labelOf).join(', ') + '. Pick it from the list above' +
+        (missing.indexOf('sku') >= 0 ? '.' : ', or import anyway and those values stay empty.'));
+    }
+    var guessed = Object.keys(mapFuzzy).filter(function (f) { return activeMapping[f] != null; });
+    if (guessed.length) {
+      warn.push('Guessed from a similar column name: ' + guessed.map(function (f) {
+        return labelOf(f) + ' ← “' + mapAnalysis.headers[activeMapping[f]] + '”';
+      }).join(', ') + '. Check these.');
+    }
+    (result.warnings || []).forEach(function (w) { warn.push(w); });
     var seen = {};
     var dup = false;
     Object.keys(activeMapping).forEach(function (field) {
@@ -847,35 +967,42 @@
       if (seen[idx]) dup = true;
       seen[idx] = true;
     });
-    if (dup && !result.error) $('mapWarn').textContent = 'Two fields use the same column. Change one of them if that was an accident.';
+    if (dup) warn.push('Two fields use the same column. Change one of them if that was an accident.');
+    $('mapWarn').textContent = warn.join(' ');
+    $('mapConfirm').textContent = missing.length && missing.indexOf('sku') < 0 ? 'Import anyway' : 'Import';
+    var saved = $('mapSavedNote');
+    if (mapSavedInfo) {
+      saved.hidden = false;
+      $('mapSavedText').textContent = 'Using your saved column mapping for ' + typeLabelOf(mapAnalysis.type) + ' files' +
+        (mapSavedInfo.missing.length ? ' (not in this file: ' + mapSavedInfo.missing.map(labelOf).join(', ') + ')' : '') + '.';
+    } else saved.hidden = true;
   }
 
   function openMap(name, analysis) {
     mapOpen = true;
     mapAnalysis = analysis;
     mapFileName = name;
-    activeMapping = Object.assign({}, analysis.mapping);
+    activeMapping = suggestFor(analysis);
     $('mapMeta').textContent = name + ' · header on row ' + (analysis.headerIndex + 1) +
       (analysis.headerIndex ? ' · ' + analysis.headerIndex + ' title row' + (analysis.headerIndex === 1 ? '' : 's') + ' skipped' : '') +
       (analysis.period ? ' · ' + analysis.period.label : '');
     var select = $('mapType');
     select.textContent = '';
-    if (analysis.type === 'unknown') {
-      var unknown = el('option');
-      unknown.value = 'unknown';
-      unknown.textContent = 'Unrecognized — map the columns';
-      select.appendChild(unknown);
-    }
+    var unknown = el('option');
+    unknown.value = 'unknown';
+    unknown.textContent = 'Other spreadsheet: map the columns';
+    select.appendChild(unknown);
     TM.FILE_TYPES.forEach(function (type) {
       var opt = el('option');
       opt.value = type.id;
       opt.textContent = type.label;
       select.appendChild(opt);
     });
-    select.value = analysis.type === 'unknown' ? 'unknown' : analysis.type;
-    var type = null;
-    TM.FILE_TYPES.forEach(function (item) { if (item.id === analysis.type) type = item; });
-    $('mapBlurb').textContent = type ? type.blurb : 'These column names were not recognized. Pick the SKU column, or change the file type.';
+    select.value = analysis.type;
+    $('mapBlurb').textContent = analysis.type === 'unknown'
+      ? 'These column names were not recognized. Pick the SKU column and the numbers you want, or choose the file type above.'
+      : (analysis.typeBlurb || '');
+    $('mapRemember').checked = !!savedMappingFor(analysis);
     renderMapFields();
     renderMapPreview();
     $('mapModal').hidden = false;
@@ -888,18 +1015,64 @@
     if (andNext) nextFile();
   }
 
+  /* One summary block per file: type, columns used and ignored, rows, skips. */
+  function fileSummary(name, analysis, mapping, result, stats) {
+    var box = el('details', 'file-summary' + (stats.warn ? ' has-warn' : ''));
+    var sum = el('summary');
+    sum.textContent = name + ' — ' + (analysis.typeLabel || typeLabelOf(analysis.type)) + '. ' + stats.text;
+    box.appendChild(sum);
+    var rep = TM.columnReport(analysis, mapping);
+    function line(label, text, cls) {
+      var p = el('p', cls || '');
+      var b = el('strong');
+      b.textContent = label + ' ';
+      p.appendChild(b);
+      p.appendChild(document.createTextNode(text));
+      box.appendChild(p);
+    }
+    line('Detected type:', analysis.typeLabel || typeLabelOf(analysis.type));
+    line('Columns used:', rep.used.map(function (u) { return u.header + ' → ' + u.label; }).join(', ') || 'none');
+    line('Columns ignored:', rep.ignored.length ? rep.ignored.join(', ') : 'none');
+    var skips = [];
+    if (result.skippedTotal) skips.push(result.skippedTotal + ' totals row' + (result.skippedTotal === 1 ? '' : 's'));
+    if (result.skippedBlank) skips.push(result.skippedBlank + ' blank');
+    if (result.skippedNoSku) skips.push(result.skippedNoSku + ' with no SKU');
+    if (stats.held) skips.push(stats.held + ' over the free 25-SKU limit');
+    line('Rows:', analysis.data.length + ' in the file, ' + result.records.length + ' SKUs imported (' + stats.added + ' new, ' + stats.updated + ' updated)' +
+      (skips.length ? '. Skipped: ' + skips.join(', ') : '') + '.');
+    var miss = missingFields(analysis, mapping);
+    if (miss.length) line('Missing key columns:', miss.map(labelOf).join(', ') + '. Those values were left empty.', 'bad');
+    var guessed = Object.keys(stats.fuzzy || {}).filter(function (f) { return mapping[f] != null; });
+    if (guessed.length) line('Guessed columns:', guessed.map(function (f) { return labelOf(f) + ' ← ' + analysis.headers[mapping[f]]; }).join(', ') + '. Check them.', 'bad');
+    (result.notes || []).forEach(function (n) { line('Note:', n); });
+    (result.warnings || []).forEach(function (w) { line('Check:', w, 'bad'); });
+    line('Check your data:', ACCURACY, 'accuracy');
+    $('importStatus').appendChild(box);
+    if (stats.warn) box.open = true;
+  }
+
+  function finishImport(name, analysis, mapping, result, fuzzy) {
+    var stats = applyRecords(result);
+    stats.fuzzy = fuzzy;
+    stats.warn = missingFields(analysis, mapping).length > 0 || (result.warnings && result.warnings.length > 0) ||
+      Object.keys(fuzzy || {}).some(function (f) { return mapping[f] != null; });
+    if (result.period) detectedPeriod = result.period;
+    fileSummary(name, analysis, mapping, result, stats);
+    return stats;
+  }
+
   function confirmMap() {
     var result = TM.materialize(mapAnalysis, activeMapping);
     if (result.error || !result.records.length) {
       $('mapWarn').textContent = result.error || 'Nothing to import.';
       return;
     }
-    var stats = applyRecords(result);
-    if (result.period) detectedPeriod = result.period;
-    setStatus(mapFileName + ' — ' + (mapAnalysis.typeLabel || 'Import') + '. ' + stats.text);
+    if ($('mapRemember').checked) rememberMapping(mapAnalysis, activeMapping);
+    finishImport(mapFileName, mapAnalysis, activeMapping, result, mapFuzzy);
     showToast('Imported ' + result.records.length + ' rows');
     renderAll();
     scheduleSave();
+    showCoach();
     closeMap(true);
   }
 
@@ -910,7 +1083,7 @@
     reader.onload = function () {
       try {
         if (typeof XLSX === 'undefined') throw new Error('library');
-        var wb = XLSX.read(reader.result, { type: 'array' });
+        var wb = TM.readWorkbook(XLSX, reader.result);
         var analysis = TM.analyze(TM.gridFromWorkbook(wb));
         if (!analysis.ok) {
           setStatus(file.name + ': ' + analysis.error, 'bad');
@@ -937,14 +1110,13 @@
 
   function importBuffer(buf, name) {
     try {
-      var wb = XLSX.read(buf, { type: 'array' });
+      var wb = TM.readWorkbook(XLSX, buf);
       var analysis = TM.analyze(TM.gridFromWorkbook(wb));
       if (!analysis.ok) { setStatus(name + ': ' + analysis.error, 'bad'); return; }
-      var result = TM.materialize(analysis, analysis.mapping);
+      var mapping = suggestFor(analysis);
+      var result = TM.materialize(analysis, mapping);
       if (result.error) { setStatus(name + ': ' + result.error, 'bad'); return; }
-      var stats = applyRecords(result);
-      if (result.period) detectedPeriod = result.period;
-      setStatus(name + ' — ' + analysis.typeLabel + '. ' + stats.text);
+      finishImport(name, analysis, mapping, result, mapFuzzy);
     } catch (err) {
       setStatus(name + ': could not read this sample.', 'bad');
     }
@@ -965,6 +1137,7 @@
         renderAll();
         scheduleSave();
         showToast('Sample files loaded');
+        showCoach();
         return;
       }
       var item = files[index++];
@@ -1095,6 +1268,142 @@
     renderTable();
   }
 
+  var TAB_IDS = { leak: ['tabLeak', 'viewLeak'], bid: ['tabBid', 'viewBid'], quick: ['tabQuick', 'viewQuick'] };
+  function showTab(name) {
+    activeTab = name;
+    Object.keys(TAB_IDS).forEach(function (key) {
+      var on = key === name;
+      $(TAB_IDS[key][0]).classList.toggle('on', on);
+      $(TAB_IDS[key][0]).setAttribute('aria-selected', on ? 'true' : 'false');
+      $(TAB_IDS[key][1]).hidden = !on;
+    });
+    if (name === 'leak') renderLeak();
+    if (name === 'quick') renderQuick();
+  }
+
+  function termsAccepted() {
+    try {
+      var raw = localStorage.getItem('skuclinic:termsAccepted');
+      if (!raw) return false;
+      var rec = JSON.parse(raw);
+      return !!(rec && rec.at && rec.version === TERMS_VERSION);
+    } catch (err) { return false; }
+  }
+  function acceptTerms() {
+    if (termsAccepted()) return true;
+    if (!$('agreeTerms').checked) {
+      $('agreeMsg').textContent = 'Tick “I agree to the Terms” to continue.';
+      $('agreeTerms').focus();
+      return false;
+    }
+    try {
+      localStorage.setItem('skuclinic:termsAccepted', JSON.stringify({ at: new Date().toISOString(), version: TERMS_VERSION }));
+    } catch (err) {}
+    return true;
+  }
+  function syncAgree() {
+    var ok = termsAccepted();
+    $('agreeRow').hidden = ok;
+    if (ok) {
+      try {
+        var rec = JSON.parse(localStorage.getItem('skuclinic:termsAccepted'));
+        $('agreeDone').textContent = 'You agreed to the Terms on ' + new Date(rec.at).toLocaleString() + '.';
+      } catch (err) {}
+    }
+    $('agreeDone').hidden = !ok;
+  }
+
+  /* ---- 3-step coach after the first import ---- */
+  function showCoach() {
+    var done = false;
+    try { done = localStorage.getItem('skuclinic:coachDone') === '1'; } catch (err) {}
+    if (done || !products.length) return;
+    $('coach').hidden = false;
+  }
+
+  /* ---- what data is loaded, per field, so a seller knows what is missing ---- */
+  function renderChecklist() {
+    var host = $('checklist');
+    host.textContent = '';
+    var n = products.length;
+    function count(fn) { var c = 0; products.forEach(function (p) { if (fn(p)) c++; }); return c; }
+    var items = [
+      ['Prices', count(function (p) { return TM.hasValue(p.price) || TM.hasValue(p.amzPrice) || TM.hasValue(p.amzAvgPrice); }), 'Shopify, Etsy, or Merchant Center product export, or the template', true],
+      ['Unit costs', count(function (p) { return TM.hasValue(p.cogs); }), 'Shopify “Cost per item”, a cost sheet, or the template', true],
+      ['Units sold', count(function (p) { return TM.hasValue(p.units) || TM.hasValue(p.amzUnits); }), 'Shopify orders or sales report, Etsy sold items, or Amazon settlement', false],
+      ['Ad spend', count(function (p) { return TM.hasValue(p.spend); }), 'Google Ads product report', false],
+      ['Fees', count(function (p) { return TM.hasValue(p.fees) || TM.hasValue(p.payfee) || TM.hasValue(p.reffee) || TM.hasValue(p.amzFees); }), 'Amazon fee preview, or fee columns in the template', false]
+    ];
+    var title = el('p', 'check-title');
+    title.textContent = n ? 'Your data so far (' + n + ' SKU' + (n === 1 ? '' : 's') + '):' : 'What to bring: two files are enough to start.';
+    host.appendChild(title);
+    var ul = el('ul', 'check-list');
+    items.forEach(function (it) {
+      var li = el('li', n && it[1] === n ? 'done' : n && it[1] ? 'part' : (it[3] ? 'need' : 'opt'));
+      var mark = n && it[1] === n ? '✓' : n && it[1] ? '◐' : '○';
+      li.textContent = mark + ' ' + it[0] + (n ? ': ' + it[1] + ' of ' + n : (it[3] ? ' (needed)' : ' (optional)')) + ' · ' + it[2];
+      ul.appendChild(li);
+    });
+    host.appendChild(ul);
+  }
+
+  /* ---- Quick profit: one product or service, typed by hand ---- */
+  function qv(id) { return $(id).value; }
+  function renderQuick() {
+    var mode = document.querySelector('input[name="qpAdMode"]:checked');
+    var r = TM.quickProfit({
+      price: qv('qpPrice'), cost: qv('qpCost'), shipping: qv('qpShip'), feePct: qv('qpFeePct'), feeFixed: qv('qpFeeFixed'),
+      adMode: mode ? mode.value : 'perSale', adValue: qv('qpAd'), units: qv('qpUnits'), targetMargin: qv('qpTarget')
+    });
+    $('qpAdLabel').firstChild.textContent = mode && mode.value === 'monthly' ? 'Ad spend per month $' : 'Ad cost per sale $';
+    var out = $('qpOut');
+    out.textContent = '';
+    if (!r.ok) {
+      var msg = el('p', 'note');
+      msg.textContent = r.error;
+      out.appendChild(msg);
+      return r;
+    }
+    function stat(label, value, cls) {
+      var card = el('div', 'stat');
+      var l = el('div', 'label');
+      l.textContent = label;
+      var v = el('div', 'value' + (cls ? ' ' + cls : ''));
+      v.textContent = value;
+      v.dataset.qp = label;
+      card.appendChild(l);
+      card.appendChild(v);
+      out.appendChild(card);
+    }
+    var tone = function (n) { return isFinite(n) ? (n >= 0 ? 'pos' : 'neg') : ''; };
+    stat('Profit per sale', TM.fmtMoney(r.profitPerUnit), tone(r.profitPerUnit));
+    stat('Margin after ads', TM.fmtPct(r.marginAfterAds), tone(r.marginAfterAds));
+    stat('Break-even price', TM.fmtMoney(r.breakEvenPrice));
+    if (TM.hasValue(qv('qpTarget'))) stat('Price for ' + qv('qpTarget') + '% margin', isFinite(r.targetPrice) ? TM.fmtMoney(r.targetPrice) : 'Not reachable');
+    if (isFinite(r.monthlyProfit)) stat('Profit per month', TM.fmtMoney(r.monthlyProfit), tone(r.monthlyProfit));
+    return r;
+  }
+  function addQuickToList() {
+    if (!TM.hasValue(qv('qpPrice'))) { renderQuick(); return; }
+    if (plan === 'free' && products.length >= FREE_CAP) { openUpgrade('cap'); return; }
+    var mode = document.querySelector('input[name="qpAdMode"]:checked');
+    var units = qv('qpUnits');
+    var ad = TM.parseNumber(qv('qpAd'));
+    var spend = '';
+    if (ad != null) spend = mode && mode.value === 'monthly' ? ad : (TM.hasValue(units) ? ad * TM.parseNumber(units) : '');
+    var p = {
+      id: nextId++, tests: [],
+      upc: qv('qpSku') || ('MANUAL-' + nextId),
+      name: qv('qpName') || 'Manual entry',
+      price: qv('qpPrice'), cogs: qv('qpCost'), shipping: qv('qpShip'), fees: qv('qpFeeFixed'), payfee: qv('qpFeePct'),
+      units: units, spend: spend === '' ? '' : String(Math.round(spend * 100) / 100)
+    };
+    products.push(p);
+    renderAll();
+    scheduleSave();
+    showToast('Added ' + p.upc + ' to your product list');
+  }
+
   function closeWelcome() {
     $('welcomeModal').hidden = true;
     if ($('dontShowAgain').checked) {
@@ -1107,6 +1416,7 @@
     $('rows').addEventListener('click', onRowClick);
     $('addProduct').addEventListener('click', addProduct);
     $('clearProducts').addEventListener('click', function () {
+      if (products.length && !window.confirm('Remove all ' + products.length + ' products from this store? This cannot be undone.')) return;
       products = [];
       stores[active].products = products;
       nextId = 1;
@@ -1117,12 +1427,39 @@
     });
     $('exportBtn').addEventListener('click', exportFixes);
     $('exportLeak').addEventListener('click', exportFixes);
-    $('templateBtn').addEventListener('click', function () {
-      download('skuclinic-cost-sheet.csv', 'SKU,Product,Unit cost,Shipping,Other costs,ASIN\nEXAMPLE-1,Example product,8.00,1.50,0.40,\n');
+    $('templateBtn').addEventListener('click', function () { $('templateModal').hidden = false; });
+    $('templateClose').addEventListener('click', function () { $('templateModal').hidden = true; });
+    $('dropTemplate').addEventListener('click', function () { $('templateModal').hidden = false; });
+    $('welcomeTemplate').addEventListener('click', function () {
+      if (!acceptTerms()) return;
+      closeWelcome();
+      $('templateModal').hidden = false;
     });
+    $('resetMappings').addEventListener('click', function () {
+      writeSavedMappings({});
+      showToast('Saved column mappings cleared');
+    });
+    $('printBtn').addEventListener('click', function () { window.print(); });
     $('sampleBtn').addEventListener('click', loadSamples);
-    $('welcomeSample').addEventListener('click', function () { closeWelcome(); loadSamples(); });
-    $('welcomeBlank').addEventListener('click', closeWelcome);
+    $('welcomeSample').addEventListener('click', function () {
+      if (!acceptTerms()) return;
+      closeWelcome();
+      loadSamples();
+    });
+    $('welcomeBlank').addEventListener('click', function () {
+      if (!acceptTerms()) return;
+      closeWelcome();
+    });
+    $('agreeTerms').addEventListener('change', function () { $('agreeMsg').textContent = ''; });
+    $('coachClose').addEventListener('click', function () {
+      $('coach').hidden = true;
+      try { localStorage.setItem('skuclinic:coachDone', '1'); } catch (err) {}
+    });
+    $('coachLeak').addEventListener('click', function () { showTab('leak'); });
+    $('coachExport').addEventListener('click', exportFixes);
+    $('qpForm').addEventListener('input', renderQuick);
+    $('qpForm').addEventListener('submit', function (event) { event.preventDefault(); });
+    $('qpAdd').addEventListener('click', addQuickToList);
     $('browseBtn').addEventListener('click', function () { $('fileInput').click(); });
     $('fileInput').addEventListener('change', function () {
       if (this.files && this.files.length) handleFiles(this.files);
@@ -1151,9 +1488,11 @@
         var field = btn.dataset.sort;
         if (sortField === field) sortDir = -sortDir;
         else { sortField = field; sortDir = 1; }
+        var cache = new Map();
+        products.forEach(function (p) { cache.set(p, sortValue(p, field)); });
         products.sort(function (a, b) {
-          var va = sortValue(a, field);
-          var vb = sortValue(b, field);
+          var va = cache.get(a);
+          var vb = cache.get(b);
           if (va == null && vb == null) return 0;
           if (va == null) return 1;
           if (vb == null) return -1;
@@ -1166,22 +1505,8 @@
         scheduleSave();
       });
     });
-    $('tabBid').addEventListener('click', function () {
-      $('viewBid').hidden = false;
-      $('viewLeak').hidden = true;
-      $('tabBid').classList.add('on');
-      $('tabLeak').classList.remove('on');
-      $('tabBid').setAttribute('aria-selected', 'true');
-      $('tabLeak').setAttribute('aria-selected', 'false');
-    });
-    $('tabLeak').addEventListener('click', function () {
-      $('viewBid').hidden = true;
-      $('viewLeak').hidden = false;
-      $('tabLeak').classList.add('on');
-      $('tabBid').classList.remove('on');
-      $('tabLeak').setAttribute('aria-selected', 'true');
-      $('tabBid').setAttribute('aria-selected', 'false');
-      renderLeak();
+    ['leak', 'bid', 'quick'].forEach(function (name) {
+      $(TAB_IDS[name][0]).addEventListener('click', function () { showTab(name); });
     });
     $('periodMode').addEventListener('change', function () { syncCustomDays(); renderLeak(); scheduleSave(); });
     $('customDays').addEventListener('input', function () { renderLeak(); scheduleSave(); });
@@ -1293,16 +1618,27 @@
     $('mapConfirm').addEventListener('click', confirmMap);
     $('mapType').addEventListener('change', function () {
       mapAnalysis.type = this.value;
+      mapAnalysis.typeLabel = typeLabelOf(this.value);
       var found = null;
       TM.FILE_TYPES.forEach(function (item) { if (item.id === this.value) found = item; }, this);
-      mapAnalysis.typeLabel = found ? found.label : 'Unrecognized file';
-      $('mapBlurb').textContent = found ? found.blurb : 'Map the columns yourself.';
-      activeMapping = TM.suggestMapping(this.value === 'unknown' ? 'cost_sheet' : this.value, mapAnalysis.headerNorms);
+      mapAnalysis.typeBlurb = found ? found.blurb : 'Map the columns yourself.';
+      $('mapBlurb').textContent = mapAnalysis.typeBlurb;
+      activeMapping = suggestFor(mapAnalysis);
+      $('mapRemember').checked = !!savedMappingFor(mapAnalysis);
       renderMapFields();
       renderMapPreview();
     });
-    ['mapModal', 'upgradeModal', 'helpModal', 'welcomeModal'].forEach(function (id) {
+    $('mapResetSaved').addEventListener('click', function () {
+      forgetMapping(mapAnalysis);
+      activeMapping = suggestFor(mapAnalysis);
+      $('mapRemember').checked = false;
+      renderMapFields();
+      renderMapPreview();
+      showToast('Saved mapping removed for ' + typeLabelOf(mapAnalysis.type));
+    });
+    ['mapModal', 'upgradeModal', 'helpModal', 'welcomeModal', 'templateModal'].forEach(function (id) {
       $(id).addEventListener('click', function (event) {
+        if (id === 'welcomeModal' && event.target === this) { if (termsAccepted()) closeWelcome(); return; }
         if (event.target === this) this.hidden = true;
         if (id === 'mapModal' && event.target === this) closeMap(true);
       });
@@ -1312,7 +1648,8 @@
       if (!$('mapModal').hidden) closeMap(true);
       $('upgradeModal').hidden = true;
       $('helpModal').hidden = true;
-      if (!$('welcomeModal').hidden) closeWelcome();
+      $('templateModal').hidden = true;
+      if (!$('welcomeModal').hidden && termsAccepted()) closeWelcome();
     });
     document.addEventListener('dragover', function (event) {
       if (!event.dataTransfer) return;
@@ -1353,8 +1690,14 @@
     loadWorkspace();
     renderStores();
     renderAll();
+    showTab('leak');
+    renderQuick();
+    syncAgree();
     var hide = false;
     try { hide = localStorage.getItem('skuclinic:hideWelcome') === '1'; } catch (err) {}
+    /* Paid users who already have saved products go straight to their data. */
+    if (paid() && products.length) hide = true;
+    if (!termsAccepted()) hide = false;
     if (!hide) $('welcomeModal').hidden = false;
   }
 

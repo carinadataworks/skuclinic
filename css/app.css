@@ -168,7 +168,7 @@ table.data input[data-field="upc"] { min-width: 108px; }
 .icon-btn { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 18px; padding: 0 6px; }
 .icon-btn:hover { color: var(--bad); }
 
-.advanced td { background: var(--paper); white-space: normal; }
+.advanced-row td { background: var(--paper); white-space: normal; }
 .adv-grid { display: flex; gap: 22px; flex-wrap: wrap; }
 .adv-col { min-width: 200px; }
 .adv-col h3 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
@@ -215,6 +215,65 @@ table.data input[data-field="upc"] { min-width: 108px; }
 .toast { background: var(--ink); color: white; border-radius: 10px; padding: 10px 12px; max-width: 280px; }
 
 .reason { white-space: normal; min-width: 220px; color: var(--ink-soft); font-size: 12.5px; }
+
+/* checkboxes inside labels are never stretched like text inputs */
+.check-field { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--ink-soft); }
+.check-field input[type="checkbox"], .field input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; margin: 1px 0 0; flex: none; }
+.linkish { background: none; border: 0; padding: 0; color: var(--teal-dark); text-decoration: underline; cursor: pointer; font: inherit; }
+.optional { font-weight: 400; color: var(--muted); font-size: 12px; }
+
+.accuracy { color: var(--warn); }
+.disclaimer { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 10px; }
+.print-only { display: none; }
+
+.checklist { margin-top: 8px; }
+.check-title { font-size: 13px; font-weight: 700; margin: 0 0 4px; }
+.check-list { list-style: none; padding: 0; margin: 0; font-size: 13px; display: grid; gap: 2px; }
+.check-list .done { color: var(--good); }
+.check-list .part { color: var(--warn); }
+.check-list .need { color: var(--ink-soft); }
+.check-list .opt { color: var(--muted); }
+
+.coach { position: relative; background: var(--teal-soft); border: 1px solid var(--teal); border-radius: 14px; padding: 12px 40px 12px 14px; margin: 0 0 12px; }
+.coach ol { margin: 6px 0 0; padding-left: 20px; }
+.coach li { margin: 3px 0; }
+.coach .icon-btn { position: absolute; right: 8px; top: 6px; }
+
+details.panel > summary { cursor: pointer; list-style: revert; }
+details.panel > summary h2 { display: inline; }
+details.panel[open] > summary { margin-bottom: 8px; }
+
+.file-summary { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; margin: 6px 0; font-size: 13px; }
+.file-summary.has-warn { border-color: var(--warn); }
+.file-summary summary { cursor: pointer; font-weight: 700; }
+.file-summary p { margin: 4px 0; }
+
+.map-grid .missing { color: var(--bad); font-weight: 700; }
+.map-grid .missing select { border-color: var(--bad); }
+.map-grid .guessed { color: var(--warn); }
+.map-grid .guessed select { border-color: var(--warn); }
+.saved-note { background: var(--teal-soft); border-radius: 8px; padding: 6px 8px; }
+
+.rec-why { white-space: normal; font-size: 12px; color: var(--warn); max-width: 260px; }
+th[title] { cursor: help; }
+.tip { font-size: 10px; color: var(--muted); }
+
+.qp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; align-items: end; margin: 10px 0; }
+.qp-grid .field input { width: 100%; }
+.choice { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+
+.cred { background: var(--paper); border-left: 3px solid var(--teal); padding: 8px 10px; border-radius: 8px; }
+.steps { padding-left: 20px; }
+.steps li { margin: 6px 0; }
+.agree { margin-top: 8px; }
+
+@media print {
+  .top, .drop-zone, .tabs, .toolbar, .save-bar, #impactPanel, .coach, .status, .toasts, .overlay, .nav, .row button, .pager, .search { display: none !important; }
+  .print-only { display: block; margin-top: 8px; }
+  .table-scroll { overflow: visible; }
+  table.data { font-size: 10px; }
+  .disclaimer { color: #000; }
+}
 
 @media (max-width: 720px) {
   .app-main { width: calc(100% - 20px); }

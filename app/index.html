@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="SkuClinic app. Drop Shopify and Google Ads exports. Your files stay in this browser.">
+<meta name="description" content="SkuClinic app. Find the SKUs losing you money. Your files stay in this browser.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; object-src 'none'; base-uri 'none'; form-action https://formsubmit.co">
 <meta name="theme-color" content="#0f6e62">
 <title>SkuClinic</title>
@@ -39,28 +39,89 @@
 <main id="main" class="app-main">
   <div class="app-intro">
     <h1>True profit per SKU</h1>
-    <p>Drop a Shopify export and a Google Ads product report. Get a profit-safe bid and a fix for each SKU. Nothing is uploaded.</p>
+    <p>Drop your store exports, or type a product in Quick profit. See which SKUs lose money, how much a year, and the fix for each. Nothing is uploaded.</p>
+  </div>
+
+  <div id="coach" class="coach" hidden role="region" aria-label="Next steps">
+    <strong>Your numbers are in. Three steps to the money:</strong>
+    <ol>
+      <li><button type="button" class="linkish" id="coachLeak">Open the Profit Leak Finder</button>. The worst SKUs are at the top, sorted by estimated annual leak.</li>
+      <li>Read the <em>Why</em> column. It says what is losing money (cost, fees, or ads) and the fix: cut ads, raise price, review fees, or stop selling.</li>
+      <li>Act on the top few, then <button type="button" class="linkish" id="coachExport">export the fix list</button> (Pro) or re-import next month to compare.</li>
+    </ol>
+    <button type="button" class="icon-btn" id="coachClose" aria-label="Dismiss next steps">×</button>
   </div>
 
   <div id="dropZone" class="drop-zone">
     <div>
-      <p><strong>Drop files here.</strong> Shopify products or orders, a Google Ads product report, a cost sheet, or an Amazon fee file.</p>
-      <p class="note">CSV or Excel. The header row is found for you, including Google’s title rows. You can correct the columns before anything is imported.</p>
+      <p><strong>Drop files here.</strong> Shopify products, orders, or sales report; Etsy listings or sold items; a Google Ads product report or Merchant Center feed; an Amazon fee preview or settlement; a cost sheet; or the SkuClinic template.</p>
+      <p class="note">CSV, TSV, or Excel. The header row is found for you, including Google’s title rows. You check the columns before anything is imported.</p>
+      <p class="note accuracy" id="accuracyNotice">Export formats from Shopify, Amazon, Google, Etsy and others can change without notice. Always review the column mapping and spot-check a few rows to make sure your data imported correctly.</p>
+      <div id="checklist" class="checklist"></div>
     </div>
     <div class="drop-actions">
       <button type="button" class="btn teal" id="browseBtn">Choose files</button>
       <button type="button" class="btn" id="sampleBtn">Load sample files</button>
+      <button type="button" class="btn" id="dropTemplate">Get the import template</button>
       <input id="fileInput" type="file" accept=".csv,.xlsx,.xls,text/csv" multiple>
     </div>
   </div>
   <div id="importStatus" class="status" role="status" aria-live="polite"></div>
 
   <div class="tabs" role="tablist">
-    <button type="button" class="tab on" id="tabBid" role="tab" aria-selected="true">Bid calculator</button>
-    <button type="button" class="tab" id="tabLeak" role="tab" aria-selected="false">Profit Leak Finder</button>
+    <button type="button" class="tab on" id="tabLeak" role="tab" aria-selected="true" aria-controls="viewLeak">Profit Leak Finder</button>
+    <button type="button" class="tab" id="tabBid" role="tab" aria-selected="false" aria-controls="viewBid">Ad bid calculator</button>
+    <button type="button" class="tab" id="tabQuick" role="tab" aria-selected="false" aria-controls="viewQuick">Quick profit (no file)</button>
   </div>
 
-  <section id="viewBid">
+  <section id="viewLeak">
+    <div class="stats">
+      <div class="stat"><div class="label">SKUs</div><div class="value" id="leakCount">0</div></div>
+      <div class="stat"><div class="label">Need a fix</div><div class="value" id="leakBad">0</div></div>
+      <div class="stat"><div class="label">Estimated annual leak</div><div class="value neg" id="leakAnnual">–</div></div>
+    </div>
+    <div class="panel row">
+      <label class="field">Period these numbers cover
+        <select id="periodMode" class="select">
+          <option value="auto">Detected dates, or one month</option>
+          <option value="month">One month</option>
+          <option value="quarter">One quarter</option>
+          <option value="year">One year</option>
+          <option value="custom">Custom days</option>
+        </select>
+      </label>
+      <label class="field" id="customDaysWrap" hidden>Days
+        <input id="customDays" type="number" min="1" step="1" value="30">
+      </label>
+      <label class="check-field"><input id="leakProblems" type="checkbox"> Problems only</label>
+      <button type="button" class="btn small" id="exportLeak">Export fixes (CSV)</button>
+      <button type="button" class="btn small" id="printBtn">Print</button>
+      <button type="button" class="btn small" id="feedbackLeak" hidden>Give feedback</button>
+    </div>
+    <p class="note" id="leakNote"></p>
+    <div class="table-scroll">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>SKU</th><th>Product</th>
+            <th title="Average selling price from orders when imported, otherwise list price">Price <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Unit cost + shipping per unit + other cost">Product cost <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Fees per unit in dollars plus returns, payment, and marketplace fee percentages of price">Fees / unit <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Ad spend for the period in the file">Ad spend <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Units sold from orders or sales reports; ad conversions when no orders file is loaded">Units <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Price − product cost − fees − ad spend ÷ units">Profit / unit <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Profit per unit × units − ad spend, plus the Amazon channel when imported">Profit for period <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th title="Loss for the period scaled to a year. Only losing SKUs count.">Annual leak <span class="tip" aria-hidden="true">ⓘ</span></th>
+            <th>Action</th><th>Why</th>
+          </tr>
+        </thead>
+        <tbody id="leakRows"></tbody>
+      </table>
+    </div>
+    <p class="disclaimer">Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.</p>
+  </section>
+
+  <section id="viewBid" hidden>
     <div class="save-bar row">
       <button type="button" class="btn small" id="saveSnap">Save snapshot</button>
       <button type="button" class="btn small" id="loadSnap">Load last snapshot</button>
@@ -74,8 +135,8 @@
       <p class="note">Share of gross profit you want to keep after ads. 0% stays 0%. An empty cell uses this default. Rows with shipping, fees, or other costs use margin after those costs.</p>
     </div>
 
-    <div class="panel" id="impactPanel">
-      <h2>Ad spend impact — before vs after</h2>
+    <details class="panel" id="impactPanel">
+      <summary><h2>Ad spend impact: before vs after (one product, typed by hand)</h2></summary>
       <div class="row">
         <button type="button" class="btn small mode-btn on" id="modePlan">Planning a budget</button>
         <button type="button" class="btn small mode-btn" id="modeReview">Reviewing a campaign that already ran</button>
@@ -99,7 +160,7 @@
         <div class="card"><div class="note" id="imAfterLabel">With ads</div><div class="big" id="imAfterSales">–</div><div id="imAfterProfit">–</div></div>
       </div>
       <div class="banner" id="imGain">–</div>
-    </div>
+    </details>
 
     <div class="stats" id="summaryRow"></div>
 
@@ -128,20 +189,20 @@
               <th></th>
               <th>SKU</th>
               <th>Product</th>
-              <th>Price $</th>
-              <th>COGS $</th>
-              <th>Buffer %</th>
-              <th>Spend $</th>
-              <th>Clicks</th>
-              <th><button type="button" class="sort" data-sort="sales">Sales <span class="sort-arrow" data-field="sales"></span></button></th>
-              <th><button type="button" class="sort" data-sort="cpc">CPC <span class="sort-arrow" data-field="cpc"></span></button></th>
-              <th><button type="button" class="sort" data-sort="convrate">Conv. <span class="sort-arrow" data-field="convrate"></span></button></th>
-              <th>Conf.</th>
-              <th><button type="button" class="sort" data-sort="effMarginFrac">Margin <span class="sort-arrow" data-field="effMarginFrac"></span></button></th>
-              <th><button type="button" class="sort" data-sort="maxcpc">Max CPC <span class="sort-arrow" data-field="maxcpc"></span></button></th>
-              <th><button type="button" class="sort" data-sort="troas">tROAS <span class="sort-arrow" data-field="troas"></span></button></th>
-              <th><button type="button" class="sort" data-sort="netProfit">Net <span class="sort-arrow" data-field="netProfit"></span></button></th>
-              <th><button type="button" class="sort" data-sort="cpcGap">CPC vs max <span class="sort-arrow" data-field="cpcGap"></span></button></th>
+              <th title="Selling price per unit">Price $</th>
+              <th title="Unit cost (cost of goods). Shipping, other cost, fees, and fee % are in Advanced.">COGS $</th>
+              <th title="Share of unit profit you keep and never spend on ads. Empty uses the default.">Buffer %</th>
+              <th title="Ad spend for the period">Spend $</th>
+              <th title="Ad clicks for the period">Clicks</th>
+              <th title="Ad conversions (sales from ads)"><button type="button" class="sort" data-sort="sales">Sales <span class="sort-arrow" data-field="sales"></span></button></th>
+              <th title="Spend ÷ clicks"><button type="button" class="sort" data-sort="cpc">CPC <span class="sort-arrow" data-field="cpc"></span></button></th>
+              <th title="Conversions ÷ clicks"><button type="button" class="sort" data-sort="convrate">Conv. <span class="sort-arrow" data-field="convrate"></span></button></th>
+              <th title="How sure the conversion rate is, from the number of clicks">Conf.</th>
+              <th title="Margin after shipping, fees, and other costs. * means extra costs are included."><button type="button" class="sort" data-sort="effMarginFrac">Margin <span class="sort-arrow" data-field="effMarginFrac"></span></button></th>
+              <th title="Most you can pay per click and keep your buffer: (price − cost) × (1 − buffer) × conversion rate"><button type="button" class="sort" data-sort="maxcpc">Max CPC <span class="sort-arrow" data-field="maxcpc"></span></button></th>
+              <th title="Target ROAS to set in Google Ads"><button type="button" class="sort" data-sort="troas">tROAS <span class="sort-arrow" data-field="troas"></span></button></th>
+              <th title="Profit after cost and ad spend for the period"><button type="button" class="sort" data-sort="netProfit">Net <span class="sort-arrow" data-field="netProfit"></span></button></th>
+              <th title="Current CPC as a share of max CPC"><button type="button" class="sort" data-sort="cpcGap">CPC vs max <span class="sort-arrow" data-field="cpcGap"></span></button></th>
               <th>Recommendation</th>
               <th></th>
             </tr>
@@ -153,54 +214,45 @@
         <button type="button" class="btn small" id="addProduct">+ Add product</button>
         <button type="button" class="btn small" id="clearProducts">Clear products</button>
         <button type="button" class="btn small" id="exportBtn">Export fixes (CSV)</button>
-        <button type="button" class="btn small" id="templateBtn">Blank cost sheet</button>
+        <button type="button" class="btn small" id="templateBtn">Import template</button>
         <button type="button" class="btn small" id="feedbackBid" hidden>Give feedback</button>
       </div>
+      <p class="disclaimer">Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.</p>
       <p class="note">A product with ad spend and 0 sales is marked “Decrease — losing money.” Zeros are kept. A buffer of 1 imports as 1%, not 100%. Search only filters this table. Export, on Pro, includes every SKU.</p>
     </div>
   </section>
 
-  <section id="viewLeak" hidden>
-    <div class="stats">
-      <div class="stat"><div class="label">SKUs</div><div class="value" id="leakCount">0</div></div>
-      <div class="stat"><div class="label">Need a fix</div><div class="value" id="leakBad">0</div></div>
-      <div class="stat"><div class="label">Estimated annual leak</div><div class="value neg" id="leakAnnual">–</div></div>
-    </div>
-    <div class="panel row">
-      <label class="field">Period these numbers cover
-        <select id="periodMode" class="select">
-          <option value="auto">Detected dates, or one month</option>
-          <option value="month">One month</option>
-          <option value="quarter">One quarter</option>
-          <option value="year">One year</option>
-          <option value="custom">Custom days</option>
-        </select>
-      </label>
-      <label class="field" id="customDaysWrap" hidden>Days
-        <input id="customDays" type="number" min="1" step="1" value="30">
-      </label>
-      <label class="field"><input id="leakProblems" type="checkbox"> Problems only</label>
-      <button type="button" class="btn small" id="exportLeak">Export fixes (CSV)</button>
-      <button type="button" class="btn small" id="feedbackLeak" hidden>Give feedback</button>
-    </div>
-    <p class="note" id="leakNote"></p>
-    <div class="table-scroll">
-      <table class="data">
-        <thead>
-          <tr>
-            <th>SKU</th><th>Product</th><th>Price</th><th>Product cost</th><th>Fees / unit</th>
-            <th>Ad spend</th><th>Units</th><th>Profit / unit</th><th>Profit for period</th>
-            <th>Annual leak</th><th>Action</th><th>Why</th>
-          </tr>
-        </thead>
-        <tbody id="leakRows"></tbody>
-      </table>
+  <section id="viewQuick" hidden>
+    <div class="panel">
+      <h2>Quick profit: one product or service, no file needed</h2>
+      <p class="note">Type what you know. Empty boxes count as zero. Use it for a one-off product, a service, or a price you are thinking about.</p>
+      <form id="qpForm" class="qp-grid" autocomplete="off">
+        <label class="field">Name <span class="optional">optional</span><input id="qpName" type="text"></label>
+        <label class="field">SKU <span class="optional">optional</span><input id="qpSku" type="text"></label>
+        <label class="field">Price $<input id="qpPrice" type="number" step="0.01" min="0" inputmode="decimal"></label>
+        <label class="field">Unit cost $<input id="qpCost" type="number" step="0.01" min="0" inputmode="decimal"></label>
+        <label class="field">Shipping per unit $<input id="qpShip" type="number" step="0.01" min="0" inputmode="decimal"></label>
+        <label class="field">Fees % of price<input id="qpFeePct" type="number" step="0.1" min="0" max="99" inputmode="decimal"></label>
+        <label class="field">Fixed fee per sale $<input id="qpFeeFixed" type="number" step="0.01" min="0" inputmode="decimal"></label>
+        <fieldset class="choice">
+          <legend>Ads</legend>
+          <label><input type="radio" name="qpAdMode" value="perSale" checked> Cost per sale</label>
+          <label><input type="radio" name="qpAdMode" value="monthly"> Monthly total</label>
+        </fieldset>
+        <label class="field" id="qpAdLabel">Ad cost per sale $<input id="qpAd" type="number" step="0.01" min="0" inputmode="decimal"></label>
+        <label class="field">Units per month <span class="optional">optional</span><input id="qpUnits" type="number" step="1" min="0" inputmode="numeric"></label>
+        <label class="field">Target margin % <span class="optional">optional</span><input id="qpTarget" type="number" step="1" min="0" max="99" inputmode="decimal"></label>
+      </form>
+      <div class="stats" id="qpOut"></div>
+      <div class="toolbar"><button type="button" class="btn small" id="qpAdd">Add to my product list</button></div>
+      <p class="disclaimer">Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.</p>
     </div>
   </section>
 </main>
 <footer class="foot">
-  <div>© 2026 Kyle Guy. All rights reserved.</div>
-  <div><a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div>
+  <div>© 2026 Kyle Guy. All rights reserved. SkuClinic is operated by Carina Dataworks.</div>
+  <div><a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a> · <a href="../guide.html">How to export</a></div>
+  <div class="print-only">Estimates only, based on the data you provide. Not financial or tax advice. Verify before acting.</div>
 </footer>
 
 <div id="mapModal" class="overlay" hidden>
@@ -211,11 +263,15 @@
       <select id="mapType" class="select"></select>
     </label>
     <p id="mapBlurb" class="note"></p>
+    <p id="mapSavedNote" class="note saved-note" hidden><span id="mapSavedText"></span> <button type="button" class="linkish" id="mapResetSaved">Reset saved mapping</button></p>
     <div id="mapFields" class="map-grid"></div>
     <p class="note">Buffer columns: 1 and 1% mean 1%. 0.2 means 20%. 0 stays 0%. Empty cells are left alone, so a real zero is not dropped.</p>
     <div class="table-scroll"><table class="data"><thead id="mapHead"></thead><tbody id="mapPreview"></tbody></table></div>
     <p id="mapInfo" class="note"></p>
-    <p id="mapWarn" class="warn-text"></p>
+    <p id="mapIgnored" class="note"></p>
+    <p id="mapWarn" class="warn-text" role="alert"></p>
+    <p class="note accuracy">Export formats from Shopify, Amazon, Google, Etsy and others can change without notice. Always review the column mapping and spot-check a few rows to make sure your data imported correctly.</p>
+    <label class="check-field"><input type="checkbox" id="mapRemember"> Remember this column mapping for this file type</label>
     <div class="modal-actions">
       <button type="button" class="btn" id="mapCancel">Cancel</button>
       <button type="button" class="btn primary" id="mapConfirm">Import</button>
@@ -280,11 +336,14 @@
     <section id="help-import">
       <h3>Import</h3>
       <p>Drop a Shopify product export, a Shopify orders export, a Google Ads shopping or product report, a cost sheet, or an Amazon fee preview or settlement. The header row is detected even when title rows sit above it. Google’s Total row is skipped. You get a mapping preview and can change the file type or any column before import. A file with no recognizable header, or a header and no data rows, is reported as an error. It is not imported as blank products.</p>
-      <p>Orders are totaled by SKU. Settlement fee lines become fees per unit; tax lines are ignored. Profit uses units from orders when that file is present, and otherwise falls back to ad conversions.</p>
+      <p>Also supported: Shopify “Sales by product variant”, Etsy listings and sold order items, Google Merchant Center feeds, Amazon settlement V2, and the SkuClinic import template. Column names are matched without caring about case or punctuation, and old and new names both work. A column found only by a similar name is marked “guessed”. A missing key column (SKU, price, cost, units, or spend, depending on the file) is shown as a warning before you import.</p>
+      <p>Orders are totaled by SKU; refunded, voided, and cancelled orders are left out. Settlement fee lines become Amazon fees per unit; tax lines are ignored. Amazon numbers are kept as their own channel. Profit uses units from orders when that file is present, and otherwise falls back to ad conversions.</p>
+      <p>Tick “Remember this column mapping” to reuse your choices for that file type next time. <button type="button" class="linkish" id="resetMappings">Clear all saved mappings</button></p>
+      <p class="accuracy">Export formats from Shopify, Amazon, Google, Etsy and others can change without notice. Always review the column mapping and spot-check a few rows to make sure your data imported correctly.</p>
     </section>
     <section id="help-leak">
       <h3>Profit Leak Finder</h3>
-      <p>Profit per unit = price − product cost − fees − (ad spend ÷ units), when units are above zero. Product cost is unit cost + shipping + other. Fees come from an Amazon file when you add one; without it, profit is before marketplace fees and the table says so.</p>
+      <p>Profit per unit = price − product cost − fees − (ad spend ÷ units), when units are above zero. Product cost is unit cost + shipping + other. Fees are fees per unit plus returns %, payment fee %, and marketplace fee % of price, the same as the bid calculator. Amazon fees and prices stay on the Amazon channel and are added to the period total. Rows with impossible values (negative price, fees over 100%, more conversions than clicks) are marked “Check data” and left out of totals.</p>
       <p>Cut ads: the SKU makes money before ads and loses money after them, or it has spend and zero units. Raise price: cost is over price, and a higher price would clear about a 15% margin. Stop selling: a 25% price increase still would not. Review fees: fees are at least 35% of price and the SKU loses money before ads. Annual leak adds up only the losses, scaled from the period in the file (or one month if no dates were found).</p>
     </section>
     <section id="help-snap">
@@ -302,13 +361,38 @@
 
 <div id="welcomeModal" class="overlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-    <h2 id="welcomeTitle">Your files stay in this browser</h2>
-    <p>Drop a Shopify product export and a Google Ads product report. SkuClinic joins them by SKU and tells you the most you can pay per click, and which products to fix. Nothing is uploaded.</p>
+    <h2 id="welcomeTitle">Find the SKUs that lose you money</h2>
+    <p class="cred"><strong>Made by professionals, for professionals.</strong> Built by a working e-commerce operator who does this work every day (profit, data, and ops), not by outsiders.</p>
+    <ol class="steps">
+      <li><strong>Bring two files.</strong> A product export with price and cost (Shopify, Etsy, Merchant Center, or the SkuClinic template), plus orders or a Google Ads product report if you run ads.</li>
+      <li><strong>Check the columns.</strong> SkuClinic finds the header and maps the columns. You confirm before anything is imported.</li>
+      <li><strong>Fix the top leaks.</strong> The Leak Finder ranks SKUs by estimated annual loss and gives one fix for each.</li>
+    </ol>
+    <p class="note">Your files stay in this browser. Nothing is uploaded. No file? Use the Quick profit tab.</p>
+    <div id="agreeRow" class="agree">
+      <label class="check-field"><input type="checkbox" id="agreeTerms"> I agree to the <a href="../terms.html" target="_blank" rel="noopener">Terms</a> and have read the <a href="../privacy.html" target="_blank" rel="noopener">Privacy</a> page. Results are estimates; I am responsible for checking my data and my decisions.</label>
+      <p id="agreeMsg" class="warn-text" role="alert"></p>
+    </div>
+    <p id="agreeDone" class="note" hidden></p>
     <div class="modal-actions">
       <button type="button" class="btn" id="welcomeBlank">Start blank</button>
+      <button type="button" class="btn" id="welcomeTemplate">Get the import template</button>
       <button type="button" class="btn primary" id="welcomeSample">Load sample files</button>
     </div>
-    <label class="note"><input type="checkbox" id="dontShowAgain"> Don’t show this again</label>
+    <label class="check-field note"><input type="checkbox" id="dontShowAgain"> Don’t show this again</label>
+  </div>
+</div>
+<div id="templateModal" class="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="templateTitle">
+    <h2 id="templateTitle">Import template</h2>
+    <p>One row per SKU. Opens in Excel, Numbers, or Google Sheets (File › Import). Fill it in, download it as CSV, and drop it here. Only SKU, Price, and Unit cost are required.</p>
+    <ul>
+      <li><a href="../templates/skuclinic-blueprint-example.csv" download>Template with 5 example rows</a> (CSV)</li>
+      <li><a href="../templates/skuclinic-blueprint-blank.csv" download>Blank template</a> (CSV)</li>
+      <li><a href="../templates/HOW-TO-FILL.md" target="_blank" rel="noopener">How to fill it in</a></li>
+    </ul>
+    <p class="note">Percent columns accept 20 or 20%. Leave a cell empty if you do not know it. A 0 is kept as zero.</p>
+    <div class="modal-actions"><button type="button" class="btn" id="templateClose">Close</button></div>
   </div>
 </div>
 <div id="feedbackModal" class="overlay" hidden>
@@ -346,6 +430,7 @@
 <script src="../js/util.js"></script>
 <script src="../js/forms.js"></script>
 <script src="../js/compute.js"></script>
+<script src="../js/aliases.js"></script>
 <script src="../js/detect.js"></script>
 <script src="../js/leak.js"></script>
 <script src="../js/app.js"></script>

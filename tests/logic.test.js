@@ -12,7 +12,7 @@ context.window = context;
 context.globalThis = context;
 context.XLSX = require(path.join(root, 'vendor/xlsx.full.min.js'));
 vm.createContext(context);
-['js/util.js', 'js/compute.js', 'js/detect.js', 'js/leak.js'].forEach(function (file) {
+['js/util.js', 'js/compute.js', 'js/aliases.js', 'js/detect.js', 'js/leak.js'].forEach(function (file) {
   vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
 });
 var TM = context.TM;
@@ -129,7 +129,8 @@ check('amazon fee preview', function () {
   assert.strictEqual(a.type, 'amazon_fee_preview');
   var m = TM.materialize(a, a.mapping);
   var kase = m.records.filter(function (r) { return r.sku === 'CLEAR-CASE'; })[0];
-  assert.strictEqual(kase.fees, 8.4);
+  assert.strictEqual(kase.amzFees, 8.4);
+  assert.strictEqual(kase.fees, undefined, 'Amazon fees must not overwrite store fees');
   assert.strictEqual(kase.asin, 'B0CASE0005');
 });
 
@@ -139,9 +140,10 @@ check('amazon settlement aggregates and ignores tax', function () {
   var m = TM.materialize(a, a.mapping);
   assert.ok(m.period && m.period.days === 31, JSON.stringify(m.period));
   var mug = m.records.filter(function (r) { return r.sku === 'CAMP-MUG'; })[0];
-  assert.strictEqual(mug.units, 3);
-  assert.ok(Math.abs(mug.avgPrice - 28) < 0.001, 'avg ' + mug.avgPrice);
-  assert.ok(Math.abs(mug.fees - (4.2 + 1.6 + 8.4 + 3.2) / 3) < 0.001, 'fees ' + mug.fees);
+  assert.strictEqual(mug.amzUnits, 3);
+  assert.strictEqual(mug.units, undefined);
+  assert.ok(Math.abs(mug.amzAvgPrice - 28) < 0.001, 'avg ' + mug.avgPrice);
+  assert.ok(Math.abs(mug.amzFees - (4.2 + 1.6 + 8.4 + 3.2) / 3) < 0.001, 'fees ' + mug.amzFees);
 });
 
 check('title-only file is an error, not a success', function () {
@@ -225,6 +227,105 @@ check('html escape covers quotes and tags', function () {
   assert.ok(s.indexOf('<') === -1);
   assert.ok(s.indexOf('"') === -1);
   assert.ok(s.indexOf('onerror') !== -1);
+});
+
+/* ---- renamed, reordered, and extra columns ---- */
+function fx(name) { return TM.analyze(grid('tests/fixtures/' + name)); }
+function hdr(a, field) { return a.mapping[field] == null ? null : a.headers[a.mapping[field]]; }
+
+check('renamed columns: reordered Shopify export with extra columns', function () {
+  var a = fx('renamed-shopify-products.csv');
+  assert.strictEqual(a.type, 'shopify_products');
+  assert.strictEqual(hdr(a, 'sku'), 'Variant SKU');
+  assert.strictEqual(hdr(a, 'price'), 'Variant Price (USD)');
+  assert.strictEqual(hdr(a, 'cogs'), 'Cost per item');
+  assert.strictEqual(hdr(a, 'stock'), 'Inventory quantity');
+  assert.strictEqual(hdr(a, 'name'), 'Product Title');
+  assert.strictEqual(JSON.stringify(a.missing), JSON.stringify([]));
+  var rep = TM.columnReport(a, a.mapping);
+  assert.ok(rep.ignored.indexOf('Internal note') >= 0 && rep.ignored.indexOf('Warehouse bin') >= 0, JSON.stringify(rep.ignored));
+  var m = TM.materialize(a, a.mapping);
+  var mug = m.records.filter(function (r) { return r.sku === 'MUG-1'; })[0];
+  assert.strictEqual(mug.price, 28);
+  assert.strictEqual(mug.cogs, 8);
+  assert.strictEqual(mug.stock, 40);
+});
+
+check('renamed columns: Google Ads "Product ID", "Cost (USD)", "Conv." in a new order', function () {
+  var a = fx('renamed-google-ads.csv');
+  assert.strictEqual(a.type, 'google_ads');
+  assert.strictEqual(hdr(a, 'sku'), 'Product ID');
+  assert.strictEqual(hdr(a, 'spend'), 'Cost (USD)');
+  assert.strictEqual(hdr(a, 'sales'), 'Conv.');
+  var m = TM.materialize(a, a.mapping);
+  var mug = m.records.filter(function (r) { return r.sku === 'MUG-1'; })[0];
+  assert.strictEqual(mug.spend, 20);
+  assert.strictEqual(mug.clicks, 60);
+  assert.strictEqual(mug.sales, 4);
+  assert.ok(TM.columnReport(a, a.mapping).ignored.indexOf('Weird metric') >= 0);
+});
+
+check('fuzzy: one-letter typos and "contains" headers are guessed and flagged', function () {
+  var a = fx('typo-headers.csv');
+  assert.strictEqual(hdr(a, 'sku'), 'Varient SKU');
+  assert.strictEqual(hdr(a, 'cogs'), 'Unit Cst');
+  assert.strictEqual(hdr(a, 'spend'), 'Total ad spend');
+  assert.ok(a.fuzzy.sku && a.fuzzy.cogs && a.fuzzy.spend, JSON.stringify(a.fuzzy));
+  assert.strictEqual(hdr(a, 'name'), null);
+});
+
+check('fuzzy never maps "Compare at price" to Price', function () {
+  var a = fx('compare-at-only.csv');
+  assert.strictEqual(hdr(a, 'price'), null);
+  assert.strictEqual(hdr(a, 'cogs'), 'Unit cost');
+});
+
+check('missing key column is reported, not dropped', function () {
+  var a = fx('cost-sheet-missing-cost.csv');
+  assert.ok(a.ok);
+  assert.ok(a.missing.indexOf('cogs') >= 0 || a.type !== 'cost_sheet', a.type + ' ' + JSON.stringify(a.missing));
+  var t = TM.mapColumns('cost_sheet', a.headerNorms);
+  assert.strictEqual(JSON.stringify(t.missing), JSON.stringify(['cogs']));
+});
+
+check('unknown headers still reach manual mapping', function () {
+  var a = fx('custom-headers.csv');
+  assert.ok(a.ok, a.error);
+  assert.strictEqual(a.type, 'unknown');
+  assert.strictEqual(JSON.stringify(a.missing), JSON.stringify(['sku']));
+  var m = TM.materialize(a, { sku: 0, cogs: 1, price: 2 });
+  assert.strictEqual(m.records.length, 2);
+  assert.strictEqual(m.records[1].price, 25);
+});
+
+check('saved mapping is applied by header name even when columns move', function () {
+  var a = fx('custom-headers.csv');
+  var saved = { sku: 'item', cogs: 'my cost', price: 'selling for' };
+  var r = TM.mapColumns('cost_sheet', a.headerNorms, saved);
+  assert.strictEqual(a.headers[r.mapping.sku], 'Item');
+  assert.strictEqual(a.headers[r.mapping.price], 'Selling for');
+  var moved = TM.analyze([['Extra', 'Selling for', 'Item', 'My cost'], ['z', 20, 'A-1', 5]]);
+  var r2 = TM.mapColumns('cost_sheet', moved.headerNorms, saved);
+  assert.strictEqual(moved.headers[r2.mapping.sku], 'Item');
+  assert.strictEqual(moved.headers[r2.mapping.cogs], 'My cost');
+  assert.strictEqual(JSON.stringify(r2.missing), JSON.stringify([]));
+  var r3 = TM.mapColumns('cost_sheet', moved.headerNorms, { sku: 'item', cogs: 'gone column' });
+  assert.strictEqual(JSON.stringify(r3.savedMissing), JSON.stringify(['cogs']));
+});
+
+check('case and punctuation do not matter', function () {
+  ['VARIANT_SKU', 'variant-sku', 'Variant SKU:', ' variant  sku '].forEach(function (h) {
+    var a = TM.analyze([[h, 'Variant Price', 'Cost per item'], ['X-1', 10, 4]]);
+    assert.strictEqual(a.type, 'shopify_products', h);
+    assert.strictEqual(a.mapping.sku, 0, h);
+  });
+});
+
+check('every file type lists required fields that exist in its field list', function () {
+  TM.FILE_TYPES.forEach(function (t) {
+    var keys = t.fields.map(function (f) { return f[0]; });
+    (t.required || []).forEach(function (r) { assert.ok(keys.indexOf(r) >= 0, t.id + ' ' + r); });
+  });
 });
 
 if (failed) {

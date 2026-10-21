@@ -1,0 +1,6 @@
+SKU,Product name,Price,Unit cost,Shipping cost,Other costs,Fees per unit,Ad spend,Clicks,Conversions,Units sold,Stock units,Desired profit buffer
+MUG-ENAMEL-12,Enamel camp mug 12oz,28.00,8.00,1.50,0.40,1.11,90.00,400,22,80,120,20
+LAMP-DESK-BRASS,Brass desk lamp,42.00,14.00,2.00,0.00,1.52,700.00,900,18,18,40,20
+CABLE-USBC-2M,USB-C cable 2m,14.00,6.50,0.80,0.00,0.71,180.00,1500,0,0,300,20
+CANDLE-CEDAR-8,Cedar candle 8oz,16.00,12.80,3.40,0.00,0.76,15.00,200,16,30,60,20
+SERVICE-SETUP,Store setup (service),250.00,60.00,0.00,0.00,7.55,0.00,0,0,3,,0
