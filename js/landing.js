@@ -1,46 +1,44 @@
 (function () {
   var monthly = document.getElementById('billMonthly');
   var annual = document.getElementById('billAnnual');
-  var price = document.getElementById('proPrice');
-  var note = document.getElementById('proNote');
-  var cta = document.getElementById('proCta');
-  var agency = document.getElementById('agencyCta');
   var mode = 'month';
-  var PLAN_LABEL = { 'pro-monthly': 'Pro monthly', 'pro-yearly': 'Pro yearly', agency: 'Agency' };
+  // Cards that follow the Monthly / Annual toggle: [price el, note el, button, monthly key, yearly key]
+  var CARDS = [
+    ['proPrice', 'proNote', 'proCta', 'pro-monthly', 'pro-yearly'],
+    ['multiPrice', 'multiNote', 'multiCta', 'multichannel-monthly', 'multichannel-yearly']
+  ];
+  var audit = document.getElementById('auditCta');
 
-  function paintLink(el, url, checkoutLabel, plan) {
-    var href = String(url || '').trim();
-    el.textContent = href ? checkoutLabel : 'Join the founding list';
+  function paintLink(el, key) {
+    var option = TM.planOption(key);
+    var href = TM.planLink(option);
+    el.textContent = href ? option.checkout : TM.foundingButtonText(option);
     el.classList.remove('is-disabled');
     el.removeAttribute('aria-disabled');
     el.dataset.href = href;
-    el.dataset.plan = plan;
+    el.dataset.plan = key;
   }
 
   function paint() {
-    if (mode === 'year') {
-      price.textContent = '$290';
-      note.textContent = 'per year';
-      paintLink(cta, window.STRIPE_PRO_YEARLY_LINK, 'Start Pro yearly', 'pro-yearly');
-    } else {
-      price.textContent = '$29';
-      note.textContent = 'per month';
-      paintLink(cta, window.STRIPE_PRO_MONTHLY_LINK, 'Start Pro', 'pro-monthly');
-    }
-    document.getElementById('proSoon').hidden = String(cta.dataset.href || '').length > 0;
+    CARDS.forEach(function (c) {
+      var option = TM.planOption(mode === 'year' ? c[4] : c[3]);
+      document.getElementById(c[0]).textContent = option.price;
+      document.getElementById(c[1]).textContent = option.per;
+      paintLink(document.getElementById(c[2]), option.key);
+    });
     monthly.classList.toggle('on', mode === 'month');
     annual.classList.toggle('on', mode === 'year');
     monthly.setAttribute('aria-pressed', mode === 'month' ? 'true' : 'false');
     annual.setAttribute('aria-pressed', mode === 'year' ? 'true' : 'false');
   }
 
-  function prefillPlan(plan) {
-    var label = PLAN_LABEL[plan];
-    if (!label) return;
-    document.getElementById('planChoice').value = label;
+  function prefillPlan(key) {
+    var option = TM.planOption(key);
+    if (!option) return;
+    document.getElementById('planChoice').value = option.label;
     var line = document.getElementById('planLine');
     line.hidden = false;
-    line.textContent = 'Joining for ' + label + '.';
+    line.textContent = 'Joining for ' + option.label + '.';
     document.getElementById('signup').scrollIntoView({ behavior: 'smooth', block: 'start' });
     document.getElementById('email').focus();
   }
@@ -68,21 +66,19 @@
 
   monthly.addEventListener('click', function () { mode = 'month'; paint(); });
   annual.addEventListener('click', function () { mode = 'year'; paint(); });
-  cta.addEventListener('click', onPlanClick);
-  agency.addEventListener('click', onPlanClick);
-  paintLink(agency, window.STRIPE_AGENCY_LINK, 'Start Agency', 'agency');
-  document.getElementById('agencySoon').hidden = String(agency.dataset.href || '').length > 0;
-  var billingReady = [window.STRIPE_PRO_MONTHLY_LINK, window.STRIPE_PRO_YEARLY_LINK, window.STRIPE_AGENCY_LINK].every(function (url) {
-    return String(url || '').trim();
-  });
+  CARDS.forEach(function (c) { document.getElementById(c[2]).addEventListener('click', onPlanClick); });
+  audit.addEventListener('click', onPlanClick);
+  paintLink(audit, 'audit');
+  var billingReady = TM.PLAN_OPTIONS.every(function (option) { return TM.planLink(option); });
   document.getElementById('plannedLabel').hidden = billingReady;
+  document.getElementById('foundingLine').textContent = TM.FOUNDING.text;
   paint();
 
   var endpoint = String(window.SIGNUP_FORM_ENDPOINT || '').trim();
   document.getElementById('signupIdle').hidden = endpoint.length > 0;
 
   var initial = new URLSearchParams(window.location.search).get('plan');
-  if (PLAN_LABEL[initial]) prefillPlan(initial);
+  if (TM.planOption(initial)) prefillPlan(initial);
 
   document.getElementById('signupForm').addEventListener('submit', function (event) {
     event.preventDefault();

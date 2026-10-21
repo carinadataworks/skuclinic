@@ -26,27 +26,29 @@ Opening `index.html` as a `file://` URL loads the pages, but **Load sample files
 - The header row is found for you, including the title rows on a Google Ads CSV. You get a mapping preview and can change the file type or any column.
 - Bid calculator: max CPC, target ROAS, and a recommendation per SKU. Spend with zero sales is “Decrease — losing money.” A buffer of 0% stays 0%. An imported buffer of `1` is 1%, not 100%. `0.2` is read as 20%.
 - Profit Leak Finder: profit per unit and per SKU after cost, fees, and ad spend, plus an estimated annual leak.
-- Free plan: 25 SKUs, this tab only. Pro: unlimited SKUs, settings saved in this browser, CSV of the fixes. Agency: a separate store per client, for freelance ad managers.
+- Plans (planned, not billed yet; the single source is `js/plans.js`): Free, 25 SKUs, this tab only. Audit Pass, $29 one-time for 30 days of Pro. Pro, $15/mo or $120/yr: unlimited SKUs, settings saved in this browser, CSV of the fixes. Multichannel, $29/mo or $240/yr: everything in Pro plus up to 5 separate stores or clients. Founding members: 40% off for life on Pro and Multichannel for the first 200 paid accounts, while the subscription stays active.
 
 ## Where the Stripe links go
 
 Edit `config.js`:
 
 ```js
-var STRIPE_PRO_MONTHLY_LINK = ''; // $29/mo
-var STRIPE_PRO_YEARLY_LINK = '';  // $290/yr
-var STRIPE_AGENCY_LINK = '';      // $79/mo
+var STRIPE_AUDIT_LINK = '';          // Audit Pass, $29 one-time
+var STRIPE_PRO_MONTHLY_LINK = '';    // Pro, $15/mo
+var STRIPE_PRO_YEARLY_LINK = '';     // Pro, $120/yr
+var STRIPE_MULTI_MONTHLY_LINK = '';  // Multichannel, $29/mo
+var STRIPE_MULTI_YEARLY_LINK = '';   // Multichannel, $240/yr
 var SIGNUP_FORM_ENDPOINT = 'https://formsubmit.co/ajax/skuclinicapp@gmail.com';
 var CF_ANALYTICS_TOKEN = '';      // Cloudflare Web Analytics token
 ```
 
-Leave a Stripe string empty and that button says **Join the founding list**. The prices on the page are marked planned and are not billed. Paste a Payment Link and that button opens checkout.
+Leave a Stripe string empty and that button says **Join founding list:** plus the plan and price (for example *Join founding list: Pro $15/mo*). The prices on the page are marked planned and are not billed. Paste a Payment Link and that button opens checkout.
 
 `SIGNUP_FORM_ENDPOINT` is the FormSubmit AJAX address. Empty means the signup form does not send anything and says nothing is stored. The same address receives feedback from the app. Feedback buttons stay hidden until it is set.
 
 `CF_ANALYTICS_TOKEN` adds the Cloudflare Web Analytics beacon when set. Empty adds nothing.
 
-There are no accounts yet. Pro and Agency can be unlocked in the browser with the codes in the same file (`PRO_UNLOCK_CODE`, `AGENCY_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. The note to replace it with real Stripe billing is a comment in `config.js` and in the app script, not copy on the site.
+There are no accounts yet. Pro and Multichannel can be unlocked in the browser with the codes in the same file (`PRO_UNLOCK_CODE`, `MULTICHANNEL_UNLOCK_CODE`). That check is not security — anyone who can read `config.js` can unlock the paid features. The note to replace it with real Stripe billing is a comment in `config.js` and in the app script, not copy on the site.
 
 ## Layout
 
