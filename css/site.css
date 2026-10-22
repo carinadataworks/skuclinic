@@ -311,6 +311,7 @@ details p { margin: 8px 0 0; color: var(--ink-soft); }
   font-size: 14px;
 }
 .foot a { color: var(--muted); }
+.foot .foot-tm { flex: 1 0 100%; max-width: 72em; font-size: 13px; line-height: 1.5; }
 
 .prose h1 { font-size: clamp(2rem, 4vw, 2.8rem); }
 .prose h2 { font-family: var(--serif); font-weight: 500; font-size: 1.4rem; margin: 1.4em 0 0.4em; }
