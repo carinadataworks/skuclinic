@@ -4,7 +4,7 @@ SkuClinic is a browser-only profit tool for Shopify brands that run Google Shopp
 
 Nothing is uploaded. There is no server, no account connection, and no secret in this repo.
 
-© 2026 Kyle Guy. All rights reserved.
+© 2026 Carina Dataworks. All rights reserved.
 
 ## Run it
 
